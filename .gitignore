@@ -3,6 +3,10 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# added manually
+Kitchen.Api/Private/
+Kitchen.Api/README.md
+
 # dotenv files
 .env
 

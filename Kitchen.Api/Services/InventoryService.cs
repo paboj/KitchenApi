@@ -1,31 +1,35 @@
-﻿using Kitchen.Api.Models.Entities;
+﻿using System.Xml.Linq;
+using Kitchen.Api.Models.Entities;
+using Kitchen.Api.Services;
 
-namespace Kitchen.Api.Services
+public class InventoryService : IInventoryService
 {
-    public class InventoryService : IInventoryService
+    private readonly List<Ingredient> _ingredients = new();
+
+    public IEnumerable<Ingredient> GetAll() => _ingredients.AsReadOnly();
+
+    public Ingredient? GetById(Guid id) => _ingredients.FirstOrDefault(i => i.Id == id);
+
+    public void Add(Ingredient ingredient)
     {
-        // temp list before database
-        private readonly List<Ingredient> _ingredients = new();
+        ingredient.Id = Guid.NewGuid();
+        _ingredients.Add(ingredient);
+    }
 
-        public IEnumerable<Ingredient> GetAllIngredients()
-        {
-            return _ingredients;
-        }
+    public bool Update(Guid id, Ingredient updatedIngredient)
+    {
+        var existing = GetById(id);
+        if (existing == null) return false;
 
-        public void AddOrUpdateIngredient(Ingredient ingredient)
-        {
-            if (ingredient.Id == Guid.Empty)
-            {
-                ingredient.Id = Guid.NewGuid();
-            }
+        existing.Name = updatedIngredient.Name;
+        existing.Amount = updatedIngredient.Amount;
+        existing.Unit = updatedIngredient.Unit;
+        return true;
+    }
 
-            var existing = _ingredients.FirstOrDefault(x => x.Id == ingredient.Id);
-            if (existing != null)
-            {
-                _ingredients.Remove(existing);
-            }
-
-            _ingredients.Add(ingredient);
-        }
+    public bool Delete(Guid id)
+    {
+        var ingredient = GetById(id);
+        return ingredient != null && _ingredients.Remove(ingredient);
     }
 }

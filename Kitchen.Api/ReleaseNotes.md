@@ -3,6 +3,16 @@
 [//]: # '[Version X] - YYYY-MM-DD'
 [//]: # 'Added / Modified / Fixed / Deleted'
 
+# [1.0.2] - 2026-04-07
+## Modified (Architectural Refactor):
+
+| Feature | Description |
+| :--- | :--- |
+| **Service Layer Pattern** | Introduced IInventoryService and InventoryService to decouple business logic from the controller. |
+| **Single Responsibility** | Refactored IngredientsController to focus solely on HTTP request handling (SRP). |
+| **Full CRUD Support** | Expanded service and controller capabilities to include PUT (Update) and DELETE operations. |
+| **Code Cleanup** | Applied expression-bodied members (=>) for improved readability across the service layer. |
+
 ## [1.0.1] - 2026-04-03
 ### Added:
 

@@ -1,36 +1,39 @@
-﻿using System;
-using Kitchen.Api.Models.Entities;
+﻿using Kitchen.Api.Models.Entities;
 using Kitchen.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Kitchen.Api.Controllers
+[ApiController]
+[Route("api/[controller]")]
+public class IngredientsController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class IngredientsController : ControllerBase
+    private readonly IInventoryService _inventoryService;
+
+    public IngredientsController(IInventoryService inventoryService)
     {
-       
-        // 1. Deklaracja pola - to tutaj "mieszka" serwis wewnątrz kontrolera
-        private readonly IInventoryService _inventoryService;
+        _inventoryService = inventoryService;
+    }
 
-        // 2. Konstruktor - tutaj .NET "wstrzykuje" serwis
-        public IngredientsController(IInventoryService inventoryService)
-        {
-            _inventoryService = inventoryService;
-        }
-        
-        [HttpGet]
-        public IEnumerable<Ingredient> Get()
-        {
-            // Zwracamy bezpośrednio to, co przygotował serwis
-            return _inventoryService.GetAllIngredients();
-        }
+    [HttpGet]
+    public IActionResult GetAll() => Ok(_inventoryService.GetAll());
 
-        [HttpPost]
-        public void Post([FromBody] Ingredient newIngredient)
-        {
-            // Wywołujemy serwis, aby zapisał nowy składnik
-            _inventoryService.AddOrUpdateIngredient(newIngredient);
-        }
+    [HttpPost]
+    public IActionResult Create(Ingredient ingredient)
+    {
+        _inventoryService.Add(ingredient);
+        return CreatedAtAction(nameof(GetAll), new { id = ingredient.Id }, ingredient);
+    }
+
+    [HttpPut("{id}")]
+    public IActionResult Update(Guid id, Ingredient ingredient)
+    {
+        var success = _inventoryService.Update(id, ingredient);
+        return success ? NoContent() : NotFound();
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult Delete(Guid id)
+    {
+        var success = _inventoryService.Delete(id);
+        return success ? NoContent() : NotFound();
     }
 }

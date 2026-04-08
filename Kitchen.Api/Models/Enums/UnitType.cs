@@ -2,8 +2,9 @@
 {
     public enum UnitType
     {
-        Grams,          // g
-        Milliliters,    // ml
-        Pieces          // szt
+        Unspecified = 0,
+        Pieces = 1,        // szt
+        Grams = 2,         // g
+        Milliliters = 3    // ml
     }
 }

@@ -1,4 +1,5 @@
-﻿using Kitchen.Api.Models.Entities;
+﻿using Kitchen.Api.Models.DTOs;
+using Kitchen.Api.Models.Entities;
 using Kitchen.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,23 +18,27 @@ public class IngredientsController : ControllerBase
     public IActionResult GetAll() => Ok(_inventoryService.GetAll());
 
     [HttpPost]
-    public IActionResult Create(Ingredient ingredient)
+    public IActionResult Create([FromBody] CreateIngredientRequest request)
     {
+        var ingredient = new Ingredient(request.Name, request.Amount, request.Unit);
+
         _inventoryService.Add(ingredient);
         return CreatedAtAction(nameof(GetAll), new { id = ingredient.Id }, ingredient);
     }
 
-    [HttpPut("{id}")]
-    public IActionResult Update(Guid id, Ingredient ingredient)
+    [HttpPut("{name}")]
+    public IActionResult Update(string name, [FromBody] UpdateIngredientRequest request)
     {
-        var success = _inventoryService.Update(id, ingredient);
+        var ingredient = new Ingredient(name, request.Amount, request.Unit);
+
+        var success = _inventoryService.Update(ingredient);
         return success ? NoContent() : NotFound();
     }
 
-    [HttpDelete("{id}")]
-    public IActionResult Delete(Guid id)
+    [HttpDelete("{name}")]
+    public IActionResult Delete(string name)
     {
-        var success = _inventoryService.Delete(id);
+        var success = _inventoryService.Delete(name);
         return success ? NoContent() : NotFound();
     }
 }

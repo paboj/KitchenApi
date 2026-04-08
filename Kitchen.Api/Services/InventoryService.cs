@@ -8,28 +8,26 @@ public class InventoryService : IInventoryService
 
     public IEnumerable<Ingredient> GetAll() => _ingredients.AsReadOnly();
 
-    public Ingredient? GetById(Guid id) => _ingredients.FirstOrDefault(i => i.Id == id);
+    public Ingredient? GetByName(string name) => _ingredients.FirstOrDefault(i => i.Name == name);
 
     public void Add(Ingredient ingredient)
     {
-        ingredient.Id = Guid.NewGuid();
         _ingredients.Add(ingredient);
     }
 
-    public bool Update(Guid id, Ingredient updatedIngredient)
+    public bool Update(Ingredient ingredient)
     {
-        var existing = GetById(id);
+        var existing = GetByName(ingredient.Name);
         if (existing == null) return false;
 
-        existing.Name = updatedIngredient.Name;
-        existing.Amount = updatedIngredient.Amount;
-        existing.Unit = updatedIngredient.Unit;
+        existing.SetAmount(ingredient.Amount);
+        existing.ChangeUnitType(ingredient.Unit);
         return true;
     }
 
-    public bool Delete(Guid id)
+    public bool Delete(string name)
     {
-        var ingredient = GetById(id);
+        var ingredient = GetByName(name);
         return ingredient != null && _ingredients.Remove(ingredient);
     }
 }

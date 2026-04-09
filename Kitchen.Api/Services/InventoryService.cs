@@ -20,8 +20,8 @@ public class InventoryService : IInventoryService
         var existing = GetByName(ingredient.Name);
         if (existing == null) return false;
 
-        existing.SetAmount(ingredient.Amount);
-        existing.ChangeUnitType(ingredient.Unit);
+        existing.AdjustAmount(ingredient.Amount);
+        existing.PlaceOrMove(ingredient.Location);
         return true;
     }
 

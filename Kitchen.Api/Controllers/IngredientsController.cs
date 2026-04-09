@@ -20,7 +20,7 @@ public class IngredientsController : ControllerBase
     [HttpPost]
     public IActionResult Create([FromBody] CreateIngredientRequest request)
     {
-        var ingredient = new Ingredient(request.Name, request.Amount, request.Unit);
+        var ingredient = new Ingredient(request.Name, request.Amount, request.Location);
 
         _inventoryService.Add(ingredient);
         return CreatedAtAction(nameof(GetAll), new { id = ingredient.Id }, ingredient);
@@ -29,7 +29,7 @@ public class IngredientsController : ControllerBase
     [HttpPut("{name}")]
     public IActionResult Update(string name, [FromBody] UpdateIngredientRequest request)
     {
-        var ingredient = new Ingredient(name, request.Amount, request.Unit);
+        var ingredient = new Ingredient(name, request.Amount, request.Location);
 
         var success = _inventoryService.Update(ingredient);
         return success ? NoContent() : NotFound();

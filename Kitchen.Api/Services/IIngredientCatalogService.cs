@@ -1,4 +1,4 @@
-﻿using Kitchen.Api.Models.Entities;
+﻿using Kitchen.Api.Domain.Entities;
 
 namespace Kitchen.Api.Services
 {

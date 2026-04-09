@@ -1,8 +1,8 @@
-﻿using Kitchen.Api.Models.Enums;
+﻿using Kitchen.Api.Domain.Enums;
 
 namespace Kitchen.Api.Models.DTOs
 {
-    public class CreateIngredientRequest
+    public class IngredientDto
     {
         public string Name { get; set; }
         public double Amount { get; set; }

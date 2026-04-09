@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
-using Kitchen.Api.Exceptions;
-using Kitchen.Api.Models.Enums;
+using Kitchen.Api.Domain.Enums;
+using Kitchen.Api.Domain.Exceptions;
 
-namespace Kitchen.Api.Models.Entities
+namespace Kitchen.Api.Domain.Entities
 {
     public class Ingredient
     {

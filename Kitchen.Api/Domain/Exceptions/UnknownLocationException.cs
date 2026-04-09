@@ -1,4 +1,4 @@
-﻿namespace Kitchen.Api.Exceptions
+﻿namespace Kitchen.Api.Domain.Exceptions
 {
     public class UnknownLocationException : KitchenApiException
     {

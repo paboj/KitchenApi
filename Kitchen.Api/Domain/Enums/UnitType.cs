@@ -1,4 +1,4 @@
-﻿namespace Kitchen.Api.Models.Enums
+﻿namespace Kitchen.Api.Domain.Enums
 {
     public enum UnitType
     {

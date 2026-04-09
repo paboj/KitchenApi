@@ -1,5 +1,5 @@
 ﻿using System.Xml.Linq;
-using Kitchen.Api.Models.Entities;
+using Kitchen.Api.Domain.Entities;
 using Kitchen.Api.Services;
 
 public class InventoryService : IInventoryService

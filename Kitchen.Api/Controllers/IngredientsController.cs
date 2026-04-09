@@ -1,5 +1,5 @@
 ﻿using Kitchen.Api.Models.DTOs;
-using Kitchen.Api.Models.Entities;
+using Kitchen.Api.Domain.Entities;
 using Kitchen.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +18,7 @@ public class IngredientsController : ControllerBase
     public IActionResult GetAll() => Ok(_inventoryService.GetAll());
 
     [HttpPost]
-    public IActionResult Create([FromBody] CreateIngredientRequest request)
+    public IActionResult Create([FromBody] IngredientDto request)
     {
         var ingredient = new Ingredient(request.Name, request.Amount, request.Location);
 
@@ -27,7 +27,7 @@ public class IngredientsController : ControllerBase
     }
 
     [HttpPut("{name}")]
-    public IActionResult Update(string name, [FromBody] UpdateIngredientRequest request)
+    public IActionResult Update(string name, [FromBody] IngredientDto request)
     {
         var ingredient = new Ingredient(name, request.Amount, request.Location);
 

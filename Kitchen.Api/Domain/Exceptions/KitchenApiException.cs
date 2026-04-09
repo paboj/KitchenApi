@@ -1,4 +1,4 @@
-﻿namespace Kitchen.Api.Exceptions
+﻿namespace Kitchen.Api.Domain.Exceptions
 {
     public abstract class KitchenApiException : Exception
     {

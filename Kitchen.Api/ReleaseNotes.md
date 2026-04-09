@@ -3,6 +3,21 @@
 [//]: # '[Version X] - YYYY-MM-DD'
 [//]: # 'Added / Modified / Fixed / Deleted'
 
+## [0.0.4] - 2026-04-09
+### Added:
+| Feature | Description |
+| :--- | :--- |
+| **Command Pattern Base** | Introduced `IngredientCommands` to separate business intentions (Actions) from data structures. |
+| **Domain Layer** | Established a dedicated `Domain` namespace for Entities, Enums, and Exceptions to isolate core business logic. |
+
+### Modified:
+| Feature | Description |
+| :--- | :--- |
+| **DTO Simplification** | Consolidated multiple Request objects into unified `IngredientDto` and `IngredientDefinitionDto`, reducing code redundancy. |
+| **Namespace Refactor** | Reorganized project structure by moving domain-related files from `Models` to `Domain` for better architectural clarity. |
+| **API Cleanup** | Removed obsolete `UpdateIngredientRequest` and `UpdateIngredientDefinitionRequest` files. |
+
+
 ## [0.0.3] - 2026-04-09
 ### Added:
 | Feature | Description |

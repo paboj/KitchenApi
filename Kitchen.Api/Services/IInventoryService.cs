@@ -1,4 +1,5 @@
-﻿using Kitchen.Api.Domain.Entities;
+﻿using Kitchen.Api.Commands;
+using Kitchen.Api.Domain.Entities;
 
 namespace Kitchen.Api.Services
 {
@@ -6,8 +7,8 @@ namespace Kitchen.Api.Services
     {
         IEnumerable<Ingredient> GetAll();
         Ingredient? GetByName(string name);
-        void Add(Ingredient ingredient);
-        bool Update(Ingredient ingredient);
+        void Add(AddToStockCommand command);
+        bool Update(ModifyIngredientCommand command);
         bool Delete(string name);
     }
 }

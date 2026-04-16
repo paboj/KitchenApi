@@ -1,5 +1,7 @@
 ﻿using System.Xml.Linq;
+using Kitchen.Api.Commands;
 using Kitchen.Api.Domain.Entities;
+using Kitchen.Api.Models.DTOs;
 using Kitchen.Api.Services;
 
 public class InventoryService : IInventoryService
@@ -10,18 +12,23 @@ public class InventoryService : IInventoryService
 
     public Ingredient? GetByName(string name) => _ingredients.FirstOrDefault(i => i.Name == name);
 
-    public void Add(Ingredient ingredient)
+    public void Add(AddToStockCommand command)
     {
+        var ingredient = new Ingredient(
+            command.Name,
+            command.Amount,
+            command.Location
+        );
         _ingredients.Add(ingredient);
     }
 
-    public bool Update(Ingredient ingredient)
+    public bool Update(ModifyIngredientCommand command)
     {
-        var existing = GetByName(ingredient.Name);
+        var existing = GetByName(command.Name);
         if (existing == null) return false;
 
-        existing.AdjustAmount(ingredient.Amount);
-        existing.PlaceOrMove(ingredient.Location);
+        existing.AdjustAmount(command.Amount);
+        existing.PlaceOrMove(command.Location);
         return true;
     }
 

@@ -2,6 +2,6 @@
 {
     public class UnknownLocationException : KitchenApiException
     {
-        public UnknownLocationException() : base("Uknown location. Available: fridge, freezer, pantry.") { }
+        public UnknownLocationException() : base("Unknown location. Available: fridge, freezer, pantry.") { }
     }
 }

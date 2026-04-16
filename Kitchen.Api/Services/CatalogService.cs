@@ -1,8 +1,10 @@
 ﻿using System.Xml.Linq;
+using Kitchen.Api.Commands;
 using Kitchen.Api.Domain.Entities;
 using Kitchen.Api.Services;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
-public class IngredientCatalogService : IIngredientCatalogService
+public class CatalogService : ICatalogService
 {
     private readonly List<IngredientDefinition> _ingredientDefinitions = new();
 
@@ -10,17 +12,21 @@ public class IngredientCatalogService : IIngredientCatalogService
 
     public IngredientDefinition? GetByName(string name) => _ingredientDefinitions.FirstOrDefault(i => i.Name == name);
 
-    public void Add(IngredientDefinition ingredientDefinition)
+    public void Add(AddToCatalogCommand command)
     {
-        _ingredientDefinitions.Add(ingredientDefinition);
+        var definition = new IngredientDefinition(
+            command.Name,
+            command.Unit
+        );
+        _ingredientDefinitions.Add(definition);
     }
 
-    public bool Update(IngredientDefinition ingredient)
+    public bool Update(ModifyInCatalogCommand command)
     {
-        var existing = GetByName(ingredient.Name);
+        var existing = GetByName(command.Name);
         if (existing == null) return false;
 
-        existing.ChangeUnitType(ingredient.Unit);
+        existing.ChangeUnitType(command.Unit);
         return true;
     }
 

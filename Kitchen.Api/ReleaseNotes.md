@@ -3,6 +3,30 @@
 [//]: # '[Version X] - YYYY-MM-DD'
 [//]: # 'Added / Modified / Fixed / Deleted'
 
+
+## [0.0.5] - 2026-04-16
+### Added:
+| Feature | Description |
+| :--- | :--- |
+| **Unit Testing Project** | Created `Kitchen.Tests.Unit` using xUnit and FluentAssertions to ensure domain logic reliability. |
+| **Command Pattern Refinement** | Introduced specific command sets: `InventoryCommands` (Stock management) and `CatalogCommands` (Definition management). |
+| **Specialized Update DTOs** | Added `UpdateIngredientRequest` and `UpdateIngredientDefinitionRequest` with nullable support for partial updates (PATCH style). |
+| **New Domain Entities Tests** | Implemented comprehensive test suites for `Ingredient` and `IngredientDefinition` state transitions. |
+
+### Modified:
+| Feature | Description |
+| :--- | :--- |
+| **Service Layer Renaming** | Renamed `IIngredientCatalogService` to `ICatalogService` for better brevity and architectural consistency. |
+| **Nullable Domain Methods** | Refactored domain methods (`AdjustAmount`, `PlaceOrMove`, `ChangeUnitType`) to handle nullable inputs, enabling optional field updates. |
+| **Controller Modernization** | Updated `IngredientsController` and `IngredientDefinitionsController` to process Commands instead of raw Entities or DTOs. |
+| **API Responses** | Improved POST endpoints to return `201 Created` with proper `CreatedAtAction` location headers. |
+
+### Fixed:
+| Feature | Description |
+| :--- | :--- |
+| **Typo in Exceptions** | Corrected "Uknown" to "Unknown" in `UnknownLocationException`. |
+
+
 ## [0.0.4] - 2026-04-09
 ### Added:
 | Feature | Description |

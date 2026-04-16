@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IInventoryService, InventoryService>();
-builder.Services.AddSingleton<IIngredientCatalogService, IngredientCatalogService>();
+builder.Services.AddSingleton<ICatalogService, CatalogService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

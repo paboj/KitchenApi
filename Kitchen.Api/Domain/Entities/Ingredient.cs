@@ -8,8 +8,8 @@ namespace Kitchen.Api.Domain.Entities
     {
         public Guid Id { get; }
         public string Name { get; set; } = string.Empty;
-        public double Amount { get; private set; }
-        public StorageLocation Location { get; private set; }
+        public double? Amount { get; private set; }
+        public StorageLocation? Location { get; private set; }
 
 
         public Ingredient(string name, double amount, StorageLocation location) { 
@@ -19,7 +19,8 @@ namespace Kitchen.Api.Domain.Entities
             Location = location;
         }
 
-        public void AdjustAmount(double amount)
+
+        public void AdjustAmount(double? amount)
         {
             if (amount < 0)
             {
@@ -28,9 +29,9 @@ namespace Kitchen.Api.Domain.Entities
             Amount = amount;
         }
 
-        public void PlaceOrMove(StorageLocation location)
+        public void PlaceOrMove(StorageLocation? location)
         {
-            if (!Enum.IsDefined(location) || location is StorageLocation.Unspecified)
+            if (!location.HasValue || location is StorageLocation.Unspecified)
             {
                 throw new UnknownLocationException();
             }

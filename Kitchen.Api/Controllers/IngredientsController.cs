@@ -1,5 +1,7 @@
-﻿using Kitchen.Api.Models.DTOs;
+﻿using System.Xml.Linq;
+using Kitchen.Api.Commands;
 using Kitchen.Api.Domain.Entities;
+using Kitchen.Api.Models.DTOs;
 using Kitchen.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,21 +19,41 @@ public class IngredientsController : ControllerBase
     [HttpGet]
     public IActionResult GetAll() => Ok(_inventoryService.GetAll());
 
-    [HttpPost]
-    public IActionResult Create([FromBody] IngredientDto request)
+    [HttpGet("{name}")]
+    public IActionResult Get(string name)
     {
-        var ingredient = new Ingredient(request.Name, request.Amount, request.Location);
+        var ingredient = _inventoryService.GetByName(name);
+        if (ingredient == null) return NotFound();
 
-        _inventoryService.Add(ingredient);
-        return CreatedAtAction(nameof(GetAll), new { id = ingredient.Id }, ingredient);
+        return Ok(ingredient);
     }
 
-    [HttpPut("{name}")]
-    public IActionResult Update(string name, [FromBody] IngredientDto request)
+    [HttpPost]
+    public IActionResult Create([FromBody] CreateIngredientRequest request)
     {
-        var ingredient = new Ingredient(name, request.Amount, request.Location);
+        var command = new AddToStockCommand(
+            request.Name,
+            request.Amount,
+            request.Location
+        );
 
-        var success = _inventoryService.Update(ingredient);
+        _inventoryService.Add(command);
+
+        return CreatedAtAction(nameof(Get), new { name = request.Name }, request);
+    
+}
+
+    [HttpPut("{name}")]
+    public IActionResult Update(string name, [FromBody] UpdateIngredientRequest request)
+    {
+        var command = new ModifyIngredientCommand(
+            name,
+            request.Amount,
+            request.Location
+        );
+
+        var success = _inventoryService.Update(command);
+
         return success ? NoContent() : NotFound();
     }
 

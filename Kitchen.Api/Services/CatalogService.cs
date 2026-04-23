@@ -1,16 +1,31 @@
 ﻿using System.Xml.Linq;
 using Kitchen.Api.Commands;
 using Kitchen.Api.Domain.Entities;
+using Kitchen.Api.Domain.Exceptions;
+using Kitchen.Api.Repositories;
 using Kitchen.Api.Services;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 public class CatalogService : ICatalogService
 {
-    private readonly List<IngredientType> _IngredientTypes = new();
+    private readonly IIngredientTypeRepository _repository;
+    private IngredientType FindIngredientType(string name)
+    {
+        var ingredientType = GetByName(name);
+        if (ingredientType == null) throw new IngredientNotFoundException();
 
-    public IEnumerable<IngredientType> GetAll() => _IngredientTypes.AsReadOnly();
+        return ingredientType;
 
-    public IngredientType? GetByName(string name) => _IngredientTypes.FirstOrDefault(i => i.Name == name);
+    }
+
+    public CatalogService(IIngredientTypeRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public IEnumerable<IngredientType> GetAll() => _repository.GetAll();
+
+    public IngredientType? GetByName(string name) => _repository.GetByName(name);
 
     public void Add(AddTypeCatalogCommand command)
     {
@@ -18,21 +33,18 @@ public class CatalogService : ICatalogService
             command.Name,
             command.Unit
         );
-        _IngredientTypes.Add(definition);
+        _repository.Add(definition);
     }
 
-    public bool Update(ModifyTypeCatalogCommand command)
+    public void Update(ModifyTypeCatalogCommand command)
     {
-        var existing = GetByName(command.Name);
-        if (existing == null) return false;
-
-        existing.ChangeUnitType(command.Unit);
-        return true;
+        var ingredientType = FindIngredientType(command.Name);
+        ingredientType.ChangeUnitType(command.Unit);
     }
 
-    public bool Delete(string name)
+    public void Delete(string name)
     {
-        var ingredient = GetByName(name);
-        return ingredient != null && _IngredientTypes.Remove(ingredient);
+        var ingredientType = FindIngredientType(name);
+        _repository.Delete(name);
     }
 }

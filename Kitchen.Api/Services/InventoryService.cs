@@ -1,17 +1,31 @@
 ﻿using System.Xml.Linq;
 using Kitchen.Api.Commands;
 using Kitchen.Api.Domain.Entities;
+using Kitchen.Api.Domain.Exceptions;
 using Kitchen.Api.Models.DTOs;
+using Kitchen.Api.Repositories;
 using Kitchen.Api.Services;
 
 public class InventoryService : IInventoryService
 {
-    private readonly List<Ingredient> _ingredients = new();
+    private readonly IIngredientRepository _repository;
+    private Ingredient FindIngredient(string name)
+    {
+        var ingredient = GetByName(name);
+        if (ingredient == null) throw new IngredientNotFoundException();
 
-    public IEnumerable<Ingredient> GetAll() => _ingredients.AsReadOnly();
+        return ingredient;
 
-    //TODO: EF? operatory wewnątrz zapytań LINQ-to-Entities mogą nie działać? (zazwyczaj mapuje się Value Object do kolumny w bazie).
-    public Ingredient? GetByName(string name) => _ingredients.FirstOrDefault(i => i.Name == name);
+    }
+
+    public InventoryService(IIngredientRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public IEnumerable<Ingredient> GetAll() => _repository.GetAll();
+
+    public Ingredient? GetByName(string name) => _repository.GetByName(name);
 
     public void Add(AddToStockCommand command)
     {
@@ -20,22 +34,21 @@ public class InventoryService : IInventoryService
             command.Amount,
             command.Location
         );
-        _ingredients.Add(ingredient);
+        _repository.Add(ingredient);
     }
 
-    public bool Update(ModifyInStockCommand command)
+    public void Update(ModifyInStockCommand command)
     {
-        var existing = GetByName(command.Name);
-        if (existing == null) return false;
+        var ingredient = FindIngredient(command.Name);
 
-        existing.AdjustAmount(command.Amount);
-        existing.PlaceOrMove(command.Location);
-        return true;
+        ingredient.AdjustAmount(command.Amount);
+        ingredient.PlaceOrMove(command.Location);
     }
 
-    public bool Delete(string name)
+    public void Delete(string name)
     {
-        var ingredient = GetByName(name);
-        return ingredient != null && _ingredients.Remove(ingredient);
+        var ingredient = FindIngredient(name);
+
+        _repository.Delete(name);
     }
 }

@@ -8,7 +8,7 @@ namespace Kitchen.Api.Services
         IEnumerable<Ingredient> GetAll();
         Ingredient? GetByName(string name);
         void Add(AddToStockCommand command);
-        bool Update(ModifyInStockCommand command);
-        bool Delete(string name);
+        void Update(ModifyInStockCommand command);
+        void Delete(string name);
     }
 }

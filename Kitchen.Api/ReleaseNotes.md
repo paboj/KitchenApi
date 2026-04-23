@@ -4,6 +4,24 @@
 [//]: # 'Added / Modified / Fixed / Deleted'
 
 
+## [0.0.6] - 2026-04-23
+### Added:
+| Feature | Description |
+| :--- | :--- |
+| **Repository Pattern** | Introduced `IIngredientRepository` and `IIngredientTypeRepository` to abstract data access from business logic. |
+| **In-Memory Persistence** | Implemented `InMemory` versions of repositories to centralize data management outside of services. |
+| **Domain Exception Flow** | Added `IngredientNotFoundException` to handle missing resources via a unified exception-driven approach. |
+| **Service Mocking** | Integrated `Moq` into the test suite to allow isolated unit testing of services by mocking repository dependencies. |
+
+### Modified:
+| Feature | Description |
+| :--- | :--- |
+| **Dependency Injection** | Refactored `Program.cs` to register repositories with a `Singleton` lifetime, ensuring data persistence across requests. |
+| **Service Logic** | Updated `InventoryService` and `CatalogService` to delegate data operations to repositories and use exception-based validation. |
+| **Controller Simplification** | Streamlined `Delete` and `Update` actions in controllers; results are now handled by the exception flow instead of boolean checks. |
+| **Entity Renaming** | Renamed `IngredientDefinition` to `IngredientType` for better domain clarity and consistency with the Catalog nomenclature. |
+
+
 ## [0.0.5] - 2026-04-16
 ### Added:
 | Feature | Description |

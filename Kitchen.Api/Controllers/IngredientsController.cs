@@ -52,15 +52,14 @@ public class IngredientsController : ControllerBase
             request.Location
         );
 
-        var success = _inventoryService.Update(command);
-
-        return success ? NoContent() : NotFound();
+        _inventoryService.Update(command);
+        return NoContent();
     }
 
     [HttpDelete("{name}")]
     public IActionResult Delete(string name)
     {
-        var success = _inventoryService.Delete(name);
-        return success ? NoContent() : NotFound();
+        _inventoryService.Delete(name);
+        return NoContent();
     }
 }

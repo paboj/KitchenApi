@@ -8,7 +8,7 @@ namespace Kitchen.Api.Services
         IEnumerable<IngredientType> GetAll();
         IngredientType? GetByName(string name);
         void Add(AddTypeCatalogCommand command);
-        bool Update(ModifyTypeCatalogCommand command);
-        bool Delete(string name);
+        void Update(ModifyTypeCatalogCommand command);
+        void Delete(string name);
     }
 }

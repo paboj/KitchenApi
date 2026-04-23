@@ -41,15 +41,15 @@ public class IngredientTypesController : ControllerBase
             request.Unit
         );
 
-        var success = _catalogService.Update(command);
+        _catalogService.Update(command);
 
-        return success ? NoContent() : NotFound();
+        return NoContent();
     }
 
     [HttpDelete("{name}")]
     public IActionResult Delete(string name)
     {
-        var success = _catalogService.Delete(name);
-        return success ? NoContent() : NotFound();
+        _catalogService.Delete(name);
+        return NoContent();
     }
 }

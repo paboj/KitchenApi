@@ -1,8 +1,11 @@
+using Kitchen.Api.Repositories;
 using Kitchen.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddSingleton<IIngredientRepository, InMemoryIngredientRepository>();
+builder.Services.AddSingleton<IIngredientTypeRepository, InMemoryIngredientTypeRepository>();
 builder.Services.AddSingleton<IInventoryService, InventoryService>();
 builder.Services.AddSingleton<ICatalogService, CatalogService>();
 

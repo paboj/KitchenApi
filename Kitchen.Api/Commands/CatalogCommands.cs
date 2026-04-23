@@ -2,12 +2,12 @@
 
 namespace Kitchen.Api.Commands
 {
-    public record AddToCatalogCommand(
+    public record AddTypeCatalogCommand(
         string Name,
         UnitType Unit
      );
 
-    public record ModifyInCatalogCommand(
+    public record ModifyTypeCatalogCommand(
         string Name,
         UnitType? Unit
      );

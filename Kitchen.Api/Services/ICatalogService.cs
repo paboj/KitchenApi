@@ -5,10 +5,10 @@ namespace Kitchen.Api.Services
 {
     public interface ICatalogService
     {
-        IEnumerable<IngredientDefinition> GetAll();
-        IngredientDefinition? GetByName(string name);
-        void Add(AddToCatalogCommand command);
-        bool Update(ModifyInCatalogCommand command);
+        IEnumerable<IngredientType> GetAll();
+        IngredientType? GetByName(string name);
+        void Add(AddTypeCatalogCommand command);
+        bool Update(ModifyTypeCatalogCommand command);
         bool Delete(string name);
     }
 }

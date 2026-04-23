@@ -1,13 +1,15 @@
 ﻿using System.Text.Json.Serialization;
+using System.Xml.Linq;
 using Kitchen.Api.Domain.Enums;
 using Kitchen.Api.Domain.Exceptions;
+using Kitchen.Api.ValueObjects;
 
 namespace Kitchen.Api.Domain.Entities
 {
     public class Ingredient
     {
         public Guid Id { get; }
-        public string Name { get; set; } = string.Empty;
+        public IngredientName Name { get; set; }
         public double? Amount { get; private set; }
         public StorageLocation? Location { get; private set; }
 

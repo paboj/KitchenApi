@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-public class IngredientDefinitionsController : ControllerBase
+public class IngredientTypesController : ControllerBase
 {
     private readonly ICatalogService _catalogService;
 
-    public IngredientDefinitionsController(ICatalogService catalogService)
+    public IngredientTypesController(ICatalogService catalogService)
     {
         _catalogService = catalogService;
     }
@@ -20,9 +20,9 @@ public class IngredientDefinitionsController : ControllerBase
     public IActionResult GetAll() => Ok(_catalogService.GetAll());
 
     [HttpPost]
-    public IActionResult Create([FromBody] CreateIngredientDefinitionRequest request)
+    public IActionResult Create([FromBody] CreateIngredientTypeRequest request)
     {
-        var command = new AddToCatalogCommand(
+        var command = new AddTypeCatalogCommand(
                 request.Name,
                 request.Unit
             );
@@ -34,9 +34,9 @@ public class IngredientDefinitionsController : ControllerBase
     }
 
     [HttpPut("{name}")]
-    public IActionResult Update(string name, [FromBody] UpdateIngredientDefinitionRequest request)
+    public IActionResult Update(string name, [FromBody] UpdateIngredientTypeRequest request)
     {
-        var command = new ModifyInCatalogCommand(
+        var command = new ModifyTypeCatalogCommand(
             name,
             request.Unit
         );

@@ -10,28 +10,30 @@ using Kitchen.Api.Domain.Exceptions;
 
 namespace Kitchen.Tests.Unit.Domain.Entities
 {
-    public class IngredientDefinitionTests
+    public class IngredientTypeTests
     {
 
         #region Arrange
 
-        private readonly IngredientDefinition _ingredientDefinition;
+        private readonly IngredientType _IngredientType;
 
-        public IngredientDefinitionTests()
+        public IngredientTypeTests()
         {
-            _ingredientDefinition = new IngredientDefinition("Mąka", UnitType.Grams);
+            _IngredientType = new IngredientType("Mąka", UnitType.Grams);
         }
 
         #endregion
+
+        #region ChangeUnitType
 
         [Fact]
         public void change_unit_type_should_update_unit_when_valid()
         {
             var newUnit = UnitType.Milliliters;
 
-            _ingredientDefinition.ChangeUnitType(newUnit);
+            _IngredientType.ChangeUnitType(newUnit);
 
-            _ingredientDefinition.Unit.Should().Be(newUnit);
+            _IngredientType.Unit.Should().Be(newUnit);
         }
 
         [Theory]
@@ -39,9 +41,11 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData((UnitType)66)]
         public void change_unit_type_should_throw_exception_when_invalid(UnitType invalidUnit)
         {
-            Action action = () => _ingredientDefinition.ChangeUnitType(invalidUnit);
+            Action action = () => _IngredientType.ChangeUnitType(invalidUnit);
 
             action.Should().Throw<UnknownUnitTypeException>();
         }
+
+        #endregion
     }
 }

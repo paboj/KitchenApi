@@ -10,6 +10,7 @@ public class InventoryService : IInventoryService
 
     public IEnumerable<Ingredient> GetAll() => _ingredients.AsReadOnly();
 
+    //TODO: EF? operatory wewnątrz zapytań LINQ-to-Entities mogą nie działać? (zazwyczaj mapuje się Value Object do kolumny w bazie).
     public Ingredient? GetByName(string name) => _ingredients.FirstOrDefault(i => i.Name == name);
 
     public void Add(AddToStockCommand command)
@@ -22,7 +23,7 @@ public class InventoryService : IInventoryService
         _ingredients.Add(ingredient);
     }
 
-    public bool Update(ModifyIngredientCommand command)
+    public bool Update(ModifyInStockCommand command)
     {
         var existing = GetByName(command.Name);
         if (existing == null) return false;

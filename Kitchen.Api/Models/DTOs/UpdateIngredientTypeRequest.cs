@@ -3,10 +3,9 @@ using Kitchen.Api.Domain.Enums;
 
 namespace Kitchen.Api.Models.DTOs
 {
-    public class CreateIngredientDefinitionRequest
+    public class UpdateIngredientTypeRequest
     {
-        public string Name { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public UnitType Unit { get; set; }
+        public UnitType? Unit { get; set; }
     }
 }

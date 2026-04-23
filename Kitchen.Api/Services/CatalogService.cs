@@ -6,22 +6,22 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 public class CatalogService : ICatalogService
 {
-    private readonly List<IngredientDefinition> _ingredientDefinitions = new();
+    private readonly List<IngredientType> _IngredientTypes = new();
 
-    public IEnumerable<IngredientDefinition> GetAll() => _ingredientDefinitions.AsReadOnly();
+    public IEnumerable<IngredientType> GetAll() => _IngredientTypes.AsReadOnly();
 
-    public IngredientDefinition? GetByName(string name) => _ingredientDefinitions.FirstOrDefault(i => i.Name == name);
+    public IngredientType? GetByName(string name) => _IngredientTypes.FirstOrDefault(i => i.Name == name);
 
-    public void Add(AddToCatalogCommand command)
+    public void Add(AddTypeCatalogCommand command)
     {
-        var definition = new IngredientDefinition(
+        var definition = new IngredientType(
             command.Name,
             command.Unit
         );
-        _ingredientDefinitions.Add(definition);
+        _IngredientTypes.Add(definition);
     }
 
-    public bool Update(ModifyInCatalogCommand command)
+    public bool Update(ModifyTypeCatalogCommand command)
     {
         var existing = GetByName(command.Name);
         if (existing == null) return false;
@@ -33,6 +33,6 @@ public class CatalogService : ICatalogService
     public bool Delete(string name)
     {
         var ingredient = GetByName(name);
-        return ingredient != null && _ingredientDefinitions.Remove(ingredient);
+        return ingredient != null && _IngredientTypes.Remove(ingredient);
     }
 }

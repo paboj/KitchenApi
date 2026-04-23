@@ -46,7 +46,7 @@ public class IngredientsController : ControllerBase
     [HttpPut("{name}")]
     public IActionResult Update(string name, [FromBody] UpdateIngredientRequest request)
     {
-        var command = new ModifyIngredientCommand(
+        var command = new ModifyInStockCommand(
             name,
             request.Amount,
             request.Location

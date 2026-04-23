@@ -24,6 +24,8 @@ namespace Kitchen.Tests.Unit.Domain.Entities
 
         #endregion
 
+        #region AdjustAmount
+
         [Fact]
         public void given_correct_amount_adjustment_should_set_new_value()
         {
@@ -44,6 +46,10 @@ namespace Kitchen.Tests.Unit.Domain.Entities
             action.Should().Throw<IncorrectAmountException>();
         }
 
+        #endregion
+
+        #region PlaceOrMove
+
         [Fact]
         public void given_valid_location_place_or_move_should_update_location()
         {
@@ -63,6 +69,8 @@ namespace Kitchen.Tests.Unit.Domain.Entities
 
             action.Should().Throw<UnknownLocationException>();
         }
+
+        #endregion
 
     }
 }

@@ -8,7 +8,7 @@ namespace Kitchen.Api.Commands
         StorageLocation Location
      );
 
-    public record ModifyIngredientCommand(
+    public record ModifyInStockCommand(
         string Name,
         double? Amount,
         StorageLocation? Location

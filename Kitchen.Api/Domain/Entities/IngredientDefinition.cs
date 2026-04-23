@@ -1,18 +1,19 @@
 ﻿using System.Text.Json.Serialization;
 using Kitchen.Api.Domain.Enums;
 using Kitchen.Api.Domain.Exceptions;
+using Kitchen.Api.ValueObjects;
 
 namespace Kitchen.Api.Domain.Entities
 {
-    public class IngredientDefinition
+    public class IngredientType
     {
         //primary key
-        public string Name { get; set; } = string.Empty;
+        public IngredientName Name { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public UnitType? Unit { get; private set; }
 
-        public IngredientDefinition(string name, UnitType unit) { 
+        public IngredientType(string name, UnitType unit) { 
             Name = name;
             Unit = unit;
         }

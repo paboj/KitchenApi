@@ -1,9 +1,7 @@
-﻿using System.Xml.Linq;
-using Kitchen.Api.Commands;
-using Kitchen.Api.Domain.Entities;
-using Kitchen.Api.Models.DTOs;
-using Kitchen.Api.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Kitchen.Application.Services;
+using Kitchen.Application.Models.DTOs;
+using Kitchen.Application.Commands;
 
 [ApiController]
 [Route("api/[controller]")]

@@ -4,7 +4,27 @@
 [//]: # 'Added / Modified / Fixed / Deleted'
 
 
+-------------------------
+## [0.0.7] - 2026-04-24
+-------------------------
+### Added:
+| Layer | Description |
+| :--- | :--- |
+| **Kitchen.Core** | New Class Library containing domain essentials: Entities, Value Objects, and Repository contracts. Strictly no external dependencies. |
+| **Kitchen.Application** | New Class Library for application logic, orchestrating business processes via Services and Commands. |
+| **Kitchen.Infrastructure** | New Class Library housing technical implementations, including In-Memory repositories. |
+
+### Modified:
+| Feature | Description |
+| :--- | :--- |
+| **Architectural Refactor** | Migrated logic from a single API project to a multi-layered solution to prevent abstraction leakage. |
+| **Visibility Control** | Applied `internal` modifier to implementation classes, exposing only necessary abstractions via interfaces. |
+| **Dependency Flow** | Established a one-way dependency chain towards the Core layer to ensure high testability and decoupling. |
+
+
+-------------------------
 ## [0.0.6] - 2026-04-23
+-------------------------
 ### Added:
 | Feature | Description |
 | :--- | :--- |
@@ -22,7 +42,9 @@
 | **Entity Renaming** | Renamed `IngredientDefinition` to `IngredientType` for better domain clarity and consistency with the Catalog nomenclature. |
 
 
+-------------------------
 ## [0.0.5] - 2026-04-16
+-------------------------
 ### Added:
 | Feature | Description |
 | :--- | :--- |
@@ -45,7 +67,9 @@
 | **Typo in Exceptions** | Corrected "Uknown" to "Unknown" in `UnknownLocationException`. |
 
 
+-------------------------
 ## [0.0.4] - 2026-04-09
+-------------------------
 ### Added:
 | Feature | Description |
 | :--- | :--- |
@@ -60,7 +84,9 @@
 | **API Cleanup** | Removed obsolete `UpdateIngredientRequest` and `UpdateIngredientDefinitionRequest` files. |
 
 
+-------------------------
 ## [0.0.3] - 2026-04-09
+-------------------------
 ### Added:
 | Feature | Description |
 | :--- | :--- |
@@ -79,9 +105,10 @@
 | **Validation Logic** | Enhanced state protection using `Enum.IsDefined` to prevent `Unspecified` values from entering the domain. |
 
 
+-------------------------
 ## [0.0.2] - 2026-04-07
+-------------------------
 ### Modified:
-
 | Feature | Description |
 | :--- | :--- |
 | **Service Layer Pattern** | Introduced IInventoryService and InventoryService to decouple business logic from the controller. |
@@ -89,9 +116,11 @@
 | **Full CRUD Support** | Expanded service and controller capabilities to include PUT (Update) and DELETE operations. |
 | **Code Cleanup** | Applied expression-bodied members (=>) for improved readability across the service layer. |
 
-## [0.0.1] - 2026-04-03
-### Added:
 
+-------------------------
+## [0.0.1] - 2026-04-03
+-------------------------
+### Added:
 | Feature | Description |
 | :--- | :--- |
 | **Ingredients Controller** | Implemented GET and POST endpoints for managing kitchen ingredients. |
@@ -100,5 +129,7 @@
 | **Launch Configuration** | Updated the application to start directly on the /swagger endpoint for better developer experience. |
 
 
+-------------------------
 ## [0.0.0] - 2026-04-01
+-------------------------
 Initial Commit.

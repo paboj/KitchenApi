@@ -1,8 +1,8 @@
 ﻿using System.Xml.Linq;
-using Kitchen.Api.Commands;
-using Kitchen.Api.Domain.Entities;
-using Kitchen.Api.Models.DTOs;
-using Kitchen.Api.Services;
+using Kitchen.Application.Commands;
+using Kitchen.Core.Domain.Entities;
+using Kitchen.Application.Models.DTOs;
+using Kitchen.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]

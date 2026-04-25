@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Xml.Linq;
+using FluentAssertions;
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
 using Kitchen.Core.Domain.Exceptions;
@@ -14,6 +15,20 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         public IngredientTests()
         {
             _ingredient = new Ingredient("Pomidor", 2, StorageLocation.Fridge);
+        }
+
+        #endregion
+
+        #region Initial
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void given_empty_name_should_fail(string name)
+        {
+            Action action = () => new Ingredient(name, 2, StorageLocation.Fridge);
+
+            action.Should().Throw<InvalidIngredientNameException>();
         }
 
         #endregion

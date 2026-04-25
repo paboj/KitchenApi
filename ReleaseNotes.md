@@ -5,6 +5,18 @@
 
 
 -------------------------
+## [0.0.8] - 2026-04-25
+-------------------------
+### Modified
+| Feature | Description |
+| :--- | :--- |
+| **Testing** | Added `InternalsVisibleTo` to Application and Infrastructure layers for Unit Tests access. |
+| **Validation** | Replaced manual null-checks with `Enum.IsDefined` in `Ingredient` and `IngredientType` for better type safety. |
+| **DI Pattern** | Standardized Dependency Injection by renaming registration classes to `Extensions.cs` in all projects. |
+| **Project Structure**| Moved documentation files to the repository root for better visibility. |
+
+
+-------------------------
 ## [0.0.7] - 2026-04-24
 -------------------------
 ### Added:

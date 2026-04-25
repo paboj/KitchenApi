@@ -20,7 +20,7 @@ namespace Kitchen.Core.Domain.Entities
 
         public void ChangeUnitType(UnitType? unit)
         {
-            if (!unit.HasValue || unit is UnitType.Unspecified)
+            if (!Enum.IsDefined(typeof(UnitType), unit))
             {
                 throw new UnknownUnitTypeException();
             }

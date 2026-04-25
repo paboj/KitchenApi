@@ -2,7 +2,7 @@
 using Kitchen.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
-public static class InfrastructureDependencyInjection
+public static class Extensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {

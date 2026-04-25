@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using FluentAssertions;
-using Kitchen.Api.Domain.Entities;
-using Kitchen.Api.Domain.Enums;
-using Kitchen.Api.Domain.Exceptions;
+﻿using FluentAssertions;
+using Kitchen.Core.Domain.Entities;
+using Kitchen.Core.Domain.Enums;
+using Kitchen.Core.Domain.Exceptions;
 
 namespace Kitchen.Tests.Unit.Domain.Entities
 {

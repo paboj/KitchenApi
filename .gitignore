@@ -5,6 +5,8 @@
 
 # added manually
 Private/
+coveragereport/
+Kitchen.Tests.Unit/TestResults/
 
 # dotenv files
 .env

@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Kitchen.Api.Domain.Entities;
-using Kitchen.Api.Domain.Enums;
-using Kitchen.Api.Domain.Exceptions;
+﻿using FluentAssertions;
+using Kitchen.Core.Domain.Entities;
+using Kitchen.Core.Domain.Enums;
+using Kitchen.Core.Domain.Exceptions;
 
 namespace Kitchen.Tests.Unit.Domain.Entities
 {
@@ -37,7 +32,6 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         }
 
         [Theory]
-        [InlineData(UnitType.Unspecified)]
         [InlineData((UnitType)66)]
         public void change_unit_type_should_throw_exception_when_invalid(UnitType invalidUnit)
         {

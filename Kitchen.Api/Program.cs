@@ -5,8 +5,9 @@ using Kitchen.Infrastructure.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddInfrastructure();
+builder.Services.AddCore();
 builder.Services.AddApplication();
+builder.Services.AddInfrastructure();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

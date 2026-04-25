@@ -33,7 +33,7 @@ namespace Kitchen.Core.Domain.Entities
 
         public void PlaceOrMove(StorageLocation? location)
         {
-            if (!location.HasValue || location is StorageLocation.Unspecified)
+            if (!Enum.IsDefined(typeof(StorageLocation), location))
             {
                 throw new UnknownLocationException();
             }

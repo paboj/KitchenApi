@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Kitchen.Api.Domain.Entities;
-using Kitchen.Api.Domain.Enums;
-using Kitchen.Api.Repositories;
-using Kitchen.Api.ValueObjects;
+﻿using Kitchen.Core.Domain.Entities;
+using Kitchen.Core.Domain.Enums;
+using Kitchen.Core.Repositories;
+using Kitchen.Core.ValueObjects;
 using Moq;
-using Xunit;
 
 namespace Kitchen.Tests.Unit.Services
 {
@@ -31,7 +25,7 @@ namespace Kitchen.Tests.Unit.Services
             var expectedIngredient = new Ingredient(ingredientName, 10, StorageLocation.Fridge);
 
             _repositoryMock
-                .Setup(repo => repo.GetByName(It.IsAny<IngredientName>()))
+                .Setup(repo => repo.GetByName(ingredientName))
                 .Returns(expectedIngredient);
 
             // Act
@@ -42,7 +36,7 @@ namespace Kitchen.Tests.Unit.Services
             Assert.Equal(ingredientName, (string)result.Name);
 
             // Optional
-            _repositoryMock.Verify(repo => repo.GetByName(It.IsAny<IngredientName>()), Times.Once);
+            _repositoryMock.Verify(repo => repo.GetByName(ingredientName), Times.Once);
         }
 
         [Fact]
@@ -50,7 +44,7 @@ namespace Kitchen.Tests.Unit.Services
         {
             // Arrange
             _repositoryMock
-                .Setup(repo => repo.GetByName(It.IsAny<IngredientName>()))
+                .Setup(repo => repo.GetByName(It.IsAny<string>()))
                 .Returns((Ingredient?)null);
 
             // Act

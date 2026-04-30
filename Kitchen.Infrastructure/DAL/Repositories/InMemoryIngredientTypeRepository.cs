@@ -1,7 +1,7 @@
 ﻿using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Repositories;
 
-namespace Kitchen.Infrastructure.Repositories
+namespace Kitchen.Infrastructure.DAL.Repositories
 {
     internal class InMemoryIngredientTypeRepository : IIngredientTypeRepository
     {

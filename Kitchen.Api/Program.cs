@@ -1,6 +1,6 @@
 using Kitchen.Core.Repositories;
 using Kitchen.Application.Services;
-using Kitchen.Infrastructure.Repositories;
+using Kitchen.Infrastructure.DAL.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  kitchen-db:
+    image: postgres:latest
+    container_name: kitchen-api-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=KitchenDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+volumes:
+  postgres_data:

@@ -13,6 +13,8 @@ namespace Kitchen.Core.Domain.Entities
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public UnitType? Unit { get; private set; }
 
+
+        private IngredientType() { }
         public IngredientType(string name, UnitType unit) { 
             Name = name;
             Unit = unit;

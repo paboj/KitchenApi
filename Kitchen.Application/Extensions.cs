@@ -5,8 +5,8 @@ public static class Extensions
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        services.AddSingleton<IInventoryService, InventoryService>();
-        services.AddSingleton<ICatalogService, CatalogService>();
+        services.AddScoped<IInventoryService, InventoryService>();
+        services.AddScoped<ICatalogService, CatalogService>();
 
         return services;
     }

@@ -8,14 +8,16 @@ namespace Kitchen.Core.Domain.Entities
 {
     public class Ingredient
     {
-        public Guid Id { get; }
+        public IngredientId Id { get; private set; }
         public IngredientName Name { get; set; }
         public double? Amount { get; private set; }
         public StorageLocation? Location { get; private set; }
 
 
+        private Ingredient() { }
+
         public Ingredient(string name, double amount, StorageLocation location) { 
-            Id = Guid.NewGuid();
+            Id = new IngredientId(Guid.NewGuid());
             Name = name;
             Amount = amount;
             Location = location;

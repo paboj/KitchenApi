@@ -28,6 +28,12 @@ namespace Kitchen.Infrastructure.DAL.Repositories
             _dbContext.SaveChanges();
         }
 
+        public void Update(Ingredient ingredient)
+        {
+            _dbContext.Ingredients.Update(ingredient);
+            _dbContext.SaveChanges();
+        }
+
         public void Delete(string name)
         {
             var ingredient = GetByName(name);

@@ -43,6 +43,8 @@ internal class InventoryService : IInventoryService
 
         ingredient.AdjustAmount(command.Amount);
         ingredient.PlaceOrMove(command.Location);
+
+        _repository.Update(ingredient);
     }
 
     public void Delete(string name)

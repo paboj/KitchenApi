@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Kitchen.Infrastructure.DAL
 {
-    internal sealed class KitchenDbContext : DbContext
+    public sealed class KitchenDbContext : DbContext
     {
         public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<IngredientType> IngredientTypes { get; set; }

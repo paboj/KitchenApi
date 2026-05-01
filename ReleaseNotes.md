@@ -5,6 +5,28 @@
 
 
 -------------------------
+## [0.0.9] - 2026-04-30
+-------------------------
+### Added
+| Feature | Description |
+| :--- | :--- |
+| **Database** | Integrated **PostgreSQL** using Entity Framework Core as the primary persistent storage. |
+| **Infrastructure**| Added `KitchenDbContext` with comprehensive entity configurations and automated mapping for `Ingredients`. |
+| **DevOps** | Introduced `docker-compose.yml` to automate the local database environment setup. |
+| **EF Core Tools** | Implemented `IDesignTimeDbContextFactory` to support database migrations in a multi-project architecture. |
+| **Data Seeding** | Added automated data seeding on startup to populate empty databases with test ingredients. |
+
+### Modified
+| Feature | Description |
+| :--- | :--- |
+| **Repositories** | Migrated from in-memory collections to **Postgres-backed repositories** using LINQ for data access. |
+| **DI Lifetimes** | Updated service registrations from `Singleton` to `Scoped` to ensure thread-safe `DbContext` access per request. |
+| **Domain Entities**| Refactored `Ingredient` and `IngredientType` with private constructors for EF Core compatibility. |
+| **Migrations** | Configured the application to automatically execute pending EF Core migrations on startup. |
+| **CRUD Operations**| Extended `IIngredientRepository` with an `Update` method and implemented it across all repository types. |
+
+
+-------------------------
 ## [0.0.8] - 2026-04-25
 -------------------------
 ### Modified

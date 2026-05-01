@@ -8,6 +8,7 @@ namespace Kitchen.Core.Repositories
         IEnumerable<Ingredient> GetAll();
         Ingredient? GetByName(string name);
         void Add(Ingredient ingredient);
+        void Update(Ingredient ingredient);
         void Delete(string name);
     }
 }

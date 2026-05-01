@@ -18,6 +18,7 @@ namespace Kitchen.Infrastructure.DAL
             services.AddDbContext<KitchenDbContext>(x => x.UseNpgsql(connectionString));
             services.AddScoped<IIngredientRepository, PostgresIngredientRepository>();
             services.AddScoped<IIngredientTypeRepository, PostgresIngredientTypeRepository>();
+            services.AddScoped<DatabaseInitializer>();
 
             return services;
         }

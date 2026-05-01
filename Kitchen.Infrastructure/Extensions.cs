@@ -1,6 +1,5 @@
-﻿using Kitchen.Core.Repositories;
+﻿using Kitchen.Infrastructure.BackgroundServices;
 using Kitchen.Infrastructure.DAL;
-using Kitchen.Infrastructure.DAL.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
 public static class Extensions
@@ -8,6 +7,8 @@ public static class Extensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         services.AddPostgres();
+        services.AddHostedService<DatabaseInitBackgroundService>();
+
         return services;
     }
 }

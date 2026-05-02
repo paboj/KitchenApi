@@ -2,7 +2,7 @@
 using Kitchen.Application.Commands;
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Exceptions;
-using Kitchen.Application.Models.DTOs;
+using Kitchen.Application.Models.Requests;
 using Kitchen.Core.Repositories;
 using Kitchen.Application.Services;
 

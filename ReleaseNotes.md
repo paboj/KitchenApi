@@ -7,162 +7,161 @@
 -------------------------
 ## [0.0.9] - 2026-04-30
 -------------------------
+
 ### Added
 | Feature | Description |
 | :--- | :--- |
-| **Database** | Integrated **PostgreSQL** using Entity Framework Core as the primary persistent storage. |
-| **Infrastructure**| Added `KitchenDbContext` with comprehensive entity configurations and automated mapping for `Ingredients`. |
-| **DevOps** | Introduced `docker-compose.yml` to automate the local database environment setup. |
-| **EF Core Tools** | Implemented `IDesignTimeDbContextFactory` to support database migrations in a multi-project architecture. |
-| **Data Seeding** | Added automated data seeding on startup to populate empty databases with test ingredients. |
+| **Database** | Integrated **PostgreSQL** via EF Core as the primary database storage. |
+| **Infrastructure** | Added `KitchenDbContext` with dedicated entity configurations for automated mapping. |
+| **DevOps** | Introduced `docker-compose.yml` to spin up the local database environment quickly. |
+| **EF Core Tools** | Implemented `IDesignTimeDbContextFactory` to support migrations in a multi-project setup. |
+| **Data Seeding** | Added automated migrations and test data seeding on application startup. |
 
 ### Modified
 | Feature | Description |
 | :--- | :--- |
-| **Repositories** | Migrated from in-memory collections to **Postgres-backed repositories** using LINQ for data access. |
-| **DI Lifetimes** | Updated service registrations from `Singleton` to `Scoped` to ensure thread-safe `DbContext` access per request. |
-| **Domain Entities**| Refactored `Ingredient` and `IngredientType` with private constructors for EF Core compatibility. |
-| **Migrations** | Configured the application to automatically execute pending EF Core migrations on startup. |
-| **CRUD Operations**| Extended `IIngredientRepository` with an `Update` method and implemented it across all repository types. |
-| **Background Tasks**|	Moved database migrations and seeding from Program.cs to a dedicated IHostedService to clean up the startup pipeline. |
-| **Configuration**| Moved the database connection string from hardcoded values to appsettings.json using the Options Pattern. |
+| **Repositories** | Migrated from in-memory collections to **PostgreSQL repositories** using LINQ. |
+| **DI Lifetimes** | Changed service registrations from `Singleton` to `Scoped` for thread-safe DbContext usage. |
+| **Domain Entities** | Added private constructors to domain entities to ensure EF Core compatibility. |
+| **Startup Pipeline** | Moved migrations and seeding to a dedicated `IHostedService` to keep startup clean. |
+| **Configuration** | Extracted the database connection string to `appsettings.json` using the **Options Pattern**. |
 
 -------------------------
 ## [0.0.8] - 2026-04-25
 -------------------------
+
 ### Modified
 | Feature | Description |
 | :--- | :--- |
-| **Testing** | Added `InternalsVisibleTo` to Application and Infrastructure layers for Unit Tests access. |
-| **Validation** | Replaced manual null-checks with `Enum.IsDefined` in `Ingredient` and `IngredientType` for better type safety. |
-| **DI Pattern** | Standardized Dependency Injection by renaming registration classes to `Extensions.cs` in all projects. |
-| **Project Structure**| Moved documentation files to the repository root for better visibility. |
-
+| **Testing** | Added `InternalsVisibleTo` to give unit tests access to internal application and infrastructure classes. |
+| **Validation** | Replaced manual null-checks with `Enum.IsDefined` for better type safety in domain models. |
+| **DI Pattern** | Cleaned up Dependency Injection by standardizing registration classes as `Extensions.cs` in all projects. |
+| **Project Structure** | Moved documentation files (`README.md`, `ReleaseNotes.md`) to the repository root for better visibility. |
 
 -------------------------
 ## [0.0.7] - 2026-04-24
 -------------------------
-### Added:
-| Layer | Description |
-| :--- | :--- |
-| **Kitchen.Core** | New Class Library containing domain essentials: Entities, Value Objects, and Repository contracts. Strictly no external dependencies. |
-| **Kitchen.Application** | New Class Library for application logic, orchestrating business processes via Services and Commands. |
-| **Kitchen.Infrastructure** | New Class Library housing technical implementations, including In-Memory repositories. |
 
-### Modified:
+### Added
 | Feature | Description |
 | :--- | :--- |
-| **Architectural Refactor** | Migrated logic from a single API project to a multi-layered solution to prevent abstraction leakage. |
-| **Visibility Control** | Applied `internal` modifier to implementation classes, exposing only necessary abstractions via interfaces. |
-| **Dependency Flow** | Established a one-way dependency chain towards the Core layer to ensure high testability and decoupling. |
+| **Kitchen.Core** | Created domain layer containing core entities, value objects, and repository interfaces. |
+| **Kitchen.Application** | Created application layer to handle business logic via services and commands. |
+| **Kitchen.Infrastructure** | Created infrastructure layer for technical implementations like data access. |
 
+### Modified
+| Feature | Description |
+| :--- | :--- |
+| **Architecture** | Split the monolith into a multi-project solution to prevent leaky abstractions. |
+| **Visibility** | Applied the `internal` modifier to implementations, exposing only interfaces to the outside. |
+| **Dependency Flow** | Enforced a strict one-way dependency flow pointing directly towards the domain core. |
 
 -------------------------
 ## [0.0.6] - 2026-04-23
 -------------------------
-### Added:
+
+### Added
 | Feature | Description |
 | :--- | :--- |
-| **Repository Pattern** | Introduced `IIngredientRepository` and `IIngredientTypeRepository` to abstract data access from business logic. |
-| **In-Memory Persistence** | Implemented `InMemory` versions of repositories to centralize data management outside of services. |
-| **Domain Exception Flow** | Added `IngredientNotFoundException` to handle missing resources via a unified exception-driven approach. |
-| **Service Mocking** | Integrated `Moq` into the test suite to allow isolated unit testing of services by mocking repository dependencies. |
+| **Repository Pattern** | Introduced repository contracts to decouple data access from core business logic. |
+| **In-Memory Storage** | Created temporary in-memory repositories to centralize data management. |
+| **Exceptions** | Added specialized domain exceptions like `IngredientNotFoundException` for unified error handling. |
+| **Service Mocking** | Integrated `Moq` into the test suite to easily isolate service tests from real repositories. |
 
-### Modified:
+### Modified
 | Feature | Description |
 | :--- | :--- |
-| **Dependency Injection** | Refactored `Program.cs` to register repositories with a `Singleton` lifetime, ensuring data persistence across requests. |
-| **Service Logic** | Updated `InventoryService` and `CatalogService` to delegate data operations to repositories and use exception-based validation. |
-| **Controller Simplification** | Streamlined `Delete` and `Update` actions in controllers; results are now handled by the exception flow instead of boolean checks. |
-| **Entity Renaming** | Renamed `IngredientDefinition` to `IngredientType` for better domain clarity and consistency with the Catalog nomenclature. |
-
+| **DI Lifetimes** | Switched repository registrations to `Singleton` to keep in-memory data alive between requests. |
+| **Service Logic** | Updated services to delegate database operations to repositories and validate using exceptions. |
+| **API Cleanup** | Simplified controllers by letting the exception flow handle error responses instead of boolean checks. |
+| **Domain Entities** | Renamed `IngredientDefinition` to `IngredientType` for better clarity and alignment with the catalog. |
 
 -------------------------
 ## [0.0.5] - 2026-04-16
 -------------------------
-### Added:
+
+### Added
 | Feature | Description |
 | :--- | :--- |
-| **Unit Testing Project** | Created `Kitchen.Tests.Unit` using xUnit and FluentAssertions to ensure domain logic reliability. |
-| **Command Pattern Refinement** | Introduced specific command sets: `InventoryCommands` (Stock management) and `CatalogCommands` (Definition management). |
-| **Specialized Update DTOs** | Added `UpdateIngredientRequest` and `UpdateIngredientDefinitionRequest` with nullable support for partial updates (PATCH style). |
-| **New Domain Entities Tests** | Implemented comprehensive test suites for `Ingredient` and `IngredientDefinition` state transitions. |
+| **Testing** | Created the `Kitchen.Tests.Unit` project using xUnit and FluentAssertions for domain testing. |
+| **Commands** | Refined the command pattern by grouping actions into `InventoryCommands` and `CatalogCommands`. |
+| **Requests** | Introduced dedicated update requests with nullable types to easily support partial updates. |
+| **Entity Tests** | Added comprehensive unit tests to verify state transitions in domain entities. |
 
-### Modified:
+### Modified
 | Feature | Description |
 | :--- | :--- |
-| **Service Layer Renaming** | Renamed `IIngredientCatalogService` to `ICatalogService` for better brevity and architectural consistency. |
-| **Nullable Domain Methods** | Refactored domain methods (`AdjustAmount`, `PlaceOrMove`, `ChangeUnitType`) to handle nullable inputs, enabling optional field updates. |
-| **Controller Modernization** | Updated `IngredientsController` and `IngredientDefinitionsController` to process Commands instead of raw Entities or DTOs. |
-| **API Responses** | Improved POST endpoints to return `201 Created` with proper `CreatedAtAction` location headers. |
+| **Service Names** | Renamed the catalog service to `ICatalogService` for better brevity and readability. |
+| **Domain Methods** | Updated domain methods to accept nullable types, making optional updates much simpler. |
+| **Controllers** | Refactored endpoints to accept specific commands instead of passing raw entities. |
+| **API Responses** | Improved POST endpoints to return `201 Created` with a valid location header. |
 
-### Fixed:
+### Fixed
 | Feature | Description |
 | :--- | :--- |
-| **Typo in Exceptions** | Corrected "Uknown" to "Unknown" in `UnknownLocationException`. |
-
+| **Typos** | Fixed a spelling error in `UnknownLocationException`. |
 
 -------------------------
 ## [0.0.4] - 2026-04-09
 -------------------------
-### Added:
+
+### Added
 | Feature | Description |
 | :--- | :--- |
-| **Command Pattern Base** | Introduced `IngredientCommands` to separate business intentions (Actions) from data structures. |
-| **Domain Layer** | Established a dedicated `Domain` namespace for Entities, Enums, and Exceptions to isolate core business logic. |
+| **Commands** | Introduced the Command pattern to separate business intent from pure data models. |
+| **Domain Layer** | Extracted core files into a dedicated domain namespace to isolate business rules. |
 
-### Modified:
+### Modified
 | Feature | Description |
 | :--- | :--- |
-| **DTO Simplification** | Consolidated multiple Request objects into unified `IngredientDto` and `IngredientDefinitionDto`, reducing code redundancy. |
-| **Namespace Refactor** | Reorganized project structure by moving domain-related files from `Models` to `Domain` for better architectural clarity. |
-| **API Cleanup** | Removed obsolete `UpdateIngredientRequest` and `UpdateIngredientDefinitionRequest` files. |
-
+| **DTOs** | Consolidated redundant request objects into unified, reusable DTO models. |
+| **Namespaces** | Reorganized files from `Models` into the `Domain` namespace for better architectural clarity. |
+| **API Cleanup** | Deleted old, obsolete request classes to keep the codebase clean. |
 
 -------------------------
 ## [0.0.3] - 2026-04-09
 -------------------------
-### Added:
+
+### Added
 | Feature | Description |
 | :--- | :--- |
-| **Ingredient Catalog** | Introduced `IngredientDefinition` to store global product metadata (name, default unit) separately from physical stock items. |
-| **Storage Management** | Added `StorageLocation` enum (Fridge, Freezer, Pantry) to track exactly where items are kept in the kitchen. |
-| **Custom Exception System** | Implemented a dedicated exception hierarchy starting from `KitchenApiException` (e.g., `IncorrectAmountException`, `UnknownLocationException`). |
-| **Catalog API** | Added `IngredientDefinitionsController` to manage the global product dictionary and unit types. |
+| **Ingredient Catalog** | Added `IngredientDefinition` to store global metadata separately from physical items. |
+| **Storage Tracking** | Introduced the `StorageLocation` enum to manage where items are stored in the kitchen. |
+| **Domain Exceptions** | Created a structured hierarchy of custom exceptions starting from a base API exception. |
+| **Catalog API** | Created a new controller to manage global ingredient metadata and unit types. |
 
-### Modified:
+### Modified
 | Feature | Description |
 | :--- | :--- |
-| **DDD Domain Logic** | Refactored `Ingredient` methods to use domain-driven naming: `AdjustAmount` and `PlaceOrMove` instead of technical setters. |
-| **Architecture Split** | Decoupled the service layer into `IngredientCatalogService` (catalog management) and `InventoryService` (stock management). |
-| **Resource Identification** | Standardized using `Name` as a Natural Key for definitions and technical `Id` for physical inventory items. |
-| **Data Transfer Objects** | Refactored DTOs to separate catalog concerns (Units) from inventory concerns (Location, Amount). |
-| **Validation Logic** | Enhanced state protection using `Enum.IsDefined` to prevent `Unspecified` values from entering the domain. |
-
+| **Domain Logic** | Refactored entities to use expressive domain methods instead of technical property setters. |
+| **Architecture** | Separated the service layer into a catalog service and an inventory service. |
+| **Resource Identifiers** | Used natural keys for global metadata and technical GUIDs for physical stock items. |
+| **Data Contracts** | Split requests into dedicated models for catalog management and physical inventory management. |
+| **Validation** | Protected domain invariants using `Enum.IsDefined` to block invalid enum values. |
 
 -------------------------
 ## [0.0.2] - 2026-04-07
 -------------------------
-### Modified:
+
+### Modified
 | Feature | Description |
 | :--- | :--- |
-| **Service Layer Pattern** | Introduced IInventoryService and InventoryService to decouple business logic from the controller. |
-| **Single Responsibility** | Refactored IngredientsController to focus solely on HTTP request handling (SRP). |
-| **Full CRUD Support** | Expanded service and controller capabilities to include PUT (Update) and DELETE operations. |
-| **Code Cleanup** | Applied expression-bodied members (=>) for improved readability across the service layer. |
-
+| **Service Layer** | Introduced the service pattern to pull business logic out of the controller. |
+| **Single Responsibility**| Simplified the controller to focus strictly on handling HTTP requests. |
+| **CRUD Support** | Added full support for update and delete operations in both the service and the controller. |
+| **Readability** | Cleaned up the service layer using modern expression-bodied members. |
 
 -------------------------
 ## [0.0.1] - 2026-04-03
 -------------------------
-### Added:
+
+### Added
 | Feature | Description |
 | :--- | :--- |
-| **Ingredients Controller** | Implemented GET and POST endpoints for managing kitchen ingredients. |
-| **Unit System** | Added UnitType enum supporting Grams, Liters, and Pieces. |
-| **JSON Serialization** | Added JsonStringEnumConverter to allow sending and receiving Enum values as strings (e.g., "Liter") instead of integers. |
-| **Launch Configuration** | Updated the application to start directly on the /swagger endpoint for better developer experience. |
-
+| **Ingredients API** | Added basic GET and POST endpoints for managing physical kitchen ingredients. |
+| **Unit System** | Introduced the `UnitType` enum supporting Grams, Liters, and Pieces. |
+| **Serialization** | Added a global converter to serialize and deserialize enums as readable strings. |
+| **Developer UX** | Set up the launch settings to open Swagger automatically when starting the application. |
 
 -------------------------
 ## [0.0.0] - 2026-04-01

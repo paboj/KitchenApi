@@ -1,7 +1,7 @@
 ﻿using System.Xml.Linq;
 using Kitchen.Application.Commands;
 using Kitchen.Core.Domain.Entities;
-using Kitchen.Application.Models.DTOs;
+using Kitchen.Application.Models.Requests;
 using Kitchen.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 

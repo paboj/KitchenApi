@@ -4,6 +4,39 @@
 [//]: # 'Added / Modified / Fixed / Deleted'
 
 
+-----------------------------------------------------------
+## [1.0.0] - Release 1: "The Digital Pantry" - 2026-05-02
+-----------------------------------------------------------
+
+### Purpose & Business Value
+The primary goal of this first release is to provide a digital tracking system for your home food storage. It allows users to maintain an accurate, up-to-date record of what is currently in their fridge and pantry, reducing the need to manually memorize ingredients and helping to prevent food waste.
+
+---
+
+### Features & Scope
+The initial scope provides the complete foundational features for digital pantry management:
+
+* **Inventory Management:** Supports adding, viewing, modifying, and deleting stored food items. Ingredients can be assigned to specific physical storage locations such as the fridge or pantry.
+* **Product Catalog:** Implements a global dictionary of ingredient types to maintain naming and unit consistency (Grams, Liters, Pieces) across the application.
+
+---
+
+### Architecture & Technical Features
+The application is built around the principles of Clean Architecture and Domain-Driven Design (DDD), ensuring high maintainability and long-term scalability.
+
+#### 1. Layer Responsibilities
+* **`Kitchen.Core` (Domain):** The heart of the application. Contains pure business logic, entities, and value objects (`IngredientId`, `IngredientName`), strictly protecting the application against invalid data states.
+* **`Kitchen.Application` (Application):** Orchestration layer. Receives incoming API requests, transforms them into business intents (`Commands`), and executes logic using services.
+* **`Kitchen.Infrastructure` (Infrastructure):** Technical implementation details. Handles database communication with PostgreSQL using Entity Framework Core.
+* **`Kitchen.Api` (Presentation):** Exposes REST API endpoints and provides Swagger UI documentation for clients.
+
+#### 2. Technical Foundation
+* **Database:** PostgreSQL running in a Docker container via `docker-compose`.
+* **Database Management:** Automated migrations and test data seeding on application startup.
+* **Security & Configuration:** Uses the Options Pattern to securely bind and inject the database connection string.
+* **Testing:** Dedicated testing project (xUnit + FluentAssertions) to validate the correctness of domain rules and application logic.
+
+* 
 -------------------------
 ## [0.0.9] - 2026-04-30
 -------------------------

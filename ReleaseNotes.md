@@ -25,6 +25,7 @@
 | **Migrations** | Configured the application to automatically execute pending EF Core migrations on startup. |
 | **CRUD Operations**| Extended `IIngredientRepository` with an `Update` method and implemented it across all repository types. |
 | **Background Tasks**|	Moved database migrations and seeding from Program.cs to a dedicated IHostedService to clean up the startup pipeline. |
+| **Configuration**| Moved the database connection string from hardcoded values to appsettings.json using the Options Pattern. |
 
 -------------------------
 ## [0.0.8] - 2026-04-25

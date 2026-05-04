@@ -17,7 +17,7 @@ namespace Kitchen.Core.Domain.Entities
         private IngredientType() { }
         public IngredientType(string name, UnitType unit) { 
             Name = name;
-            Unit = unit;
+            ChangeUnitType(unit);
         }
 
         public void ChangeUnitType(UnitType? unit)

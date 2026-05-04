@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using Kitchen.Core.Domain.Exceptions;
+﻿using Kitchen.Core.Domain.Exceptions;
 
 namespace Kitchen.Core.ValueObjects
 {
@@ -7,10 +6,14 @@ namespace Kitchen.Core.ValueObjects
     {
         public string Value { get; }
 
-        public IngredientName(string value) // TODO: cant start with number/ cant contain numbers?
+        public IngredientName(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new InvalidIngredientNameException();
+            value = value.Trim();
+            if (char.IsDigit(value[0]))
+                throw new InvalidIngredientNameException();
+            
             Value = value;
         }
 

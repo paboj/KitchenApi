@@ -19,8 +19,8 @@ namespace Kitchen.Core.Domain.Entities
         public Ingredient(string name, double amount, StorageLocation location) { 
             Id = new IngredientId(Guid.NewGuid());
             Name = name;
-            Amount = amount;
-            Location = location;
+            AdjustAmount(amount);
+            PlaceOrMove(location);
         }
 
 

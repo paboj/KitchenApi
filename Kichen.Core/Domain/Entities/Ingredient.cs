@@ -10,8 +10,8 @@ namespace Kitchen.Core.Domain.Entities
     {
         public IngredientId Id { get; private set; }
         public IngredientName Name { get; set; }
-        public double? Amount { get; private set; }
-        public StorageLocation? Location { get; private set; }
+        public double Amount { get; private set; } = 0;
+        public StorageLocation Location { get; private set; } = StorageLocation.Unspecified;
 
 
         private Ingredient() { }
@@ -26,21 +26,25 @@ namespace Kitchen.Core.Domain.Entities
 
         public void AdjustAmount(double? amount)
         {
+            if (amount is null) return;
+
             if (amount < 0)
             {
                 throw new IncorrectAmountException();
             }
-            Amount = amount;
+            Amount = amount.Value;
         }
 
         public void PlaceOrMove(StorageLocation? location)
         {
+            if (location is null) return;
+
             if (!Enum.IsDefined(typeof(StorageLocation), location))
             {
                 throw new UnknownLocationException();
             }
 
-            Location = location;
+            Location = location.Value;
         }
     }
 }

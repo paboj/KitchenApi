@@ -28,6 +28,12 @@ internal class CatalogService : ICatalogService
 
     public void Add(AddTypeCatalogCommand command)
     {
+        var existing = _repository.GetByName(command.Name);
+        if (existing != null)
+        {
+            throw new IngredientTypeAlreadyExistsException();
+        }
+
         var definition = new IngredientType(
             command.Name,
             command.Unit

@@ -9,11 +9,16 @@ namespace Kitchen.Tests.Unit.Domain.Entities
     {
         #region Arrange
 
+        
+        private readonly string _startName = "Pomidor";
+        private readonly double _startAmount = 2;
+        private readonly StorageLocation _startLocation = StorageLocation.Fridge;
+
         private readonly Ingredient _ingredient;
 
         public IngredientTests()
         {
-            _ingredient = new Ingredient("Pomidor", 2, StorageLocation.Fridge);
+            _ingredient = new Ingredient(_startName, _startAmount, _startLocation);
         }
 
         #endregion
@@ -75,6 +80,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
             _ingredient.AdjustAmount(newValue);
 
             _ingredient.Amount.Should().Be(newValue);
+            _ingredient.Location.Should().Be(_startLocation);
         }
 
         [Theory]
@@ -85,6 +91,15 @@ namespace Kitchen.Tests.Unit.Domain.Entities
             Action action = () => _ingredient.AdjustAmount(invalidAmount);
 
             action.Should().Throw<IncorrectAmountException>();
+        }
+
+        [Fact]
+        public void given_null_amount_adjustment_should_leave_previous_value()
+        {
+            _ingredient.AdjustAmount(null);
+
+            _ingredient.Amount.Should().Be(_startAmount);
+            _ingredient.Location.Should().Be(_startLocation);
         }
 
         #endregion
@@ -99,6 +114,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
             _ingredient.PlaceOrMove(newLocation);
 
             _ingredient.Location.Should().Be(newLocation);
+            _ingredient.Amount.Should().Be(_startAmount);
         }
 
         [Theory]
@@ -109,6 +125,15 @@ namespace Kitchen.Tests.Unit.Domain.Entities
             Action action = () => _ingredient.PlaceOrMove((StorageLocation)invalidLocation);
 
             action.Should().Throw<UnknownLocationException>();
+        }
+
+        [Fact]
+        public void given_null_location_place_or_move_should_leave_previous_value()
+        {
+            _ingredient.PlaceOrMove(null);
+
+            _ingredient.Amount.Should().Be(_startAmount);
+            _ingredient.Location.Should().Be(_startLocation);
         }
 
         #endregion

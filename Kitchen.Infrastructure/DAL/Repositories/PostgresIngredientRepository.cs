@@ -20,7 +20,7 @@ namespace Kitchen.Infrastructure.DAL.Repositories
         
 
         public Ingredient? GetByName(string name)
-            => _dbContext.Ingredients.SingleOrDefault(x => x.Name == name);
+            => _dbContext.Ingredients.FirstOrDefault(x => x.Name == name);
 
         public void Add(Ingredient ingredient)
         {

@@ -29,6 +29,11 @@ internal class InventoryService : IInventoryService
 
     public void Add(AddToStockCommand command)
     {
+        var existing = _repository.GetByName(command.Name);
+        if (existing != null)
+        {
+            throw new IngredientAlreadyExistsException();
+        }
         var ingredient = new Ingredient(
             command.Name,
             command.Amount,

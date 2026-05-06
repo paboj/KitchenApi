@@ -16,9 +16,16 @@ namespace Kitchen.Infrastructure.DAL.Configurations
 
             builder.Property(x => x.Unit)
                 .HasConversion(
-                    x => x != null ? (int) x : (int?)null,
-                    x => x != null ? (UnitType) x : (UnitType?)null
+                    x => (int)x,
+                    x => (UnitType)x
                 );
+
+            builder.Property(x => x.Category)
+                .IsRequired()
+                .HasConversion(
+                    x => (int)x,
+                    x => (Category)x
+        );
         }
     }
 }

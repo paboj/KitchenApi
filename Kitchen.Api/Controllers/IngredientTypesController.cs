@@ -24,7 +24,8 @@ public class IngredientTypesController : ControllerBase
     {
         var command = new AddTypeCatalogCommand(
                 request.Name,
-                request.Unit
+                request.Unit,
+                request.Category
             );
 
         _catalogService.Add(command);
@@ -38,7 +39,8 @@ public class IngredientTypesController : ControllerBase
     {
         var command = new ModifyTypeCatalogCommand(
             name,
-            request.Unit
+            request.Unit,
+            request.Category
         );
 
         _catalogService.Update(command);

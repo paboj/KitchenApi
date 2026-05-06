@@ -11,7 +11,10 @@ namespace Kitchen.Core.Domain.Entities
         public IngredientName Name { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public UnitType? Unit { get; private set; }
+        public UnitType Unit { get; private set; } = UnitType.Unspecified;
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public Category Category { get; private set; } = Category.Unspecified;
 
 
         private IngredientType() { }
@@ -27,7 +30,17 @@ namespace Kitchen.Core.Domain.Entities
                 throw new UnknownUnitTypeException();
             }
 
-            Unit = unit;
+            Unit = unit.Value;
+        }
+
+        public void SetCategory(Category? category)
+        {
+            if (!Enum.IsDefined(typeof(Category), category))
+            {
+                throw new UnknownCategoryException();
+            }
+
+            Category = category.Value;
         }
     }
 }

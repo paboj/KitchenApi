@@ -7,5 +7,8 @@ namespace Kitchen.Application.Models.Requests
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public UnitType? Unit { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public Category? Category { get; set; }
     }
 }

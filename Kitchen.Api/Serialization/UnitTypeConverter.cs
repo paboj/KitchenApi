@@ -21,7 +21,6 @@ public class UnitTypeConverter : JsonConverter<UnitType>
 
     public override void Write(Utf8JsonWriter writer, UnitType value, JsonSerializerOptions options)
     {
-        // Tutaj decydujesz co API wysyła na zewnątrz (np. zawsze opis "szt")
         writer.WriteStringValue(GetDescription(value));
     }
 

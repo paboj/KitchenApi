@@ -27,6 +27,15 @@ namespace Kitchen.Infrastructure.DAL.Configurations
                     x => (int)x,
                     x => (StorageLocation)x
                 );
+
+            builder.Property<IngredientName>("TypeName")
+            .HasConversion(x => x.Value, x => new IngredientName(x))
+            .IsRequired(false);
+
+            builder.HasOne(x => x.Type)
+                .WithMany()
+                .HasForeignKey("TypeName")
+                .IsRequired(false);
         }
     }
 }

@@ -27,10 +27,10 @@ namespace Kitchen.Infrastructure.BackgroundServices
                 {
                     ingredients = new List<Ingredient>()
                     {
-                        new Ingredient("Test", 1, StorageLocation.Unspecified),
-                        new Ingredient("Test - lodówka", 2, StorageLocation.Fridge),
-                        new Ingredient("Test - zamrażarka", 5, StorageLocation.Freezer),
-                        new Ingredient("Test - spiżarnia", 10, StorageLocation.Pantry)
+                        new Ingredient("Test", 1, StorageLocation.Unspecified, null),
+                        new Ingredient("Test - lodówka", 2, StorageLocation.Fridge, null),
+                        new Ingredient("Test - zamrażarka", 5, StorageLocation.Freezer, null),
+                        new Ingredient("Test - spiżarnia", 10, StorageLocation.Pantry, null)
                     };
                     dbContext.Ingredients.AddRange(ingredients);
                     dbContext.SaveChanges();

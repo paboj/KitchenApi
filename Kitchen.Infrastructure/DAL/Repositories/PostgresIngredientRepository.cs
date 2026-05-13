@@ -14,13 +14,16 @@ namespace Kitchen.Infrastructure.DAL.Repositories
             _dbContext = dbContext;
         }
 
-        //TODO: Eager loading?
         public IEnumerable<Ingredient> GetAll()
-            => _dbContext.Ingredients.AsNoTracking().ToList();
+            => _dbContext.Ingredients
+            .AsNoTracking()
+            .ToList();
         
 
         public Ingredient? GetByName(string name)
-            => _dbContext.Ingredients.FirstOrDefault(x => x.Name == name);
+            => _dbContext.Ingredients
+            .AsNoTracking()
+            .FirstOrDefault(x => x.Name == new IngredientName(name));
 
         public void Add(Ingredient ingredient)
         {
@@ -44,5 +47,17 @@ namespace Kitchen.Infrastructure.DAL.Repositories
                 _dbContext.SaveChanges();
             }
         }
+        public IEnumerable<Ingredient> GetAllWithDetails()
+            => _dbContext.Ingredients
+            .Include(i => i.Type)
+            .AsNoTracking()
+            .ToList();
+
+
+        public Ingredient? GetByNameWithDetails(string name)
+            => _dbContext.Ingredients
+            .Include(i => i.Type)
+            .AsNoTracking()
+            .FirstOrDefault(x => x.Name == new IngredientName(name));
     }
 }

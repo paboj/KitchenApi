@@ -8,6 +8,7 @@ using Kitchen.Application.Services;
 internal class CatalogService : ICatalogService
 {
     private readonly IIngredientTypeRepository _repository;
+    private readonly IIngredientRepository _ingredientRepository;
     private IngredientType FindIngredientType(string name)
     {
         var ingredientType = GetByName(name);
@@ -17,9 +18,10 @@ internal class CatalogService : ICatalogService
 
     }
 
-    public CatalogService(IIngredientTypeRepository repository)
+    public CatalogService(IIngredientTypeRepository repository, IIngredientRepository ingredientRepository)
     {
         _repository = repository;
+        _ingredientRepository = ingredientRepository;
     }
 
     public IEnumerable<IngredientType> GetAll() => _repository.GetAll();
@@ -36,7 +38,8 @@ internal class CatalogService : ICatalogService
 
         var definition = new IngredientType(
             command.Name,
-            command.Unit
+            command.Unit,
+            command.Category
         );
         _repository.Add(definition);
     }
@@ -51,5 +54,15 @@ internal class CatalogService : ICatalogService
     {
         var ingredientType = FindIngredientType(name);
         _repository.Delete(name);
+    }
+
+    public void LinkMetadataToExistingIngredients(IngredientType ingredientType)
+    {
+        var orphanedIngredients = _ingredientRepository.GetAll(); //TODO: fetch with null type
+
+        foreach (var ingredient in orphanedIngredients)
+        {
+            ingredient.AssignType(ingredientType);
+        }
     }
 }

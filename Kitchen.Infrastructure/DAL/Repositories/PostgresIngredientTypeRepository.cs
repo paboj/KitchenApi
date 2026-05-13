@@ -31,7 +31,9 @@ namespace Kitchen.Infrastructure.DAL.Repositories
         }
 
         public IEnumerable<IngredientType> GetAll()
-            => _dbContext.IngredientTypes.AsNoTracking().ToList();
+            => _dbContext.IngredientTypes
+            .AsNoTracking()
+            .ToList();
 
         public IngredientType? GetByName(string name)
             => _dbContext.IngredientTypes

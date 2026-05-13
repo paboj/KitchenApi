@@ -18,13 +18,16 @@ namespace Kitchen.Core.Domain.Entities
 
 
         private IngredientType() { }
-        public IngredientType(string name, UnitType unit) { 
+        public IngredientType(string name, UnitType unit, Category category) { 
             Name = name;
             ChangeUnitType(unit);
+            SetCategory(category);
         }
 
         public void ChangeUnitType(UnitType? unit)
         {
+            if (unit == null) return;
+
             if (!Enum.IsDefined(typeof(UnitType), unit))
             {
                 throw new UnknownUnitTypeException();
@@ -35,6 +38,8 @@ namespace Kitchen.Core.Domain.Entities
 
         public void SetCategory(Category? category)
         {
+            if (category == null) return;
+
             if (!Enum.IsDefined(typeof(Category), category))
             {
                 throw new UnknownCategoryException();
@@ -42,5 +47,6 @@ namespace Kitchen.Core.Domain.Entities
 
             Category = category.Value;
         }
+
     }
 }

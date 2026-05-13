@@ -9,6 +9,7 @@ using Kitchen.Application.Services;
 internal class InventoryService : IInventoryService
 {
     private readonly IIngredientRepository _repository;
+    private readonly IIngredientTypeRepository _typeRepository;
     private Ingredient FindIngredient(string name)
     {
         var ingredient = GetByName(name);
@@ -18,9 +19,10 @@ internal class InventoryService : IInventoryService
 
     }
 
-    public InventoryService(IIngredientRepository repository)
+    public InventoryService(IIngredientRepository repository, IIngredientTypeRepository typeRepository)
     {
         _repository = repository;
+        _typeRepository = typeRepository;
     }
 
     public IEnumerable<Ingredient> GetAll() => _repository.GetAll();
@@ -34,10 +36,12 @@ internal class InventoryService : IInventoryService
         {
             throw new IngredientAlreadyExistsException();
         }
+        var ingredientType = _typeRepository.GetByName(command.Name);
         var ingredient = new Ingredient(
             command.Name,
             command.Amount,
-            command.Location
+            command.Location,
+            ingredientType
         );
         _repository.Add(ingredient);
     }

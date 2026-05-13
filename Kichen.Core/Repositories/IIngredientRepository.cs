@@ -3,15 +3,15 @@ using Kitchen.Core.ValueObjects;
 
 namespace Kitchen.Core.Repositories
 {
-    public interface IIngredientRepository
+    public interface IStockItemRepository
     {
-        IEnumerable<Ingredient> GetAll();
-        Ingredient? GetByName(string name);
-        void Add(Ingredient ingredient);
-        void Update(Ingredient ingredient);
+        IEnumerable<StockItem> GetAll();
+        StockItem? GetByName(string name);
+        void Add(StockItem stockItem);
+        void Update(StockItem stockItem);
         void Delete(string name);
 
-        IEnumerable<Ingredient> GetAllWithDetails();
-        Ingredient? GetByNameWithDetails(string name);
+        IEnumerable<StockItem> GetAllWithDetails();
+        StockItem? GetByNameWithDetails(string name);
     }
 }

@@ -22,17 +22,17 @@ namespace Kitchen.Infrastructure.BackgroundServices
                 var dbContext = scope.ServiceProvider.GetRequiredService<KitchenDbContext>();
                 dbContext.Database.Migrate();
 
-                var ingredients = dbContext.Ingredients.ToList();
-                if (!ingredients.Any())
+                var stockItems = dbContext.StockItems.ToList();
+                if (!stockItems.Any())
                 {
-                    ingredients = new List<Ingredient>()
+                    stockItems = new List<StockItem>()
                     {
-                        new Ingredient("Test", 1, StorageLocation.Unspecified, null),
-                        new Ingredient("Test - lodówka", 2, StorageLocation.Fridge, null),
-                        new Ingredient("Test - zamrażarka", 5, StorageLocation.Freezer, null),
-                        new Ingredient("Test - spiżarnia", 10, StorageLocation.Pantry, null)
+                        new StockItem("Test", 1, StorageLocation.Unspecified, null),
+                        new StockItem("Test - lodówka", 2, StorageLocation.Fridge, null),
+                        new StockItem("Test - zamrażarka", 5, StorageLocation.Freezer, null),
+                        new StockItem("Test - spiżarnia", 10, StorageLocation.Pantry, null)
                     };
-                    dbContext.Ingredients.AddRange(ingredients);
+                    dbContext.StockItems.AddRange(stockItems);
                     dbContext.SaveChanges();
                 }
             }

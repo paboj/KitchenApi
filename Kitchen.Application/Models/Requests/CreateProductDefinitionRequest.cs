@@ -3,12 +3,13 @@ using Kitchen.Core.Domain.Enums;
 
 namespace Kitchen.Application.Models.Requests
 {
-    public class UpdateIngredientTypeRequest
+    public class CreateProductDefinitionRequest
     {
+        public string Name { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public UnitType? Unit { get; set; }
+        public UnitType Unit { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public Category? Category { get; set; }
+        public Category Category { get; set; }
     }
 }

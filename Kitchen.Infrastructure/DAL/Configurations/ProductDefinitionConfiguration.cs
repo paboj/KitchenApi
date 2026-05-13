@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Kitchen.Infrastructure.DAL.Configurations
 {
-    internal sealed class IngredientTypeConfiguration : IEntityTypeConfiguration<IngredientType>
+    internal sealed class ProductDefinitionConfiguration : IEntityTypeConfiguration<ProductDefinition>
     {
-        public void Configure(EntityTypeBuilder<IngredientType> builder)
+        public void Configure(EntityTypeBuilder<ProductDefinition> builder)
         {
             builder.HasKey(x => x.Name);
             builder.Property(x => x.Name)
-                .HasConversion(x => x.Value, x => new IngredientName(x));
+                .HasConversion(x => x.Value, x => new ProductName(x));
 
             builder.Property(x => x.Unit)
                 .HasConversion(

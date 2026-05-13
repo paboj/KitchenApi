@@ -6,26 +6,26 @@ using Kitchen.Core.ValueObjects;
 
 namespace Kitchen.Core.Domain.Entities
 {
-    public class Ingredient
+    public class StockItem
     {
-        public IngredientId Id { get; private set; }
-        public IngredientName Name { get; set; }
+        public StockItemId Id { get; private set; }
+        public ProductName Name { get; set; }
         public double Amount { get; private set; } = 0;
         public StorageLocation Location { get; private set; } = StorageLocation.Unspecified;
-        public IngredientName? TypeName { get; private set; }
-        public IngredientType? Type { get; set; }
+        public ProductName? TypeName { get; private set; }
+        public ProductDefinition? Type { get; set; }
 
-        private Ingredient() { }
+        private StockItem() { }
 
-        public Ingredient(string name, double amount, StorageLocation location, IngredientType? type) { 
-            Id = new IngredientId(Guid.NewGuid());
+        public StockItem(string name, double amount, StorageLocation location, ProductDefinition? type) { 
+            Id = new StockItemId(Guid.NewGuid());
             Name = name;
             AdjustAmount(amount);
             PlaceOrMove(location);
             AssignType(type);
         }
 
-        public void AssignType(IngredientType? type)
+        public void AssignType(ProductDefinition? type)
         {
             if (type != null)
             {

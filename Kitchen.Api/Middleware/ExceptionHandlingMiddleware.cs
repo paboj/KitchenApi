@@ -30,17 +30,16 @@ namespace Kitchen.Api.Middleware
             var code = exception switch
             {
                 // 404 Not Found
-                IngredientNotFoundException => HttpStatusCode.NotFound,
+                StockItemNotFoundException => HttpStatusCode.NotFound,
 
                 // 400 Bad Request (validation errors & incorrect data)
-                InvalidIngredientNameException or
+                InvalidProductNameException or
                 IncorrectAmountException or
                 UnknownLocationException or
                 UnknownUnitTypeException => HttpStatusCode.BadRequest,
 
                 // 409 Conflict (already exists)
-                IngredientAlreadyExistsException or
-                IngredientTypeAlreadyExistsException => HttpStatusCode.Conflict,
+                ProductDefinitionAlreadyExistsException => HttpStatusCode.Conflict,
 
                 // 400 Bad Request (other from Kitchen.Api)
                 KitchenApiException => HttpStatusCode.BadRequest,

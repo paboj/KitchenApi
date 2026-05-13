@@ -5,11 +5,11 @@ using Kitchen.Application.Commands;
 
 [ApiController]
 [Route("api/[controller]")]
-public class IngredientsController : ControllerBase
+public class StockItemsController : ControllerBase
 {
     private readonly IInventoryService _inventoryService;
 
-    public IngredientsController(IInventoryService inventoryService)
+    public StockItemsController(IInventoryService inventoryService)
     {
         _inventoryService = inventoryService;
     }
@@ -20,14 +20,14 @@ public class IngredientsController : ControllerBase
     [HttpGet("{name}")]
     public IActionResult Get(string name)
     {
-        var ingredient = _inventoryService.GetByName(name);
-        if (ingredient == null) return NotFound();
+        var stockitem = _inventoryService.GetByName(name);
+        if (stockitem == null) return NotFound();
 
-        return Ok(ingredient);
+        return Ok(stockitem);
     }
 
     [HttpPost]
-    public IActionResult Create([FromBody] CreateIngredientRequest request)
+    public IActionResult Create([FromBody] CreateStockItemRequest request)
     {
         var command = new AddToStockCommand(
             request.Name,
@@ -42,7 +42,7 @@ public class IngredientsController : ControllerBase
 }
 
     [HttpPut("{name}")]
-    public IActionResult Update(string name, [FromBody] UpdateIngredientRequest request)
+    public IActionResult Update(string name, [FromBody] UpdateStockItemRequest request)
     {
         var command = new ModifyInStockCommand(
             name,

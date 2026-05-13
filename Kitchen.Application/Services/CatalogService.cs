@@ -7,62 +7,62 @@ using Kitchen.Application.Services;
 
 internal class CatalogService : ICatalogService
 {
-    private readonly IIngredientTypeRepository _repository;
-    private readonly IIngredientRepository _ingredientRepository;
-    private IngredientType FindIngredientType(string name)
+    private readonly IProductDefinitionRepository _catalogRepository;
+    private readonly IStockItemRepository _inventoryRepository;
+    private ProductDefinition FindProductDefinition(string name)
     {
-        var ingredientType = GetByName(name);
-        if (ingredientType == null) throw new IngredientNotFoundException();
+        var productDefinition = GetByName(name);
+        if (productDefinition == null) throw new StockItemNotFoundException();
 
-        return ingredientType;
+        return productDefinition;
 
     }
 
-    public CatalogService(IIngredientTypeRepository repository, IIngredientRepository ingredientRepository)
+    public CatalogService(IProductDefinitionRepository repository, IStockItemRepository stockItemRepository)
     {
-        _repository = repository;
-        _ingredientRepository = ingredientRepository;
+        _catalogRepository = repository;
+        _inventoryRepository = stockItemRepository;
     }
 
-    public IEnumerable<IngredientType> GetAll() => _repository.GetAll();
+    public IEnumerable<ProductDefinition> GetAll() => _catalogRepository.GetAll();
 
-    public IngredientType? GetByName(string name) => _repository.GetByName(name);
+    public ProductDefinition? GetByName(string name) => _catalogRepository.GetByName(name);
 
     public void Add(AddTypeCatalogCommand command)
     {
-        var existing = _repository.GetByName(command.Name);
+        var existing = _catalogRepository.GetByName(command.Name);
         if (existing != null)
         {
-            throw new IngredientTypeAlreadyExistsException();
+            throw new ProductDefinitionAlreadyExistsException();
         }
 
-        var definition = new IngredientType(
+        var definition = new ProductDefinition(
             command.Name,
             command.Unit,
             command.Category
         );
-        _repository.Add(definition);
+        _catalogRepository.Add(definition);
     }
 
     public void Update(ModifyTypeCatalogCommand command)
     {
-        var ingredientType = FindIngredientType(command.Name);
-        ingredientType.ChangeUnitType(command.Unit);
+        var productDefinition = FindProductDefinition(command.Name);
+        productDefinition.ChangeUnitType(command.Unit);
     }
 
     public void Delete(string name)
     {
-        var ingredientType = FindIngredientType(name);
-        _repository.Delete(name);
+        var productDefinition = FindProductDefinition(name);
+        _catalogRepository.Delete(name);
     }
 
-    public void LinkMetadataToExistingIngredients(IngredientType ingredientType)
+    public void LinkMetadataToExistingStockItems(ProductDefinition productDefinition)
     {
-        var orphanedIngredients = _ingredientRepository.GetAll(); //TODO: fetch with null type
+        var orphanedStockItems = _inventoryRepository.GetAll(); //TODO: fetch with null type
 
-        foreach (var ingredient in orphanedIngredients)
+        foreach (var stockItem in orphanedStockItems)
         {
-            ingredient.AssignType(ingredientType);
+            stockItem.AssignType(productDefinition);
         }
     }
 }

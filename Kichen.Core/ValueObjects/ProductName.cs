@@ -2,23 +2,23 @@
 
 namespace Kitchen.Core.ValueObjects
 {
-    public class IngredientName
+    public class ProductName
     {
         public string Value { get; }
 
-        public IngredientName(string value)
+        public ProductName(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new InvalidIngredientNameException();
+                throw new InvalidProductNameException();
             value = value.Trim();
             if (char.IsDigit(value[0]))
-                throw new InvalidIngredientNameException();
+                throw new InvalidProductNameException();
             
             Value = value;
         }
 
-        public static implicit operator IngredientName(string value) => new(value);
-        public static implicit operator string(IngredientName name) => name.Value;
+        public static implicit operator ProductName(string value) => new(value);
+        public static implicit operator string(ProductName name) => name.Value;
         public override string ToString() => Value;
     }
 }

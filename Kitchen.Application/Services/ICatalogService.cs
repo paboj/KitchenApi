@@ -5,8 +5,8 @@ namespace Kitchen.Application.Services
 {
     public interface ICatalogService
     {
-        IEnumerable<IngredientType> GetAll();
-        IngredientType? GetByName(string name);
+        IEnumerable<ProductDefinition> GetAll();
+        ProductDefinition? GetByName(string name);
         void Add(AddTypeCatalogCommand command);
         void Update(ModifyTypeCatalogCommand command);
         void Delete(string name);

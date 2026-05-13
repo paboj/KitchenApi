@@ -8,57 +8,52 @@ using Kitchen.Application.Services;
 
 internal class InventoryService : IInventoryService
 {
-    private readonly IIngredientRepository _repository;
-    private readonly IIngredientTypeRepository _typeRepository;
-    private Ingredient FindIngredient(string name)
+    private readonly IStockItemRepository _repository;
+    private readonly IProductDefinitionRepository _typeRepository;
+    private StockItem FindStockItem(string name)
     {
-        var ingredient = GetByName(name);
-        if (ingredient == null) throw new IngredientNotFoundException();
+        var stockItem = GetByName(name);
+        if (stockItem == null) throw new StockItemNotFoundException();
 
-        return ingredient;
+        return stockItem;
 
     }
 
-    public InventoryService(IIngredientRepository repository, IIngredientTypeRepository typeRepository)
+    public InventoryService(IStockItemRepository repository, IProductDefinitionRepository typeRepository)
     {
         _repository = repository;
         _typeRepository = typeRepository;
     }
 
-    public IEnumerable<Ingredient> GetAll() => _repository.GetAll();
+    public IEnumerable<StockItem> GetAll() => _repository.GetAll();
 
-    public Ingredient? GetByName(string name) => _repository.GetByName(name);
+    public StockItem? GetByName(string name) => _repository.GetByName(name);
 
     public void Add(AddToStockCommand command)
     {
-        var existing = _repository.GetByName(command.Name);
-        if (existing != null)
-        {
-            throw new IngredientAlreadyExistsException();
-        }
-        var ingredientType = _typeRepository.GetByName(command.Name);
-        var ingredient = new Ingredient(
+        var productDefinition = _typeRepository.GetByName(command.Name);
+        var stockItem = new StockItem(
             command.Name,
             command.Amount,
             command.Location,
-            ingredientType
+            productDefinition
         );
-        _repository.Add(ingredient);
+        _repository.Add(stockItem);
     }
 
     public void Update(ModifyInStockCommand command)
     {
-        var ingredient = FindIngredient(command.Name);
+        var stockItem = FindStockItem(command.Name);
 
-        ingredient.AdjustAmount(command.Amount);
-        ingredient.PlaceOrMove(command.Location);
+        stockItem.AdjustAmount(command.Amount);
+        stockItem.PlaceOrMove(command.Location);
 
-        _repository.Update(ingredient);
+        _repository.Update(stockItem);
     }
 
     public void Delete(string name)
     {
-        var ingredient = FindIngredient(name);
+        var stockItem = FindStockItem(name);
 
         _repository.Delete(name);
     }

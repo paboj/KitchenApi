@@ -5,18 +5,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Kitchen.Infrastructure.DAL.Repositories
 {
-    internal sealed class PostgresIngredientTypeRepository : IIngredientTypeRepository
+    internal sealed class PostgresProductDefinitionRepository : IProductDefinitionRepository
     {
         private readonly KitchenDbContext _dbContext;
 
-        public PostgresIngredientTypeRepository(KitchenDbContext dbContext)
+        public PostgresProductDefinitionRepository(KitchenDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public void Add(IngredientType ingredientType)
+        public void Add(ProductDefinition productDefinition)
         {
-            _dbContext.IngredientTypes.Add(ingredientType);
+            _dbContext.ProductDefinitions.Add(productDefinition);
             _dbContext.SaveChanges();
         }
 
@@ -25,19 +25,19 @@ namespace Kitchen.Infrastructure.DAL.Repositories
             var entity = GetByName(name);
             if (entity is not null)
             {
-                _dbContext.IngredientTypes.Remove(entity);
+                _dbContext.ProductDefinitions.Remove(entity);
                 _dbContext.SaveChanges();
             }
         }
 
-        public IEnumerable<IngredientType> GetAll()
-            => _dbContext.IngredientTypes
+        public IEnumerable<ProductDefinition> GetAll()
+            => _dbContext.ProductDefinitions
             .AsNoTracking()
             .ToList();
 
-        public IngredientType? GetByName(string name)
-            => _dbContext.IngredientTypes
+        public ProductDefinition? GetByName(string name)
+            => _dbContext.ProductDefinitions
                 .AsNoTracking()
-                .SingleOrDefault(x => x.Name == new IngredientName(name));
+                .SingleOrDefault(x => x.Name == new ProductName(name));
     }
 }

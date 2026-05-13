@@ -4,7 +4,7 @@ using Kitchen.Core.Domain.Enums;
 
 namespace Kitchen.Application.Models.Requests
 {
-    public class CreateIngredientRequest
+    public class CreateStockItemRequest
     {
         public string Name { get; set; }
         public double Amount { get; set; } = 0;

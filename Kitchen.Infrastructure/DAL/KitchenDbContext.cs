@@ -5,8 +5,8 @@ namespace Kitchen.Infrastructure.DAL
 {
     internal sealed class KitchenDbContext : DbContext
     {
-        public DbSet<Ingredient> Ingredients { get; set; }
-        public DbSet<IngredientType> IngredientTypes { get; set; }
+        public DbSet<StockItem> StockItems { get; set; }
+        public DbSet<ProductDefinition> ProductDefinitions { get; set; }
 
         public KitchenDbContext(DbContextOptions<KitchenDbContext> dbContextOptions) : base(dbContextOptions) 
         {

@@ -5,10 +5,10 @@ using Kitchen.Core.ValueObjects;
 
 namespace Kitchen.Core.Domain.Entities
 {
-    public class IngredientType
+    public class ProductDefinition
     {
         //primary key
-        public IngredientName Name { get; set; }
+        public ProductName Name { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public UnitType Unit { get; private set; } = UnitType.Unspecified;
@@ -17,8 +17,8 @@ namespace Kitchen.Core.Domain.Entities
         public Category Category { get; private set; } = Category.Unspecified;
 
 
-        private IngredientType() { }
-        public IngredientType(string name, UnitType unit, Category category) { 
+        private ProductDefinition() { }
+        public ProductDefinition(string name, UnitType unit, Category category) { 
             Name = name;
             ChangeUnitType(unit);
             SetCategory(category);

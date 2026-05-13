@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Kitchen.Core.Domain.Exceptions
 {
-    public sealed class IngredientTypeAlreadyExistsException : KitchenApiException
+    public sealed class ProductDefinitionAlreadyExistsException : KitchenApiException
     {
-        public IngredientTypeAlreadyExistsException() : base("Ingredient type already exists.") { }
+        public ProductDefinitionAlreadyExistsException() : base("Product already defined.") { }
     }
 }

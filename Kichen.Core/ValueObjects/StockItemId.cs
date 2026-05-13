@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace Kitchen.Core.ValueObjects
 {
-    public record IngredientId(Guid Value);
+    public record StockItemId(Guid Value);
 }

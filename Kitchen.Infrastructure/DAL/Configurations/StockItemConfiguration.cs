@@ -6,17 +6,17 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Kitchen.Infrastructure.DAL.Configurations
 {
-    internal sealed class IngredientConfiguration : IEntityTypeConfiguration<Ingredient>
+    internal sealed class StockItemConfiguration : IEntityTypeConfiguration<StockItem>
     {
-        public void Configure(EntityTypeBuilder<Ingredient> builder) 
+        public void Configure(EntityTypeBuilder<StockItem> builder) 
         {
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id)
-                .HasConversion(x => x.Value, x => new IngredientId(x));
+                .HasConversion(x => x.Value, x => new StockItemId(x));
 
             builder.Property(x => x.Name)
                 .IsRequired()
-                .HasConversion(x => x.Value, x => new IngredientName(x));
+                .HasConversion(x => x.Value, x => new ProductName(x));
             builder.HasIndex(x => x.Name)
                 .IsUnique();
 
@@ -28,8 +28,8 @@ namespace Kitchen.Infrastructure.DAL.Configurations
                     x => (StorageLocation)x
                 );
 
-            builder.Property<IngredientName>("TypeName")
-            .HasConversion(x => x.Value, x => new IngredientName(x))
+            builder.Property<ProductName>("TypeName")
+            .HasConversion(x => x.Value, x => new ProductName(x))
             .IsRequired(false);
 
             builder.HasOne(x => x.Type)

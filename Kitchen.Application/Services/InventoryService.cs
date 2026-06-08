@@ -1,8 +1,6 @@
-﻿using System.Xml.Linq;
-using Kitchen.Application.Commands;
+﻿using Kitchen.Application.Commands;
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Exceptions;
-using Kitchen.Application.Models.Requests;
 using Kitchen.Core.Repositories;
 using Kitchen.Application.Services;
 
@@ -10,9 +8,9 @@ internal class InventoryService : IInventoryService
 {
     private readonly IStockItemRepository _repository;
     private readonly IProductDefinitionRepository _typeRepository;
-    private StockItem FindStockItem(string name)
+    private StockItem FindStockItem(Guid id)
     {
-        var stockItem = GetByName(name);
+        var stockItem = GetById(id);
         if (stockItem == null) throw new StockItemNotFoundException();
 
         return stockItem;
@@ -25,11 +23,13 @@ internal class InventoryService : IInventoryService
         _typeRepository = typeRepository;
     }
 
-    public IEnumerable<StockItem> GetAll() => _repository.GetAll();
+    public IEnumerable<StockItem> GetAll() => _repository.GetAllWithDetails();
 
-    public StockItem? GetByName(string name) => _repository.GetByName(name);
+    public StockItem? GetById(Guid id) => _repository.GetByIdWithDetails(id);
 
-    public void Add(AddToStockCommand command)
+    public IEnumerable<StockItem> GetByName(string name) => _repository.GetByNameWithDetails(name);
+
+    public void Add(AddStockItemCommand command)
     {
         var productDefinition = _typeRepository.GetByName(command.Name);
         var stockItem = new StockItem(
@@ -41,9 +41,9 @@ internal class InventoryService : IInventoryService
         _repository.Add(stockItem);
     }
 
-    public void Update(ModifyInStockCommand command)
+    public void Update(ModifyStockItemCommand command)
     {
-        var stockItem = FindStockItem(command.Name);
+        var stockItem = FindStockItem(command.Id);
 
         stockItem.AdjustAmount(command.Amount);
         stockItem.PlaceOrMove(command.Location);
@@ -51,10 +51,10 @@ internal class InventoryService : IInventoryService
         _repository.Update(stockItem);
     }
 
-    public void Delete(string name)
+    public void Delete(Guid id)
     {
-        var stockItem = FindStockItem(name);
+        var stockItem = FindStockItem(id);
 
-        _repository.Delete(name);
+        _repository.Delete(id);
     }
 }

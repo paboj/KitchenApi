@@ -5,7 +5,7 @@ using Kitchen.Core.Domain.Exceptions;
 
 namespace Kitchen.Tests.Unit.Domain.Entities
 {
-    public class IngredientTests
+    public class StockItemTests
     {
         #region Arrange
 
@@ -14,11 +14,11 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         private readonly double _startAmount = 2;
         private readonly StorageLocation _startLocation = StorageLocation.Fridge;
 
-        private readonly Ingredient _ingredient;
+        private readonly StockItem _StockItem;
 
-        public IngredientTests()
+        public StockItemTests()
         {
-            _ingredient = new Ingredient(_startName, _startAmount, _startLocation);
+            _StockItem = new StockItem(_startName, _startAmount, _startLocation, null);
         }
 
         #endregion
@@ -30,9 +30,9 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData(null)]
         public void given_empty_name_constructor_should_fail(string name)
         {
-            Action action = () => new Ingredient(name, 2, StorageLocation.Fridge);
+            Action action = () => new StockItem(name, 2, StorageLocation.Fridge, null);
 
-            action.Should().Throw<InvalidIngredientNameException>();
+            action.Should().Throw<InvalidProductNameException>();
         }
 
         [Theory]
@@ -40,7 +40,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData(-0.01)]
         public void given_negative_amount_constructor_should_fail(double invalidAmount)
         {
-            Action action = () => new Ingredient("Pomidor", invalidAmount, StorageLocation.Fridge);
+            Action action = () => new StockItem("Pomidor", invalidAmount, StorageLocation.Fridge, null);
 
             action.Should().Throw<IncorrectAmountException>();
         }
@@ -50,7 +50,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData(999)]
         public void given_invalid_location_constructor_should_fail(int invalidLocation)
         {
-            Action action = () => new Ingredient("Pomidor", 2, (StorageLocation)invalidLocation);
+            Action action = () => new StockItem("Pomidor", 2, (StorageLocation)invalidLocation, null);
 
             action.Should().Throw<UnknownLocationException>();
         }
@@ -59,13 +59,13 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         public void given_valid_parameters_constructor_should_create_correct_entity()
         {
             // Act
-            var ingredient = new Ingredient("Czosnek", 10, StorageLocation.Pantry);
+            var StockItem = new StockItem("Czosnek", 10, StorageLocation.Pantry, null);
 
             // Assert
-            ingredient.Name.Value.Should().Be("Czosnek");
-            ingredient.Amount.Should().Be(10);
-            ingredient.Location.Should().Be(StorageLocation.Pantry);
-            ingredient.Id.Should().NotBe(Guid.Empty);
+            StockItem.Name.Value.Should().Be("Czosnek");
+            StockItem.Amount.Should().Be(10);
+            StockItem.Location.Should().Be(StorageLocation.Pantry);
+            StockItem.Id.Should().NotBe(Guid.Empty);
         }
 
         #endregion
@@ -77,10 +77,10 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         {
             var newValue = 5;
 
-            _ingredient.AdjustAmount(newValue);
+            _StockItem.AdjustAmount(newValue);
 
-            _ingredient.Amount.Should().Be(newValue);
-            _ingredient.Location.Should().Be(_startLocation);
+            _StockItem.Amount.Should().Be(newValue);
+            _StockItem.Location.Should().Be(_startLocation);
         }
 
         [Theory]
@@ -88,7 +88,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData(-0.1)]
         public void given_invalid_amount_adjustment_should_fail(double invalidAmount)
         {   
-            Action action = () => _ingredient.AdjustAmount(invalidAmount);
+            Action action = () => _StockItem.AdjustAmount(invalidAmount);
 
             action.Should().Throw<IncorrectAmountException>();
         }
@@ -96,10 +96,10 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Fact]
         public void given_null_amount_adjustment_should_leave_previous_value()
         {
-            _ingredient.AdjustAmount(null);
+            _StockItem.AdjustAmount(null);
 
-            _ingredient.Amount.Should().Be(_startAmount);
-            _ingredient.Location.Should().Be(_startLocation);
+            _StockItem.Amount.Should().Be(_startAmount);
+            _StockItem.Location.Should().Be(_startLocation);
         }
 
         #endregion
@@ -111,10 +111,10 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         {
             var newLocation = StorageLocation.Pantry;
 
-            _ingredient.PlaceOrMove(newLocation);
+            _StockItem.PlaceOrMove(newLocation);
 
-            _ingredient.Location.Should().Be(newLocation);
-            _ingredient.Amount.Should().Be(_startAmount);
+            _StockItem.Location.Should().Be(newLocation);
+            _StockItem.Amount.Should().Be(_startAmount);
         }
 
         [Theory]
@@ -122,7 +122,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData(666)]
         public void given_invalid_location_place_or_move_should_fail(int invalidLocation)
         {
-            Action action = () => _ingredient.PlaceOrMove((StorageLocation)invalidLocation);
+            Action action = () => _StockItem.PlaceOrMove((StorageLocation)invalidLocation);
 
             action.Should().Throw<UnknownLocationException>();
         }
@@ -130,10 +130,10 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Fact]
         public void given_null_location_place_or_move_should_leave_previous_value()
         {
-            _ingredient.PlaceOrMove(null);
+            _StockItem.PlaceOrMove(null);
 
-            _ingredient.Amount.Should().Be(_startAmount);
-            _ingredient.Location.Should().Be(_startLocation);
+            _StockItem.Amount.Should().Be(_startAmount);
+            _StockItem.Location.Should().Be(_startLocation);
         }
 
         #endregion

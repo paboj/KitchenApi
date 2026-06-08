@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using System.Xml.Linq;
-using Kitchen.Core.Domain.Enums;
+﻿using Kitchen.Core.Domain.Enums;
 using Kitchen.Core.Domain.Exceptions;
 using Kitchen.Core.ValueObjects;
 
@@ -13,7 +11,7 @@ namespace Kitchen.Core.Domain.Entities
         public double Amount { get; private set; } = 0;
         public StorageLocation Location { get; private set; } = StorageLocation.Unspecified;
         public ProductName? TypeName { get; private set; }
-        public ProductDefinition? Type { get; set; }
+        public ProductDefinition? Type { get; private set; }
 
         private StockItem() { }
 

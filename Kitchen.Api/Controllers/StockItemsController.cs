@@ -17,19 +17,28 @@ public class StockItemsController : ControllerBase
     [HttpGet]
     public IActionResult GetAll() => Ok(_inventoryService.GetAll());
 
-    [HttpGet("{name}")]
-    public IActionResult Get(string name)
+    [HttpGet("{id:guid}")]
+    public IActionResult Get(Guid id)
     {
-        var stockitem = _inventoryService.GetByName(name);
+        var stockitem = _inventoryService.GetById(id);
         if (stockitem == null) return NotFound();
 
         return Ok(stockitem);
     }
 
+    [HttpGet("{name}")]
+    public IActionResult Get(string name)
+    {
+        var stockitems = _inventoryService.GetByName(name);
+        if (!stockitems.Any()) return NotFound();
+
+        return Ok(stockitems);
+    }
+
     [HttpPost]
     public IActionResult Create([FromBody] CreateStockItemRequest request)
     {
-        var command = new AddToStockCommand(
+        var command = new AddStockItemCommand(
             request.Name,
             request.Amount,
             request.Location
@@ -41,11 +50,12 @@ public class StockItemsController : ControllerBase
     
 }
 
-    [HttpPut("{name}")]
-    public IActionResult Update(string name, [FromBody] UpdateStockItemRequest request)
+    [HttpPut("{id:guid}")]
+    public IActionResult Update(Guid id, [FromBody] UpdateStockItemRequest request)
     {
-        var command = new ModifyInStockCommand(
-            name,
+        var command = new ModifyStockItemCommand(
+            id,
+            request.Name,
             request.Amount,
             request.Location
         );
@@ -54,10 +64,10 @@ public class StockItemsController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{name}")]
-    public IActionResult Delete(string name)
+    [HttpDelete("{id:guid}")]
+    public IActionResult Delete(Guid id)
     {
-        _inventoryService.Delete(name);
+        _inventoryService.Delete(id);
         return NoContent();
     }
 }

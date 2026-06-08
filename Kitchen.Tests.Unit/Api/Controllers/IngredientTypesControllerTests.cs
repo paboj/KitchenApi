@@ -6,21 +6,20 @@ using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Xunit;
 
 namespace Kitchen.Tests.Unit.Api.Controllers
 {
-    public class IngredientTypesControllerTests
+    public class ProductDefinitionsControllerTests
     {
         #region Arrange
 
         private readonly Mock<ICatalogService> _catalogServiceMock;
-        private readonly IngredientTypesController _controller;
+        private readonly ProductDefinitionsController _controller;
 
-        public IngredientTypesControllerTests()
+        public ProductDefinitionsControllerTests()
         {
             _catalogServiceMock = new Mock<ICatalogService>();
-            _controller = new IngredientTypesController(_catalogServiceMock.Object);
+            _controller = new ProductDefinitionsController(_catalogServiceMock.Object);
         }
 
         #endregion
@@ -31,10 +30,10 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         public void get_all_should_return_ok_with_ingredient_types()
         {
             // Arrange
-            var expectedTypes = new List<IngredientType>
+            var expectedTypes = new List<ProductDefinition>
             {
-                new("Mąka", UnitType.Grams),
-                new("Mleko", UnitType.Milliliters)
+                new("Mąka", UnitType.Kilograms, Category.DryGoods),
+                new("Mleko", UnitType.Liters, Category.Dairy)
             };
 
             _catalogServiceMock
@@ -58,10 +57,10 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         public void create_should_return_created_at_action_when_request_is_valid()
         {
             // Arrange
-            var request = new CreateIngredientTypeRequest
+            var request = new CreateProductDefinitionRequest
             {
                 Name = "Cukier",
-                Unit = UnitType.Grams
+                Unit = UnitType.Kilograms
             };
 
             // Act
@@ -73,11 +72,11 @@ namespace Kitchen.Tests.Unit.Api.Controllers
             result.ActionName.Should().Be("GetAll");
             result.RouteValues["name"].Should().Be(request.Name);
 
-            var command = result.Value.Should().BeOfType<AddTypeCatalogCommand>().Subject;
+            var command = result.Value.Should().BeOfType<AddProductDefinitionCommand>().Subject;
             command.Name.Should().Be(request.Name);
             command.Unit.Should().Be(request.Unit);
 
-            _catalogServiceMock.Verify(s => s.Add(It.Is<AddTypeCatalogCommand>(c =>
+            _catalogServiceMock.Verify(s => s.Add(It.Is<AddProductDefinitionCommand>(c =>
                 c.Name == request.Name &&
                 c.Unit == request.Unit)), Times.Once);
         }
@@ -91,9 +90,9 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         {
             // Arrange
             var typeName = "Mleko";
-            var request = new UpdateIngredientTypeRequest
+            var request = new UpdateProductDefinitionRequest
             {
-                Unit = UnitType.Milliliters
+                Unit = UnitType.Liters
             };
 
             // Act
@@ -102,7 +101,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
             // Assert
             response.Should().BeOfType<NoContentResult>();
 
-            _catalogServiceMock.Verify(s => s.Update(It.Is<ModifyTypeCatalogCommand>(c =>
+            _catalogServiceMock.Verify(s => s.Update(It.Is<ModifyProductDefinitionCommand>(c =>
                 c.Name == typeName &&
                 c.Unit == request.Unit)), Times.Once);
         }

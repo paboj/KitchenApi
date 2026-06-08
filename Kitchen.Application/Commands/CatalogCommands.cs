@@ -2,13 +2,13 @@
 
 namespace Kitchen.Application.Commands
 {
-    public record AddTypeCatalogCommand(
+    public record AddProductDefinitionCommand(
         string Name,
         UnitType Unit,
         Category Category
      );
 
-    public record ModifyTypeCatalogCommand(
+    public record ModifyProductDefinitionCommand(
         string Name,
         UnitType? Unit,
         Category? Category

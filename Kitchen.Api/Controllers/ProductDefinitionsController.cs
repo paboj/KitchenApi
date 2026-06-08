@@ -1,6 +1,4 @@
-﻿using System.Xml.Linq;
-using Kitchen.Application.Commands;
-using Kitchen.Core.Domain.Entities;
+﻿using Kitchen.Application.Commands;
 using Kitchen.Application.Models.Requests;
 using Kitchen.Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +20,7 @@ public class ProductDefinitionsController : ControllerBase
     [HttpPost]
     public IActionResult Create([FromBody] CreateProductDefinitionRequest request)
     {
-        var command = new AddTypeCatalogCommand(
+        var command = new AddProductDefinitionCommand(
                 request.Name,
                 request.Unit,
                 request.Category
@@ -37,7 +35,7 @@ public class ProductDefinitionsController : ControllerBase
     [HttpPut("{name}")]
     public IActionResult Update(string name, [FromBody] UpdateProductDefinitionRequest request)
     {
-        var command = new ModifyTypeCatalogCommand(
+        var command = new ModifyProductDefinitionCommand(
             name,
             request.Unit,
             request.Category

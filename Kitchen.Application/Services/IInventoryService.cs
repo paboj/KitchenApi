@@ -6,9 +6,10 @@ namespace Kitchen.Application.Services
     public interface IInventoryService
     {
         IEnumerable<StockItem> GetAll();
-        StockItem? GetByName(string name);
-        void Add(AddToStockCommand command);
-        void Update(ModifyInStockCommand command);
-        void Delete(string name);
+        StockItem? GetById(Guid id);
+        IEnumerable<StockItem> GetByName(string name);
+        void Add(AddStockItemCommand command);
+        void Update(ModifyStockItemCommand command);
+        void Delete(Guid id);
     }
 }

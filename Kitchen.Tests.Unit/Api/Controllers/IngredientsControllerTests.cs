@@ -9,22 +9,22 @@ using Xunit;
 
 namespace Kitchen.Tests.Unit.Api.Controllers
 {
-    public class IngredientsControllerTests
+    public class StockItemsControllerTests
     {
         private readonly Mock<IInventoryService> _inventoryServiceMock;
-        private readonly IngredientsController _controller;
+        private readonly StockItemsController _controller;
 
-        public IngredientsControllerTests()
+        public StockItemsControllerTests()
         {
             _inventoryServiceMock = new Mock<IInventoryService>();
-            _controller = new IngredientsController(_inventoryServiceMock.Object);
+            _controller = new StockItemsController(_inventoryServiceMock.Object);
         }
 
         [Fact]
         public void create_should_return_created_at_action_when_request_is_valid()
         {
             // Arrange
-            var request = new CreateIngredientRequest
+            var request = new CreateStockItemRequest
             {
                 Name = "Tomato",
                 Amount = 5,
@@ -38,10 +38,10 @@ namespace Kitchen.Tests.Unit.Api.Controllers
             var result = response.Should().BeOfType<CreatedAtActionResult>().Subject;
 
             result.ActionName.Should().Be("Get");
-            result.RouteValues["name"].Should().Be(request.Name);
+            result.RouteValues!["id"].Should().NotBeNull();
             result.Value.Should().Be(request);
 
-            _inventoryServiceMock.Verify(s => s.Add(It.Is<AddToStockCommand>(c =>
+            _inventoryServiceMock.Verify(s => s.Add(It.Is<AddStockItemCommand>(c =>
                 c.Name == request.Name &&
                 c.Amount == request.Amount &&
                 c.Location == request.Location)), Times.Once);

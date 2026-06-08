@@ -20,10 +20,16 @@ namespace Kitchen.Infrastructure.DAL.Repositories
             .ToList();
         
 
-        public StockItem? GetByName(string name)
+        public StockItem? GetById(Guid id)
             => _dbContext.StockItems
             .AsNoTracking()
-            .FirstOrDefault(x => x.Name == new ProductName(name));
+            .SingleOrDefault(x => x.Id == new StockItemId(id));
+
+        public IEnumerable<StockItem> GetByName(string name)
+           => _dbContext.StockItems
+           .AsNoTracking()
+           .Where(x => x.Name == new ProductName(name))
+           .ToList();
 
         public void Add(StockItem stockItem)
         {
@@ -37,9 +43,9 @@ namespace Kitchen.Infrastructure.DAL.Repositories
             _dbContext.SaveChanges();
         }
 
-        public void Delete(string name)
+        public void Delete(Guid id)
         {
-            var stockItem = GetByName(name);
+            var stockItem = GetById(id);
 
             if (stockItem != null)
             {
@@ -53,11 +59,18 @@ namespace Kitchen.Infrastructure.DAL.Repositories
             .AsNoTracking()
             .ToList();
 
-
-        public StockItem? GetByNameWithDetails(string name)
+        public StockItem? GetByIdWithDetails(Guid id)
             => _dbContext.StockItems
             .Include(i => i.Type)
             .AsNoTracking()
-            .FirstOrDefault(x => x.Name == new ProductName(name));
+            .SingleOrDefault(x => x.Id == new StockItemId(id));
+
+
+        public IEnumerable<StockItem> GetByNameWithDetails(string name)
+            => _dbContext.StockItems
+            .Include(i => i.Type)
+            .AsNoTracking()
+            .Where(x => x.Name == new ProductName(name))
+            .ToList();
     }
 }

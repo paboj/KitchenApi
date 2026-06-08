@@ -6,12 +6,14 @@ namespace Kitchen.Core.Repositories
     public interface IStockItemRepository
     {
         IEnumerable<StockItem> GetAll();
-        StockItem? GetByName(string name);
+        StockItem? GetById(Guid id);
+        IEnumerable<StockItem> GetByName(string name);
         void Add(StockItem stockItem);
         void Update(StockItem stockItem);
-        void Delete(string name);
+        void Delete(Guid id);
 
         IEnumerable<StockItem> GetAllWithDetails();
-        StockItem? GetByNameWithDetails(string name);
+        StockItem? GetByIdWithDetails(Guid id);
+        IEnumerable<StockItem> GetByNameWithDetails(string name);
     }
 }

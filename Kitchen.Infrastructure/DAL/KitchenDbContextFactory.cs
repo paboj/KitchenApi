@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace Kitchen.Infrastructure.DAL
@@ -15,7 +10,7 @@ namespace Kitchen.Infrastructure.DAL
         {
             var optionsBuilder = new DbContextOptionsBuilder<KitchenDbContext>();
 
-            const string connectionString = "Host=localhost;Database=Kitchen;Username=postgres;Password=postgres";
+            const string connectionString = "Host=localhost;Database=KitchenDb;Username=postgres;Password=postgres";
 
             optionsBuilder.UseNpgsql(connectionString);
 

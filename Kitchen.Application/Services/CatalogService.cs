@@ -12,7 +12,7 @@ internal class CatalogService : ICatalogService
     private ProductDefinition FindProductDefinition(string name)
     {
         var productDefinition = GetByName(name);
-        if (productDefinition == null) throw new StockItemNotFoundException();
+        if (productDefinition == null) throw new ProductDefinitionNotFoundException();
 
         return productDefinition;
 
@@ -28,13 +28,10 @@ internal class CatalogService : ICatalogService
 
     public ProductDefinition? GetByName(string name) => _catalogRepository.GetByName(name);
 
-    public void Add(AddTypeCatalogCommand command)
+    public void Add(AddProductDefinitionCommand command)
     {
         var existing = _catalogRepository.GetByName(command.Name);
-        if (existing != null)
-        {
-            throw new ProductDefinitionAlreadyExistsException();
-        }
+        if (existing != null) throw new ProductDefinitionAlreadyExistsException();
 
         var definition = new ProductDefinition(
             command.Name,
@@ -42,12 +39,15 @@ internal class CatalogService : ICatalogService
             command.Category
         );
         _catalogRepository.Add(definition);
+
+        LinkToExistingStockItems(definition);
     }
 
-    public void Update(ModifyTypeCatalogCommand command)
+    public void Update(ModifyProductDefinitionCommand command)
     {
         var productDefinition = FindProductDefinition(command.Name);
         productDefinition.ChangeUnitType(command.Unit);
+        productDefinition.SetCategory(command.Category);
     }
 
     public void Delete(string name)
@@ -56,13 +56,17 @@ internal class CatalogService : ICatalogService
         _catalogRepository.Delete(name);
     }
 
-    public void LinkMetadataToExistingStockItems(ProductDefinition productDefinition)
+    public void LinkToExistingStockItems(ProductDefinition productDefinition)
     {
-        var orphanedStockItems = _inventoryRepository.GetAll(); //TODO: fetch with null type
+        var stockItems = _inventoryRepository.GetAll();
 
-        foreach (var stockItem in orphanedStockItems)
+        foreach (var stockItem in stockItems)
         {
-            stockItem.AssignType(productDefinition);
+            if (productDefinition.Name == stockItem.Name && stockItem.Type == null)
+            {
+                stockItem.AssignType(productDefinition);
+                _inventoryRepository.Update(stockItem);
+            }
         }
     }
 }

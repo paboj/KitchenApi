@@ -5,16 +5,16 @@ using Kitchen.Core.Domain.Exceptions;
 
 namespace Kitchen.Tests.Unit.Domain.Entities
 {
-    public class IngredientTypeTests
+    public class ProductDefinitionTests
     {
 
         #region Arrange
 
-        private readonly IngredientType _IngredientType;
+        private readonly ProductDefinition _ProductDefinition;
 
-        public IngredientTypeTests()
+        public ProductDefinitionTests()
         {
-            _IngredientType = new IngredientType("Mąka", UnitType.Grams);
+            _ProductDefinition = new ProductDefinition("Mąka", UnitType.Kilograms, Category.DryGoods);
         }
 
         #endregion
@@ -25,11 +25,11 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         public void given_valid_parameters_constructor_should_create_correct_entity()
         {
             // Act
-            var type = new IngredientType("Mleko", UnitType.Milliliters);
+            var type = new ProductDefinition("Mleko", UnitType.Liters, Category.Dairy);
 
             // Assert
             type.Name.Value.Should().Be("Mleko");
-            type.Unit.Should().Be(UnitType.Milliliters);
+            type.Unit.Should().Be(UnitType.Liters);
         }
 
         [Theory]
@@ -37,9 +37,9 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData(null)]
         public void given_empty_name_constructor_should_fail(string invalidName)
         {
-            Action action = () => new IngredientType(invalidName, UnitType.Grams);
+            Action action = () => new ProductDefinition(invalidName, UnitType.Kilograms, Category.DryGoods);
 
-            action.Should().Throw<InvalidIngredientNameException>();
+            action.Should().Throw<InvalidProductNameException>();
         }
 
         [Theory]
@@ -47,7 +47,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData((UnitType)999)]
         public void given_invalid_unit_constructor_should_fail(UnitType invalidUnit)
         {
-            Action action = () => new IngredientType("Mąka", invalidUnit);
+            Action action = () => new ProductDefinition("Mąka", invalidUnit, Category.DryGoods);
 
             action.Should().Throw<UnknownUnitTypeException>();
         }
@@ -59,18 +59,18 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Fact]
         public void change_unit_type_should_update_unit_when_valid()
         {
-            var newUnit = UnitType.Milliliters;
+            var newUnit = UnitType.Liters;
 
-            _IngredientType.ChangeUnitType(newUnit);
+            _ProductDefinition.ChangeUnitType(newUnit);
 
-            _IngredientType.Unit.Should().Be(newUnit);
+            _ProductDefinition.Unit.Should().Be(newUnit);
         }
 
         [Theory]
         [InlineData((UnitType)66)]
         public void change_unit_type_should_throw_exception_when_invalid(UnitType invalidUnit)
         {
-            Action action = () => _IngredientType.ChangeUnitType(invalidUnit);
+            Action action = () => _ProductDefinition.ChangeUnitType(invalidUnit);
 
             action.Should().Throw<UnknownUnitTypeException>();
         }

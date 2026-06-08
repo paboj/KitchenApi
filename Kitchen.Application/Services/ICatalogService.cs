@@ -7,8 +7,8 @@ namespace Kitchen.Application.Services
     {
         IEnumerable<ProductDefinition> GetAll();
         ProductDefinition? GetByName(string name);
-        void Add(AddTypeCatalogCommand command);
-        void Update(ModifyTypeCatalogCommand command);
+        void Add(AddProductDefinitionCommand command);
+        void Update(ModifyProductDefinitionCommand command);
         void Delete(string name);
     }
 }

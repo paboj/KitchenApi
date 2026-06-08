@@ -17,8 +17,6 @@ namespace Kitchen.Infrastructure.DAL.Configurations
             builder.Property(x => x.Name)
                 .IsRequired()
                 .HasConversion(x => x.Value, x => new ProductName(x));
-            builder.HasIndex(x => x.Name)
-                .IsUnique();
 
             builder.Property(x => x.Amount);
 

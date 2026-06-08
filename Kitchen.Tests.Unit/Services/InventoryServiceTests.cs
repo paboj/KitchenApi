@@ -3,91 +3,94 @@ using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
 using Kitchen.Core.Domain.Exceptions;
 using Kitchen.Core.Repositories;
-using Kitchen.Core.ValueObjects;
 using Moq;
 
 namespace Kitchen.Tests.Unit.Services
 {
     public class InventoryServiceTests
     {
-        private readonly Mock<IIngredientRepository> _repositoryMock;
+        private readonly Mock<IStockItemRepository> _stockItemRepositoryMock;
+        private readonly Mock<IProductDefinitionRepository> _productDefinitionRepositoryMock;
         private readonly InventoryService _service;
 
         public InventoryServiceTests()
         {
-            _repositoryMock = new Mock<IIngredientRepository>();
-            _service = new InventoryService(_repositoryMock.Object);
+            _stockItemRepositoryMock = new Mock<IStockItemRepository>();
+            _productDefinitionRepositoryMock = new Mock<IProductDefinitionRepository>();
+            _service = new InventoryService(_stockItemRepositoryMock.Object, _productDefinitionRepositoryMock.Object);
         }
 
         [Fact]
-        public void GetByName_ShouldReturnIngredient_WhenIngredientExists()
+        public void GetByName_ShouldReturnStockItems_WhenStockItemsExist()
         {
             // Arrange 
-            var ingredientName = "Onion";
-            var expectedIngredient = new Ingredient(ingredientName, 10, StorageLocation.Fridge);
+            var stockItemName = "Onion";
+            var firstExpectedStockItem = new StockItem(stockItemName, 10, StorageLocation.Fridge, null);
+            var secondExpectedStockItem = new StockItem(stockItemName, 5, StorageLocation.Freezer, null);
+            IEnumerable<StockItem> expectedStockItems = new List<StockItem> { firstExpectedStockItem, secondExpectedStockItem };
 
-            _repositoryMock
-                .Setup(repo => repo.GetByName(ingredientName))
-                .Returns(expectedIngredient);
+            _stockItemRepositoryMock
+                .Setup(repo => repo.GetByName(stockItemName))
+                .Returns(expectedStockItems);
 
             // Act
-            var result = _service.GetByName(ingredientName);
+            var result = _service.GetByName(stockItemName);
 
             // Assert 
             Assert.NotNull(result);
-            Assert.Equal(ingredientName, (string)result.Name);
+            Assert.All(result, item => Assert.Equal(stockItemName, item.Name));
 
             // Optional
-            _repositoryMock.Verify(repo => repo.GetByName(ingredientName), Times.Once);
+            _stockItemRepositoryMock.Verify(repo => repo.GetByName(stockItemName), Times.Once);
         }
 
         [Fact]
-        public void GetByName_ShouldReturnNull_WhenIngredientDoesNotExist()
+        public void GetByName_ShouldReturnNull_WhenStockItemsDoNotExist()
         {
             // Arrange
-            _repositoryMock
+            _stockItemRepositoryMock
                 .Setup(repo => repo.GetByName(It.IsAny<string>()))
-                .Returns((Ingredient?)null);
+                .Returns(Enumerable.Empty<StockItem>());
 
             // Act
             var result = _service.GetByName("NonExistent");
 
             // Assert
-            Assert.Null(result);
+            Assert.Empty(result);
         }
 
         [Fact]
-        public void GetAll_ShouldReturnIngredients_WhenIngredientsExists()
+        public void GetAll_ShouldReturnStockItems_WhenStockItemsExists()
         {
             // Arrange 
-            IEnumerable<Ingredient> expectedIngredients = new List<Ingredient>
+            IEnumerable<StockItem> expectedStockItems = new List<StockItem>
             {
-                new Ingredient("Onion", 10, StorageLocation.Fridge),
-                new Ingredient("Potato", 5, StorageLocation.Pantry)
+                new StockItem("Onion", 10, StorageLocation.Fridge, null),
+                new StockItem("Potato", 5, StorageLocation.Pantry, null)
             };
 
-            _repositoryMock
+            _stockItemRepositoryMock
                 .Setup(repo => repo.GetAll())
-                .Returns(expectedIngredients);
+                .Returns(expectedStockItems);
 
             // Act
             var result = _service.GetAll();
 
             // Assert 
             Assert.NotNull(result);
-            Assert.Equal(expectedIngredients, result);
+            Assert.Equal(expectedStockItems, result);
 
-            _repositoryMock.Verify(repo => repo.GetAll(), Times.Once);
+            _stockItemRepositoryMock.Verify(repo => repo.GetAll(), Times.Once);
         }
 
         [Fact]
-        public void Add_ShouldSucceed_WhenValidIngredient()
+        public void Add_ShouldSucceed_WhenValidStockItem()
         {
-            var command = new AddToStockCommand("Onion", 10, StorageLocation.Fridge);
+            var command = new AddStockItemCommand("Onion", 10, StorageLocation.Fridge);
 
             _service.Add(command);
 
-            _repositoryMock.Verify(repo => repo.Add(It.Is<Ingredient>(i =>
+            _stockItemRepositoryMock.Verify(repo => repo.Add(It.Is<StockItem>(i =>
                 i.Name == command.Name &&
                 i.Amount == command.Amount &&
                 i.Location == command.Location)),
@@ -95,58 +98,61 @@ namespace Kitchen.Tests.Unit.Services
         }
 
         [Fact]
-        public void Update_ShouldSucceed_WhenValidIngredient()
+        public void Update_ShouldSucceed_WhenValidStockItem()
         {
-            var ingredientName = "Onion";
+            var StockItemName = "Onion";
             var initialAmount = 10;
             var newAmount = 5;
             var initialLocation = StorageLocation.Fridge;
             var newLocation = StorageLocation.Pantry;
 
-            var existingIngredient = new Ingredient(ingredientName, initialAmount, initialLocation);
+            var existingStockItem = new StockItem(StockItemName, initialAmount, initialLocation, null);
 
-            _repositoryMock
-                .Setup(repo => repo.GetByName(ingredientName))
-                .Returns(existingIngredient);
+            var existingStockItemId = existingStockItem.Id.Value;
 
-            var command = new ModifyInStockCommand(ingredientName, newAmount, newLocation);
+            _stockItemRepositoryMock
+                .Setup(repo => repo.GetById(existingStockItemId))
+                .Returns(existingStockItem);
+
+            var command = new ModifyStockItemCommand(existingStockItemId, StockItemName, newAmount, newLocation);
 
             _service.Update(command);
 
-            Assert.Equal(newAmount, existingIngredient.Amount);
-            Assert.Equal(newLocation, existingIngredient.Location);
+            Assert.Equal(newAmount, existingStockItem.Amount);
+            Assert.Equal(newLocation, existingStockItem.Location);
 
         }
 
         [Fact]
-        public void Delete_ShouldCallRepository_WhenIngredientExists()
+        public void Delete_ShouldCallRepository_WhenStockItemExists()
         {
-            var ingredientName = "Onion";
-            var existingIngredient = new Ingredient(ingredientName, 10, StorageLocation.Fridge);
+            var StockItemName = "Onion";
+            var existingStockItem = new StockItem(StockItemName, 10, StorageLocation.Fridge, null);
+            var existingStockItemId = existingStockItem.Id.Value;
 
-            _repositoryMock
-                .Setup(repo => repo.GetByName(ingredientName))
-                .Returns(existingIngredient);
+            _stockItemRepositoryMock
+                .Setup(repo => repo.GetById(existingStockItemId))
+                .Returns(existingStockItem);
 
-            _service.Delete(ingredientName);
+            _service.Delete(existingStockItemId);
 
-            _repositoryMock.Verify(repo => repo.Delete(ingredientName), Times.Once);
+            _stockItemRepositoryMock.Verify(repo => repo.Delete(existingStockItemId), Times.Once);
         }
 
         [Fact]
-        public void Delete_ShouldThrowException_WhenIngredientDoesNotExists()
+        public void Delete_ShouldThrowException_WhenStockItemDoesNotExists()
         {
-            var ingredientName = "Onion";
+            var StockItemId = new Guid();
 
-            _repositoryMock
-                .Setup(repo => repo.GetByName(ingredientName))
-                .Returns((Ingredient?)null);
+            _stockItemRepositoryMock
+                .Setup(repo => repo.GetById(StockItemId))
+                .Returns((StockItem?)null);
 
-            var action = () => _service.Delete(ingredientName);
+            var action = () => _service.Delete(StockItemId);
 
-            Assert.Throws<IngredientNotFoundException>(action);
+            Assert.Throws<StockItemNotFoundException>(action);
 
-            _repositoryMock.Verify(repo => repo.Delete(It.IsAny<string>()), Times.Never);
+            _stockItemRepositoryMock.Verify(repo => repo.Delete(It.IsAny<Guid>()), Times.Never);
         }
     }
 }

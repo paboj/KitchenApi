@@ -7,7 +7,7 @@ namespace Kitchen.Core.Domain.Entities
     public class StockItem
     {
         public StockItemId Id { get; private set; }
-        public ProductName Name { get; set; }
+        public ProductName Name { get; private set; }
         public double Amount { get; private set; } = 0;
         public StorageLocation Location { get; private set; } = StorageLocation.Unspecified;
         public ProductName? TypeName { get; private set; }
@@ -17,10 +17,16 @@ namespace Kitchen.Core.Domain.Entities
 
         public StockItem(string name, double amount, StorageLocation location, ProductDefinition? type) { 
             Id = new StockItemId(Guid.NewGuid());
-            Name = name;
+            Name = new ProductName(name);
             AdjustAmount(amount);
             PlaceOrMove(location);
             AssignType(type);
+        }
+
+        public void SetName(string? name)
+        {
+            if (name is null) return;
+            Name = new ProductName(name);
         }
 
         public void AssignType(ProductDefinition? type)

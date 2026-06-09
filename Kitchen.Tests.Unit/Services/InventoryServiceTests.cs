@@ -30,7 +30,7 @@ namespace Kitchen.Tests.Unit.Services
             IEnumerable<StockItem> expectedStockItems = new List<StockItem> { firstExpectedStockItem, secondExpectedStockItem };
 
             _stockItemRepositoryMock
-                .Setup(repo => repo.GetByName(stockItemName))
+                .Setup(repo => repo.GetByNameWithDetails(stockItemName))
                 .Returns(expectedStockItems);
 
             // Act
@@ -41,7 +41,7 @@ namespace Kitchen.Tests.Unit.Services
             Assert.All(result, item => Assert.Equal(stockItemName, item.Name));
 
             // Optional
-            _stockItemRepositoryMock.Verify(repo => repo.GetByName(stockItemName), Times.Once);
+            _stockItemRepositoryMock.Verify(repo => repo.GetByNameWithDetails(stockItemName), Times.Once);
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace Kitchen.Tests.Unit.Services
         {
             // Arrange
             _stockItemRepositoryMock
-                .Setup(repo => repo.GetByName(It.IsAny<string>()))
+                .Setup(repo => repo.GetByNameWithDetails(It.IsAny<string>()))
                 .Returns(Enumerable.Empty<StockItem>());
 
             // Act
@@ -70,7 +70,7 @@ namespace Kitchen.Tests.Unit.Services
             };
 
             _stockItemRepositoryMock
-                .Setup(repo => repo.GetAll())
+                .Setup(repo => repo.GetAllWithDetails())
                 .Returns(expectedStockItems);
 
             // Act
@@ -80,7 +80,7 @@ namespace Kitchen.Tests.Unit.Services
             Assert.NotNull(result);
             Assert.Equal(expectedStockItems, result);
 
-            _stockItemRepositoryMock.Verify(repo => repo.GetAll(), Times.Once);
+            _stockItemRepositoryMock.Verify(repo => repo.GetAllWithDetails(), Times.Once);
         }
 
         [Fact]
@@ -111,7 +111,7 @@ namespace Kitchen.Tests.Unit.Services
             var existingStockItemId = existingStockItem.Id.Value;
 
             _stockItemRepositoryMock
-                .Setup(repo => repo.GetById(existingStockItemId))
+                .Setup(repo => repo.GetByIdWithDetails(existingStockItemId))
                 .Returns(existingStockItem);
 
             var command = new ModifyStockItemCommand(existingStockItemId, StockItemName, newAmount, newLocation);
@@ -131,7 +131,7 @@ namespace Kitchen.Tests.Unit.Services
             var existingStockItemId = existingStockItem.Id.Value;
 
             _stockItemRepositoryMock
-                .Setup(repo => repo.GetById(existingStockItemId))
+                .Setup(repo => repo.GetByIdWithDetails(existingStockItemId))
                 .Returns(existingStockItem);
 
             _service.Delete(existingStockItemId);
@@ -145,7 +145,7 @@ namespace Kitchen.Tests.Unit.Services
             var StockItemId = new Guid();
 
             _stockItemRepositoryMock
-                .Setup(repo => repo.GetById(StockItemId))
+                .Setup(repo => repo.GetByIdWithDetails(StockItemId))
                 .Returns((StockItem?)null);
 
             var action = () => _service.Delete(StockItemId);

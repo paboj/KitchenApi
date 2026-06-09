@@ -8,7 +8,7 @@ namespace Kitchen.Core.Domain.Entities
     public class ProductDefinition
     {
         //primary key
-        public ProductName Name { get; set; }
+        public ProductName Name { get; private set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public UnitType Unit { get; private set; } = UnitType.Unspecified;
@@ -18,10 +18,15 @@ namespace Kitchen.Core.Domain.Entities
 
 
         private ProductDefinition() { }
-        public ProductDefinition(string name, UnitType unit, Category category) { 
-            Name = name;
+        public ProductDefinition(string name, UnitType unit, Category category) {
+            SetName(name);
             ChangeUnitType(unit);
             SetCategory(category);
+        }
+
+        public void SetName(string name)
+        {
+            Name = new ProductName(name);
         }
 
         public void ChangeUnitType(UnitType? unit)

@@ -9,5 +9,6 @@ namespace Kitchen.Core.Repositories
         ProductDefinition? GetByName(string name);
         void Add(ProductDefinition productDefinition);
         void Delete(string name);
+        void Update(ProductDefinition productDefinition);
     }
 }

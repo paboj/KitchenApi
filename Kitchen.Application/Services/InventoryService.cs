@@ -45,6 +45,7 @@ internal class InventoryService : IInventoryService
     {
         var stockItem = FindStockItem(command.Id);
 
+        stockItem.SetName(command.Name);
         stockItem.AdjustAmount(command.Amount);
         stockItem.PlaceOrMove(command.Location);
 

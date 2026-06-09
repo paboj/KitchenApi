@@ -30,6 +30,7 @@ namespace Kitchen.Api.Middleware
             var code = exception switch
             {
                 // 404 Not Found
+                ProductDefinitionNotFoundException or
                 StockItemNotFoundException => HttpStatusCode.NotFound,
 
                 // 400 Bad Request (validation errors & incorrect data)

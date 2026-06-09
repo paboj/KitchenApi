@@ -20,6 +20,12 @@ namespace Kitchen.Infrastructure.DAL.Repositories
             _dbContext.SaveChanges();
         }
 
+        public void Update(ProductDefinition productDefinition)
+        {
+            _dbContext.ProductDefinitions.Update(productDefinition);
+            _dbContext.SaveChanges();
+        }
+
         public void Delete(string name)
         {
             var entity = GetByName(name);

@@ -1,5 +1,4 @@
-﻿using System.Xml.Linq;
-using Kitchen.Application.Commands;
+﻿using Kitchen.Application.Commands;
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Exceptions;
 using Kitchen.Core.Repositories;
@@ -48,6 +47,8 @@ internal class CatalogService : ICatalogService
         var productDefinition = FindProductDefinition(command.Name);
         productDefinition.ChangeUnitType(command.Unit);
         productDefinition.SetCategory(command.Category);
+
+        _catalogRepository.Update(productDefinition);
     }
 
     public void Delete(string name)

@@ -38,7 +38,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
             var result = response.Should().BeOfType<CreatedAtActionResult>().Subject;
 
             result.ActionName.Should().Be("Get");
-            result.RouteValues!["id"].Should().NotBeNull();
+            result.RouteValues!["name"].Should().Be(request.Name);
             result.Value.Should().Be(request);
 
             _inventoryServiceMock.Verify(s => s.Add(It.Is<AddStockItemCommand>(c =>

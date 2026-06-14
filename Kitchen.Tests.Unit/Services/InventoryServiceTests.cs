@@ -21,7 +21,7 @@ namespace Kitchen.Tests.Unit.Services
         }
 
         [Fact]
-        public void GetByName_ShouldReturnStockItems_WhenStockItemsExist()
+        public async Task GetByName_ShouldReturnStockItems_WhenStockItemsExist()
         {
             // Arrange 
             var stockItemName = "Onion";
@@ -31,10 +31,10 @@ namespace Kitchen.Tests.Unit.Services
 
             _stockItemRepositoryMock
                 .Setup(repo => repo.GetByNameWithDetails(stockItemName))
-                .Returns(expectedStockItems);
+                .ReturnsAsync(expectedStockItems);
 
             // Act
-            var result = _service.GetByName(stockItemName);
+            var result = await _service.GetByName(stockItemName);
 
             // Assert 
             Assert.NotNull(result);
@@ -45,22 +45,22 @@ namespace Kitchen.Tests.Unit.Services
         }
 
         [Fact]
-        public void GetByName_ShouldReturnNull_WhenStockItemsDoNotExist()
+        public async Task GetByName_ShouldReturnNull_WhenStockItemsDoNotExist()
         {
             // Arrange
             _stockItemRepositoryMock
                 .Setup(repo => repo.GetByNameWithDetails(It.IsAny<string>()))
-                .Returns(Enumerable.Empty<StockItem>());
+                .ReturnsAsync(Enumerable.Empty<StockItem>());
 
             // Act
-            var result = _service.GetByName("NonExistent");
+            var result = await _service.GetByName("NonExistent");
 
             // Assert
             Assert.Empty(result);
         }
 
         [Fact]
-        public void GetAll_ShouldReturnStockItems_WhenStockItemsExists()
+        public async Task GetAll_ShouldReturnStockItems_WhenStockItemsExists()
         {
             // Arrange 
             IEnumerable<StockItem> expectedStockItems = new List<StockItem>
@@ -71,10 +71,10 @@ namespace Kitchen.Tests.Unit.Services
 
             _stockItemRepositoryMock
                 .Setup(repo => repo.GetAllWithDetails())
-                .Returns(expectedStockItems);
+                .ReturnsAsync(expectedStockItems);
 
             // Act
-            var result = _service.GetAll();
+            var result = await _service.GetAll();
 
             // Assert 
             Assert.NotNull(result);
@@ -84,11 +84,11 @@ namespace Kitchen.Tests.Unit.Services
         }
 
         [Fact]
-        public void Add_ShouldSucceed_WhenValidStockItem()
+        public async Task Add_ShouldSucceed_WhenValidStockItem()
         {
             var command = new AddStockItemCommand("Onion", 10, StorageLocation.Fridge);
 
-            _service.Add(command);
+            await _service.Add(command);
 
             _stockItemRepositoryMock.Verify(repo => repo.Add(It.Is<StockItem>(i =>
                 i.Name == command.Name &&
@@ -98,7 +98,7 @@ namespace Kitchen.Tests.Unit.Services
         }
 
         [Fact]
-        public void Update_ShouldSucceed_WhenValidStockItem()
+        public async Task Update_ShouldSucceed_WhenValidStockItem()
         {
             var StockItemName = "Onion";
             var initialAmount = 10;
@@ -112,19 +112,21 @@ namespace Kitchen.Tests.Unit.Services
 
             _stockItemRepositoryMock
                 .Setup(repo => repo.GetByIdWithDetails(existingStockItemId))
-                .Returns(existingStockItem);
+                .ReturnsAsync(existingStockItem);
 
             var command = new ModifyStockItemCommand(existingStockItemId, StockItemName, newAmount, newLocation);
 
-            _service.Update(command);
+            await _service.Update(command);
 
             Assert.Equal(newAmount, existingStockItem.Amount);
             Assert.Equal(newLocation, existingStockItem.Location);
 
+            _stockItemRepositoryMock.Verify(repo => repo.Update(existingStockItem), Times.Once);
+
         }
 
         [Fact]
-        public void Delete_ShouldCallRepository_WhenStockItemExists()
+        public async Task Delete_ShouldCallRepository_WhenStockItemExists()
         {
             var StockItemName = "Onion";
             var existingStockItem = new StockItem(StockItemName, 10, StorageLocation.Fridge, null);
@@ -132,25 +134,25 @@ namespace Kitchen.Tests.Unit.Services
 
             _stockItemRepositoryMock
                 .Setup(repo => repo.GetByIdWithDetails(existingStockItemId))
-                .Returns(existingStockItem);
+                .ReturnsAsync(existingStockItem);
 
-            _service.Delete(existingStockItemId);
+            await _service.Delete(existingStockItemId);
 
             _stockItemRepositoryMock.Verify(repo => repo.Delete(existingStockItemId), Times.Once);
         }
 
         [Fact]
-        public void Delete_ShouldThrowException_WhenStockItemDoesNotExists()
+        public async Task Delete_ShouldThrowException_WhenStockItemDoesNotExists()
         {
             var StockItemId = new Guid();
 
             _stockItemRepositoryMock
                 .Setup(repo => repo.GetByIdWithDetails(StockItemId))
-                .Returns((StockItem?)null);
+                .ReturnsAsync((StockItem?)null);
 
-            var action = () => _service.Delete(StockItemId);
+            var action = async () => await _service.Delete(StockItemId);
 
-            Assert.Throws<StockItemNotFoundException>(action);
+            await Assert.ThrowsAsync<StockItemNotFoundException>(action);
 
             _stockItemRepositoryMock.Verify(repo => repo.Delete(It.IsAny<Guid>()), Times.Never);
         }

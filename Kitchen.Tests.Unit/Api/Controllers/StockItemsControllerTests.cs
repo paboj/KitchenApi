@@ -21,7 +21,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         }
 
         [Fact]
-        public void create_should_return_created_at_action_when_request_is_valid()
+        public async Task create_should_return_created_at_action_when_request_is_valid()
         {
             // Arrange
             var request = new CreateStockItemRequest
@@ -32,7 +32,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
             };
 
             // Act
-            var response = _controller.Create(request);
+            var response = await _controller.Create(request);
 
             // Assert
             var result = response.Should().BeOfType<CreatedAtActionResult>().Subject;

@@ -27,7 +27,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         #region GetAll
 
         [Fact]
-        public void get_all_should_return_ok_with_ingredient_types()
+        public async Task get_all_should_return_ok_with_ingredient_types()
         {
             // Arrange
             var expectedTypes = new List<ProductDefinition>
@@ -38,10 +38,10 @@ namespace Kitchen.Tests.Unit.Api.Controllers
 
             _catalogServiceMock
                 .Setup(s => s.GetAll())
-                .Returns(expectedTypes);
+                .ReturnsAsync(expectedTypes);
 
             // Act
-            var response = _controller.GetAll();
+            var response = await _controller.GetAll();
 
             // Assert
             var result = response.Should().BeOfType<OkObjectResult>().Subject;
@@ -54,7 +54,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         #region Create
 
         [Fact]
-        public void create_should_return_created_at_action_when_request_is_valid()
+        public async Task create_should_return_created_at_action_when_request_is_valid()
         {
             // Arrange
             var request = new CreateProductDefinitionRequest
@@ -64,13 +64,16 @@ namespace Kitchen.Tests.Unit.Api.Controllers
             };
 
             // Act
-            var response = _controller.Create(request);
+            var response = await _controller.Create(request);
 
             // Assert
             var result = response.Should().BeOfType<CreatedAtActionResult>().Subject;
 
             result.ActionName.Should().Be("GetAll");
-            result.RouteValues["name"].Should().Be(request.Name);
+            //result.RouteValues!["name"].Should().Be(request.Name); - also possible
+            result.RouteValues.Should()
+                    .ContainKey("name")
+                    .WhoseValue.Should().Be(request.Name);
 
             var command = result.Value.Should().BeOfType<AddProductDefinitionCommand>().Subject;
             command.Name.Should().Be(request.Name);
@@ -86,7 +89,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         #region Update
 
         [Fact]
-        public void update_should_return_no_content_when_valid()
+        public async Task update_should_return_no_content_when_valid()
         {
             // Arrange
             var typeName = "Mleko";
@@ -96,7 +99,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
             };
 
             // Act
-            var response = _controller.Update(typeName, request);
+            var response = await _controller.Update(typeName, request);
 
             // Assert
             response.Should().BeOfType<NoContentResult>();
@@ -111,13 +114,13 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         #region Delete
 
         [Fact]
-        public void delete_should_return_no_content_when_successful()
+        public async Task delete_should_return_no_content_when_successful()
         {
             // Arrange
             var typeName = "Mąka";
 
             // Act
-            var response = _controller.Delete(typeName);
+            var response = await _controller.Delete(typeName);
 
             // Assert
             response.Should().BeOfType<NoContentResult>();

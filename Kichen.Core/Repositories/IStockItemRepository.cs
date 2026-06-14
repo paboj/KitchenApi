@@ -5,15 +5,15 @@ namespace Kitchen.Core.Repositories
 {
     public interface IStockItemRepository
     {
-        IEnumerable<StockItem> GetAll();
-        StockItem? GetById(Guid id);
-        IEnumerable<StockItem> GetByName(string name);
-        void Add(StockItem stockItem);
-        void Update(StockItem stockItem);
-        void Delete(Guid id);
+        Task<IEnumerable<StockItem>> GetAll();
+        Task<StockItem?> GetById(Guid id);
+        Task<IEnumerable<StockItem>> GetByName(string name);
+        Task Add(StockItem stockItem);
+        Task Update(StockItem stockItem);
+        Task Delete(Guid id);
 
-        IEnumerable<StockItem> GetAllWithDetails();
-        StockItem? GetByIdWithDetails(Guid id);
-        IEnumerable<StockItem> GetByNameWithDetails(string name);
+        Task<IEnumerable<StockItem>> GetAllWithDetails();
+        Task<StockItem?> GetByIdWithDetails(Guid id);
+        Task<IEnumerable<StockItem>> GetByNameWithDetails(string name);
     }
 }

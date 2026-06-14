@@ -8,9 +8,9 @@ internal class CatalogService : ICatalogService
 {
     private readonly IProductDefinitionRepository _catalogRepository;
     private readonly IStockItemRepository _inventoryRepository;
-    private ProductDefinition FindProductDefinition(string name)
+    private async Task<ProductDefinition> FindProductDefinition(string name)
     {
-        var productDefinition = GetByName(name);
+        var productDefinition = await GetByName(name);
         if (productDefinition == null) throw new ProductDefinitionNotFoundException();
 
         return productDefinition;
@@ -23,13 +23,13 @@ internal class CatalogService : ICatalogService
         _inventoryRepository = stockItemRepository;
     }
 
-    public IEnumerable<ProductDefinition> GetAll() => _catalogRepository.GetAll();
+    public async Task<IEnumerable<ProductDefinition>> GetAll() =>  await _catalogRepository.GetAll();
 
-    public ProductDefinition? GetByName(string name) => _catalogRepository.GetByName(name);
+    public async Task<ProductDefinition?> GetByName(string name) => await _catalogRepository.GetByName(name);
 
-    public void Add(AddProductDefinitionCommand command)
+    public async Task Add(AddProductDefinitionCommand command)
     {
-        var existing = _catalogRepository.GetByName(command.Name);
+        var existing = await _catalogRepository.GetByName(command.Name);
         if (existing != null) throw new ProductDefinitionAlreadyExistsException();
 
         var definition = new ProductDefinition(
@@ -37,36 +37,36 @@ internal class CatalogService : ICatalogService
             command.Unit,
             command.Category
         );
-        _catalogRepository.Add(definition);
+        await _catalogRepository.Add(definition);
 
-        LinkToExistingStockItems(definition);
+        await LinkToExistingStockItems(definition);
     }
 
-    public void Update(ModifyProductDefinitionCommand command)
+    public async Task Update(ModifyProductDefinitionCommand command)
     {
-        var productDefinition = FindProductDefinition(command.Name);
+        var productDefinition = await FindProductDefinition(command.Name);
         productDefinition.ChangeUnitType(command.Unit);
         productDefinition.SetCategory(command.Category);
 
-        _catalogRepository.Update(productDefinition);
+        await _catalogRepository.Update(productDefinition);
     }
 
-    public void Delete(string name)
+    public async Task Delete(string name)
     {
-        var productDefinition = FindProductDefinition(name);
-        _catalogRepository.Delete(name);
+        var productDefinition = await FindProductDefinition(name);
+        await _catalogRepository.Delete(name);
     }
 
-    public void LinkToExistingStockItems(ProductDefinition productDefinition)
+    public async Task LinkToExistingStockItems(ProductDefinition productDefinition)
     {
-        var stockItems = _inventoryRepository.GetAll();
+        var stockItems = await _inventoryRepository.GetAll();
 
         foreach (var stockItem in stockItems)
         {
             if (productDefinition.Name == stockItem.Name && stockItem.Type == null)
             {
                 stockItem.AssignType(productDefinition);
-                _inventoryRepository.Update(stockItem);
+                await _inventoryRepository.Update(stockItem);
             }
         }
     }

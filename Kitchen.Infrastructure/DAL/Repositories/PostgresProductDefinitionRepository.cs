@@ -14,36 +14,36 @@ namespace Kitchen.Infrastructure.DAL.Repositories
             _dbContext = dbContext;
         }
 
-        public void Add(ProductDefinition productDefinition)
+        public async Task Add(ProductDefinition productDefinition)
         {
             _dbContext.ProductDefinitions.Add(productDefinition);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void Update(ProductDefinition productDefinition)
+        public async Task Update(ProductDefinition productDefinition)
         {
             _dbContext.ProductDefinitions.Update(productDefinition);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void Delete(string name)
+        public async Task Delete(string name)
         {
-            var entity = GetByName(name);
+            var entity = await GetByName(name);
             if (entity is not null)
             {
                 _dbContext.ProductDefinitions.Remove(entity);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
         }
 
-        public IEnumerable<ProductDefinition> GetAll()
-            => _dbContext.ProductDefinitions
+        public async Task<IEnumerable<ProductDefinition>> GetAll()
+            => await _dbContext.ProductDefinitions
             .AsNoTracking()
-            .ToList();
+            .ToListAsync();
 
-        public ProductDefinition? GetByName(string name)
-            => _dbContext.ProductDefinitions
+        public async Task<ProductDefinition?> GetByName(string name)
+            => await _dbContext.ProductDefinitions
                 .AsNoTracking()
-                .SingleOrDefault(x => x.Name == new ProductName(name));
+                .SingleOrDefaultAsync(x => x.Name == new ProductName(name));
     }
 }

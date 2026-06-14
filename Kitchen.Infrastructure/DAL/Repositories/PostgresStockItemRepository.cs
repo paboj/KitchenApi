@@ -14,63 +14,63 @@ namespace Kitchen.Infrastructure.DAL.Repositories
             _dbContext = dbContext;
         }
 
-        public IEnumerable<StockItem> GetAll()
-            => _dbContext.StockItems
+        public async Task<IEnumerable<StockItem>> GetAll()
+            => await _dbContext.StockItems
             .AsNoTracking()
-            .ToList();
+            .ToListAsync();
         
 
-        public StockItem? GetById(Guid id)
-            => _dbContext.StockItems
+        public async Task<StockItem?> GetById(Guid id)
+            => await _dbContext.StockItems
             .AsNoTracking()
-            .SingleOrDefault(x => x.Id == new StockItemId(id));
+            .SingleOrDefaultAsync(x => x.Id == new StockItemId(id));
 
-        public IEnumerable<StockItem> GetByName(string name)
-           => _dbContext.StockItems
+        public async Task<IEnumerable<StockItem>> GetByName(string name)
+           => await _dbContext.StockItems
            .AsNoTracking()
            .Where(x => x.Name == new ProductName(name))
-           .ToList();
+           .ToListAsync();
 
-        public void Add(StockItem stockItem)
+        public async Task Add(StockItem stockItem)
         {
             _dbContext.StockItems.Add(stockItem);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void Update(StockItem stockItem)
+        public async Task Update(StockItem stockItem)
         {
             _dbContext.StockItems.Update(stockItem);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void Delete(Guid id)
+        public async Task Delete(Guid id)
         {
-            var stockItem = GetById(id);
+            var stockItem = await GetById(id);
 
             if (stockItem != null)
             {
                 _dbContext.StockItems.Remove(stockItem);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
         }
-        public IEnumerable<StockItem> GetAllWithDetails()
-            => _dbContext.StockItems
+        public async Task<IEnumerable<StockItem>> GetAllWithDetails()
+            => await _dbContext.StockItems
             .Include(i => i.Type)
             .AsNoTracking()
-            .ToList();
+            .ToListAsync();
 
-        public StockItem? GetByIdWithDetails(Guid id)
-            => _dbContext.StockItems
+        public async Task<StockItem?> GetByIdWithDetails(Guid id)
+            => await _dbContext.StockItems
             .Include(i => i.Type)
             .AsNoTracking()
-            .SingleOrDefault(x => x.Id == new StockItemId(id));
+            .SingleOrDefaultAsync(x => x.Id == new StockItemId(id));
 
 
-        public IEnumerable<StockItem> GetByNameWithDetails(string name)
-            => _dbContext.StockItems
+        public async Task<IEnumerable<StockItem>> GetByNameWithDetails(string name)
+            => await _dbContext.StockItems
             .Include(i => i.Type)
             .AsNoTracking()
             .Where(x => x.Name == new ProductName(name))
-            .ToList();
+            .ToListAsync();
     }
 }

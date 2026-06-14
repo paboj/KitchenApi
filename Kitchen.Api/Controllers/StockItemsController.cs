@@ -15,28 +15,28 @@ public class StockItemsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll() => Ok(_inventoryService.GetAll());
+    public async Task<IActionResult> GetAll() => Ok(await _inventoryService.GetAll());
 
     [HttpGet("{id:guid}")]
-    public IActionResult Get(Guid id)
+    public async Task<IActionResult> Get(Guid id)
     {
-        var stockitem = _inventoryService.GetById(id);
+        var stockitem = await _inventoryService.GetById(id);
         if (stockitem == null) return NotFound();
 
         return Ok(stockitem);
     }
 
     [HttpGet("{name}")]
-    public IActionResult Get(string name)
+    public async Task<IActionResult> Get(string name)
     {
-        var stockitems = _inventoryService.GetByName(name);
+        var stockitems = await _inventoryService.GetByName(name);
         if (!stockitems.Any()) return NotFound();
 
         return Ok(stockitems);
     }
 
     [HttpPost]
-    public IActionResult Create([FromBody] CreateStockItemRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateStockItemRequest request)
     {
         var command = new AddStockItemCommand(
             request.Name,
@@ -44,14 +44,14 @@ public class StockItemsController : ControllerBase
             request.Location
         );
 
-        _inventoryService.Add(command);
+        await _inventoryService.Add(command);
 
         return CreatedAtAction(nameof(Get), new { name = request.Name }, request);
     
 }
 
     [HttpPut("{id:guid}")]
-    public IActionResult Update(Guid id, [FromBody] UpdateStockItemRequest request)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateStockItemRequest request)
     {
         var command = new ModifyStockItemCommand(
             id,
@@ -60,14 +60,14 @@ public class StockItemsController : ControllerBase
             request.Location
         );
 
-        _inventoryService.Update(command);
+        await _inventoryService.Update(command);
         return NoContent();
     }
 
     [HttpDelete("{id:guid}")]
-    public IActionResult Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        _inventoryService.Delete(id);
+        await _inventoryService.Delete(id);
         return NoContent();
     }
 }

@@ -15,10 +15,10 @@ public class ProductDefinitionsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll() => Ok(_catalogService.GetAll());
+    public async Task<IActionResult> GetAll() => Ok(await _catalogService.GetAll());
 
     [HttpPost]
-    public IActionResult Create([FromBody] CreateProductDefinitionRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateProductDefinitionRequest request)
     {
         var command = new AddProductDefinitionCommand(
                 request.Name,
@@ -26,14 +26,14 @@ public class ProductDefinitionsController : ControllerBase
                 request.Category
             );
 
-        _catalogService.Add(command);
+        await _catalogService.Add(command);
 
         return CreatedAtAction(nameof(GetAll), new { name = command.Name }, command);
 
     }
 
     [HttpPut("{name}")]
-    public IActionResult Update(string name, [FromBody] UpdateProductDefinitionRequest request)
+    public async Task<IActionResult> Update(string name, [FromBody] UpdateProductDefinitionRequest request)
     {
         var command = new ModifyProductDefinitionCommand(
             name,
@@ -41,15 +41,15 @@ public class ProductDefinitionsController : ControllerBase
             request.Category
         );
 
-        _catalogService.Update(command);
+        await _catalogService.Update(command);
 
         return NoContent();
     }
 
     [HttpDelete("{name}")]
-    public IActionResult Delete(string name)
+    public async Task<IActionResult> Delete(string name)
     {
-        _catalogService.Delete(name);
+        await _catalogService.Delete(name);
         return NoContent();
     }
 }

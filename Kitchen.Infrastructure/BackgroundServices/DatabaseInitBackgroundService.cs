@@ -15,14 +15,14 @@ namespace Kitchen.Infrastructure.BackgroundServices
             _serviceProvider = serviceProvider;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<KitchenDbContext>();
-                dbContext.Database.Migrate();
+                await dbContext.Database.MigrateAsync();
 
-                var stockItems = dbContext.StockItems.ToList();
+                var stockItems = await dbContext.StockItems.ToListAsync();
                 if (!stockItems.Any())
                 {
                     stockItems = new List<StockItem>()
@@ -33,11 +33,9 @@ namespace Kitchen.Infrastructure.BackgroundServices
                         new StockItem("Test - spiżarnia", 10, StorageLocation.Pantry, null)
                     };
                     dbContext.StockItems.AddRange(stockItems);
-                    dbContext.SaveChanges();
+                    await dbContext.SaveChangesAsync();
                 }
             }
-
-            return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

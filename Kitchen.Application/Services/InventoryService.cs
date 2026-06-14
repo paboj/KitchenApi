@@ -8,9 +8,9 @@ internal class InventoryService : IInventoryService
 {
     private readonly IStockItemRepository _repository;
     private readonly IProductDefinitionRepository _typeRepository;
-    private StockItem FindStockItem(Guid id)
+    private async Task<StockItem> FindStockItem(Guid id)
     {
-        var stockItem = GetById(id);
+        var stockItem = await GetById(id);
         if (stockItem == null) throw new StockItemNotFoundException();
 
         return stockItem;
@@ -23,39 +23,39 @@ internal class InventoryService : IInventoryService
         _typeRepository = typeRepository;
     }
 
-    public IEnumerable<StockItem> GetAll() => _repository.GetAllWithDetails();
+    public async Task<IEnumerable<StockItem>> GetAll() => await _repository.GetAllWithDetails();
 
-    public StockItem? GetById(Guid id) => _repository.GetByIdWithDetails(id);
+    public async Task<StockItem?> GetById(Guid id) => await _repository.GetByIdWithDetails(id);
 
-    public IEnumerable<StockItem> GetByName(string name) => _repository.GetByNameWithDetails(name);
+    public async Task<IEnumerable<StockItem>> GetByName(string name) => await _repository.GetByNameWithDetails(name);
 
-    public void Add(AddStockItemCommand command)
+    public async Task Add(AddStockItemCommand command)
     {
-        var productDefinition = _typeRepository.GetByName(command.Name);
+        var productDefinition = await _typeRepository.GetByName(command.Name);
         var stockItem = new StockItem(
             command.Name,
             command.Amount,
             command.Location,
             productDefinition
         );
-        _repository.Add(stockItem);
+        await _repository.Add(stockItem);
     }
 
-    public void Update(ModifyStockItemCommand command)
+    public async Task Update(ModifyStockItemCommand command)
     {
-        var stockItem = FindStockItem(command.Id);
+        var stockItem = await FindStockItem(command.Id);
 
         stockItem.SetName(command.Name);
         stockItem.AdjustAmount(command.Amount);
         stockItem.PlaceOrMove(command.Location);
 
-        _repository.Update(stockItem);
+        await _repository.Update(stockItem);
     }
 
-    public void Delete(Guid id)
+    public async Task Delete(Guid id)
     {
-        var stockItem = FindStockItem(id);
+        var stockItem = await FindStockItem(id);
 
-        _repository.Delete(id);
+        await _repository.Delete(id);
     }
 }

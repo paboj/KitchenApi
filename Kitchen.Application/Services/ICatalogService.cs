@@ -5,10 +5,10 @@ namespace Kitchen.Application.Services
 {
     public interface ICatalogService
     {
-        IEnumerable<ProductDefinition> GetAll();
-        ProductDefinition? GetByName(string name);
-        void Add(AddProductDefinitionCommand command);
-        void Update(ModifyProductDefinitionCommand command);
-        void Delete(string name);
+        Task<IEnumerable<ProductDefinition>> GetAll();
+        Task<ProductDefinition?> GetByName(string name);
+        Task Add(AddProductDefinitionCommand command);
+        Task Update(ModifyProductDefinitionCommand command);
+        Task Delete(string name);
     }
 }

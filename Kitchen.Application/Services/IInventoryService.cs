@@ -5,11 +5,11 @@ namespace Kitchen.Application.Services
 {
     public interface IInventoryService
     {
-        IEnumerable<StockItem> GetAll();
-        StockItem? GetById(Guid id);
-        IEnumerable<StockItem> GetByName(string name);
-        void Add(AddStockItemCommand command);
-        void Update(ModifyStockItemCommand command);
-        void Delete(Guid id);
+        Task<IEnumerable<StockItem>> GetAll();
+        Task<StockItem?> GetById(Guid id);
+        Task<IEnumerable<StockItem>> GetByName(string name);
+        Task Add(AddStockItemCommand command);
+        Task Update(ModifyStockItemCommand command);
+        Task Delete(Guid id);
     }
 }

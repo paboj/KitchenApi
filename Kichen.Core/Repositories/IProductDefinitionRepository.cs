@@ -5,10 +5,10 @@ namespace Kitchen.Core.Repositories
 {
     public interface IProductDefinitionRepository
     {
-        IEnumerable<ProductDefinition> GetAll();
-        ProductDefinition? GetByName(string name);
-        void Add(ProductDefinition productDefinition);
-        void Delete(string name);
-        void Update(ProductDefinition productDefinition);
+        Task<IEnumerable<ProductDefinition>> GetAll();
+        Task<ProductDefinition?> GetByName(string name);
+        Task Add(ProductDefinition productDefinition);
+        Task Delete(string name);
+        Task Update(ProductDefinition productDefinition);
     }
 }

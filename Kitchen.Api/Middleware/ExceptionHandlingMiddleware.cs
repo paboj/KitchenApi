@@ -37,6 +37,7 @@ namespace Kitchen.Api.Middleware
                 InvalidProductNameException or
                 IncorrectAmountException or
                 UnknownLocationException or
+                UnknownCategoryException or
                 UnknownUnitTypeException => HttpStatusCode.BadRequest,
 
                 // 409 Conflict (already exists)

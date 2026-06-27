@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Kitchen.Api\Kitchen.Api.csproj" />
+    <ProjectReference Include="..\Kitchen.Infrastructure\Kitchen.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

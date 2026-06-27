@@ -21,7 +21,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         }
 
         [Fact]
-        public async Task create_should_return_created_at_action_when_request_is_valid()
+        public async Task Create_ShouldReturnCreatedAtAction_WhenRequestIsValid()
         {
             // Arrange
             var request = new CreateStockItemRequest

@@ -28,7 +28,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public void given_empty_name_constructor_should_fail(string name)
+        public void GivenEmptyName_Constructor_ShouldFail(string name)
         {
             Action action = () => new StockItem(name, 2, StorageLocation.Fridge, null);
 
@@ -38,7 +38,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Theory]
         [InlineData(-1)]
         [InlineData(-0.01)]
-        public void given_negative_amount_constructor_should_fail(double invalidAmount)
+        public void GivenNegativeAmount_Constructor_ShouldFail(double invalidAmount)
         {
             Action action = () => new StockItem("Pomidor", invalidAmount, StorageLocation.Fridge, null);
 
@@ -48,7 +48,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Theory]
         [InlineData(-1)]
         [InlineData(999)]
-        public void given_invalid_location_constructor_should_fail(int invalidLocation)
+        public void GivenInvalidLocation_Constructor_ShouldFail(int invalidLocation)
         {
             Action action = () => new StockItem("Pomidor", 2, (StorageLocation)invalidLocation, null);
 
@@ -56,7 +56,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         }
 
         [Fact]
-        public void given_valid_parameters_constructor_should_create_correct_entity()
+        public void GivenValidParameters_Constructor_ShouldCreateCorrectEntity()
         {
             // Act
             var StockItem = new StockItem("Czosnek", 10, StorageLocation.Pantry, null);
@@ -73,7 +73,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         #region AdjustAmount
 
         [Fact]
-        public void given_correct_amount_adjustment_should_set_new_value()
+        public void GivenCorrectAmount_Adjustment_ShouldSetNewValue()
         {
             var newValue = 5;
 
@@ -86,7 +86,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Theory]
         [InlineData(-2)]
         [InlineData(-0.1)]
-        public void given_invalid_amount_adjustment_should_fail(double invalidAmount)
+        public void GivenInvalidAmount_Adjustment_ShouldFail(double invalidAmount)
         {   
             Action action = () => _StockItem.AdjustAmount(invalidAmount);
 
@@ -94,7 +94,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         }
 
         [Fact]
-        public void given_null_amount_adjustment_should_leave_previous_value()
+        public void GivenNullAmount_Adjustment_ShouldLeavePreviousValue()
         {
             _StockItem.AdjustAmount(null);
 
@@ -107,7 +107,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         #region PlaceOrMove
 
         [Fact]
-        public void given_valid_location_place_or_move_should_update_location()
+        public void GivenValidLocation_PlaceOrMove_ShouldUpdateLocation()
         {
             var newLocation = StorageLocation.Pantry;
 
@@ -120,7 +120,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Theory]
         [InlineData(-1)]
         [InlineData(666)]
-        public void given_invalid_location_place_or_move_should_fail(int invalidLocation)
+        public void GivenInvalidLocation_PlaceOrMove_ShouldFail(int invalidLocation)
         {
             Action action = () => _StockItem.PlaceOrMove((StorageLocation)invalidLocation);
 
@@ -128,7 +128,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         }
 
         [Fact]
-        public void given_null_location_place_or_move_should_leave_previous_value()
+        public void GivenNullLocation_PlaceOrMove_ShouldLeavePreviousValue()
         {
             _StockItem.PlaceOrMove(null);
 

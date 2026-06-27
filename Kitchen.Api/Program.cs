@@ -1,4 +1,3 @@
-using Kitchen.Api.Middleware;
 using Kitchen.Application.Services;
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
@@ -24,7 +23,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseInfrastructure();
 
 if (app.Environment.IsDevelopment())
 {

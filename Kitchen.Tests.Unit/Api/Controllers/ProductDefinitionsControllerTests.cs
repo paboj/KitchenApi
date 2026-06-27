@@ -27,7 +27,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         #region GetAll
 
         [Fact]
-        public async Task get_all_should_return_ok_with_ingredient_types()
+        public async Task GetAll_ShouldReturnOk_WithIngredientTypes()
         {
             // Arrange
             var expectedTypes = new List<ProductDefinition>
@@ -54,7 +54,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         #region Create
 
         [Fact]
-        public async Task create_should_return_created_at_action_when_request_is_valid()
+        public async Task Create_ShouldReturnCreatedAtAction_WhenRequestIsValid()
         {
             // Arrange
             var request = new CreateProductDefinitionRequest
@@ -89,7 +89,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         #region Update
 
         [Fact]
-        public async Task update_should_return_no_content_when_valid()
+        public async Task Update_ShouldReturnNoContent_WhenValid()
         {
             // Arrange
             var typeName = "Mleko";
@@ -114,7 +114,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         #region Delete
 
         [Fact]
-        public async Task delete_should_return_no_content_when_successful()
+        public async Task Delete_ShouldReturnNoContent_WhenSuccessful()
         {
             // Arrange
             var typeName = "Mąka";

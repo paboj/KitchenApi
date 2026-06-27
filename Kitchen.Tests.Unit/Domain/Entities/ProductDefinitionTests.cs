@@ -22,7 +22,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         #region Initial
 
         [Fact]
-        public void given_valid_parameters_constructor_should_create_correct_entity()
+        public void GivenValidParameters_Constructor_ShouldCreateCorrectEntity()
         {
             // Act
             var type = new ProductDefinition("Mleko", UnitType.Liters, Category.Dairy);
@@ -35,7 +35,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public void given_empty_name_constructor_should_fail(string invalidName)
+        public void GivenEmptyName_Constructor_ShouldFail(string invalidName)
         {
             Action action = () => new ProductDefinition(invalidName, UnitType.Kilograms, Category.DryGoods);
 
@@ -45,7 +45,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Theory]
         [InlineData((UnitType)(-1))]
         [InlineData((UnitType)999)]
-        public void given_invalid_unit_constructor_should_fail(UnitType invalidUnit)
+        public void GivenInvalidUnit_Constructor_ShouldFail(UnitType invalidUnit)
         {
             Action action = () => new ProductDefinition("Mąka", invalidUnit, Category.DryGoods);
 
@@ -57,7 +57,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         #region ChangeUnitType
 
         [Fact]
-        public void change_unit_type_should_update_unit_when_valid()
+        public void ChangeUnitType_ShouldUpdateUnit_WhenValid()
         {
             var newUnit = UnitType.Liters;
 
@@ -68,7 +68,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
 
         [Theory]
         [InlineData((UnitType)66)]
-        public void change_unit_type_should_throw_exception_when_invalid(UnitType invalidUnit)
+        public void ChangeUnitType_ShouldThrowException_WhenInvalid(UnitType invalidUnit)
         {
             Action action = () => _ProductDefinition.ChangeUnitType(invalidUnit);
 

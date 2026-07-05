@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Kitchen.Infrastructure.DAL.Migrations
 {
     [DbContext(typeof(KitchenDbContext))]
-    [Migration("20260430210008_Init")]
-    partial class Init
+    [Migration("20260705123233_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,37 +25,54 @@ namespace Kitchen.Infrastructure.DAL.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Kitchen.Core.Domain.Entities.Ingredient", b =>
+            modelBuilder.Entity("Kitchen.Core.Domain.Entities.ProductDefinition", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Unit")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("ProductDefinitions");
+                });
+
+            modelBuilder.Entity("Kitchen.Core.Domain.Entities.StockItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<double?>("Amount")
+                    b.Property<double>("Amount")
                         .HasColumnType("double precision");
 
-                    b.Property<int?>("Location")
+                    b.Property<int>("Location")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("Ingredients");
-                });
-
-            modelBuilder.Entity("Kitchen.Core.Domain.Entities.IngredientType", b =>
-                {
-                    b.Property<string>("Name")
+                    b.Property<string>("TypeName")
                         .HasColumnType("text");
 
-                    b.Property<int?>("Unit")
-                        .HasColumnType("integer");
+                    b.HasKey("Id");
 
-                    b.HasKey("Name");
+                    b.HasIndex("TypeName");
 
-                    b.ToTable("IngredientTypes");
+                    b.ToTable("StockItems");
+                });
+
+            modelBuilder.Entity("Kitchen.Core.Domain.Entities.StockItem", b =>
+                {
+                    b.HasOne("Kitchen.Core.Domain.Entities.ProductDefinition", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeName");
+
+                    b.Navigation("Type");
                 });
 #pragma warning restore 612, 618
         }

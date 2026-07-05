@@ -1,5 +1,4 @@
 ﻿using Kitchen.Core.Repositories;
-using Kitchen.Infrastructure.BackgroundServices;
 using Kitchen.Infrastructure.DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +14,6 @@ namespace Kitchen.Infrastructure.DAL
             services.AddDbContext<KitchenDbContext>(x => x.UseNpgsql(options.ConnectionString));
             services.AddScoped<IStockItemRepository, PostgresStockItemRepository>();
             services.AddScoped<IProductDefinitionRepository, PostgresProductDefinitionRepository>();
-            services.AddHostedService<DatabaseInitBackgroundService>();
 
             return services;
         }

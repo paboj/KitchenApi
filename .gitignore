@@ -7,6 +7,7 @@
 Private/
 coveragereport/
 Kitchen.Tests.Unit/TestResults/
+backups/
 
 # dotenv files
 .env

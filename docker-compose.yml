@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   kitchen-db:
-    image: postgres:latest
+    image: postgres:16
     container_name: kitchen-api-db
     environment:
       - POSTGRES_USER=postgres

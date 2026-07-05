@@ -58,9 +58,6 @@ namespace Kitchen.Infrastructure.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.HasIndex("TypeName");
 
                     b.ToTable("StockItems");

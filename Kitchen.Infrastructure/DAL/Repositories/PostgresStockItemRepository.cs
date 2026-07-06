@@ -55,20 +55,20 @@ namespace Kitchen.Infrastructure.DAL.Repositories
         }
         public async Task<IEnumerable<StockItem>> GetAllWithDetails()
             => await _dbContext.StockItems
-            .Include(i => i.Type)
+            .Include(i => i.Definition)
             .AsNoTracking()
             .ToListAsync();
 
         public async Task<StockItem?> GetByIdWithDetails(Guid id)
             => await _dbContext.StockItems
-            .Include(i => i.Type)
+            .Include(i => i.Definition)
             .AsNoTracking()
             .SingleOrDefaultAsync(x => x.Id == new StockItemId(id));
 
 
         public async Task<IEnumerable<StockItem>> GetByNameWithDetails(string name)
             => await _dbContext.StockItems
-            .Include(i => i.Type)
+            .Include(i => i.Definition)
             .AsNoTracking()
             .Where(x => x.Name == new ProductName(name))
             .ToListAsync();

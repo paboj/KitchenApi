@@ -41,7 +41,8 @@ public class StockItemsController : ControllerBase
         var command = new AddStockItemCommand(
             request.Name,
             request.Amount,
-            request.Location
+            request.Location,
+            request.ExpirationDate
         );
 
         await _inventoryService.Add(command);
@@ -57,7 +58,8 @@ public class StockItemsController : ControllerBase
             id,
             request.Name,
             request.Amount,
-            request.Location
+            request.Location,
+            request.ExpirationDate
         );
 
         await _inventoryService.Update(command);

@@ -9,5 +9,6 @@ namespace Kitchen.Application.Models.Requests
         public double? Amount { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public StorageLocation? Location { get; set; }
+        public DateOnly? ExpirationDate { get; set; }
     }
 }

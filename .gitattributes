@@ -1,0 +1,34 @@
+# Auto detect text files and normalize line endings on the way into the
+# repository (stored as LF). Explicit rules below force a consistent
+# checkout line ending regardless of a contributor's local core.autocrlf,
+# so we don't get "whole file changed" diffs from mixed CRLF/LF again.
+* text=auto
+
+# Source and project files: checked out with CRLF (this is a Windows/
+# Visual Studio project).
+*.cs text eol=crlf diff=csharp
+*.csproj text eol=crlf
+*.sln text eol=crlf
+*.json text eol=crlf
+*.config text eol=crlf
+*.xml text eol=crlf
+
+# Docs and config: fine to normalize the same way, no strong reason not to.
+*.md text eol=crlf
+*.yml text eol=crlf
+*.yaml text eol=crlf
+.gitignore text eol=crlf
+.gitattributes text eol=crlf
+
+# Shell scripts must stay LF even on Windows, or bash chokes on them.
+*.sh text eol=lf
+
+# Binary files: never touch line endings.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.dll binary
+*.exe binary
+*.pdb binary

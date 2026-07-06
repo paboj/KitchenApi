@@ -5,14 +5,16 @@ namespace Kitchen.Application.Commands
     public record AddStockItemCommand(
         string Name,
         double Amount,
-        StorageLocation Location
+        StorageLocation Location,
+        DateOnly? ExpirationDate = null
      );
 
     public record ModifyStockItemCommand(
         Guid Id,
         string? Name,
         double? Amount,
-        StorageLocation? Location
+        StorageLocation? Location,
+        DateOnly? ExpirationDate = null
      );
 
 }

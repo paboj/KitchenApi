@@ -20,6 +20,9 @@ namespace Kitchen.Infrastructure.DAL.Configurations
 
             builder.Property(x => x.Amount);
 
+            builder.Property(x => x.ExpirationDate)
+                .IsRequired(false);
+
             builder.Property(x => x.Location)
                 .HasConversion(
                     x => (int)x,

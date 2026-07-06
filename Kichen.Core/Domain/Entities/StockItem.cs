@@ -12,15 +12,17 @@ namespace Kitchen.Core.Domain.Entities
         public StorageLocation Location { get; private set; } = StorageLocation.Unspecified;
         public ProductName? TypeName { get; private set; }
         public ProductDefinition? Type { get; private set; }
+        public DateOnly? ExpirationDate { get; private set; }
 
         private StockItem() { }
 
-        public StockItem(string name, double amount, StorageLocation location, ProductDefinition? type) { 
+        public StockItem(string name, double amount, StorageLocation location, ProductDefinition? type, DateOnly? expirationDate = null) {
             Id = new StockItemId(Guid.NewGuid());
             Name = new ProductName(name);
             AdjustAmount(amount);
             PlaceOrMove(location);
             AssignType(type);
+            SetExpirationDate(expirationDate);
         }
 
         public void SetName(string? name)
@@ -36,6 +38,14 @@ namespace Kitchen.Core.Domain.Entities
                 Type = type;
                 TypeName = type.Name;
             }
+        }
+
+        // Intentionally no "not in the past" validation: an expired item is still
+        // a real item in the fridge, just one you should eat soon or throw out.
+        public void SetExpirationDate(DateOnly? expirationDate)
+        {
+            if (expirationDate is null) return;
+            ExpirationDate = expirationDate;
         }
 
 

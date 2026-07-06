@@ -36,7 +36,8 @@ internal class InventoryService : IInventoryService
             command.Name,
             command.Amount,
             command.Location,
-            productDefinition
+            productDefinition,
+            command.ExpirationDate
         );
         await _repository.Add(stockItem);
     }
@@ -48,6 +49,7 @@ internal class InventoryService : IInventoryService
         stockItem.SetName(command.Name);
         stockItem.AdjustAmount(command.Amount);
         stockItem.PlaceOrMove(command.Location);
+        stockItem.SetExpirationDate(command.ExpirationDate);
 
         await _repository.Update(stockItem);
     }

@@ -63,9 +63,9 @@ internal class CatalogService : ICatalogService
 
         foreach (var stockItem in stockItems)
         {
-            if (productDefinition.Name == stockItem.Name && stockItem.Type == null)
+            if (productDefinition.Name == stockItem.Name && stockItem.Definition == null)
             {
-                stockItem.AssignType(productDefinition);
+                stockItem.AssignDefinition(productDefinition);
                 await _inventoryRepository.Update(stockItem);
             }
         }

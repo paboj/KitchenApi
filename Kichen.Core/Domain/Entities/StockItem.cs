@@ -10,18 +10,18 @@ namespace Kitchen.Core.Domain.Entities
         public ProductName Name { get; private set; }
         public double Amount { get; private set; } = 0;
         public StorageLocation Location { get; private set; } = StorageLocation.Unspecified;
-        public ProductName? TypeName { get; private set; }
-        public ProductDefinition? Type { get; private set; }
+        public ProductName? DefinitionName { get; private set; }
+        public ProductDefinition? Definition { get; private set; }
         public DateOnly? ExpirationDate { get; private set; }
 
         private StockItem() { }
 
-        public StockItem(string name, double amount, StorageLocation location, ProductDefinition? type, DateOnly? expirationDate = null) {
+        public StockItem(string name, double amount, StorageLocation location, ProductDefinition? definition, DateOnly? expirationDate = null) {
             Id = new StockItemId(Guid.NewGuid());
             Name = new ProductName(name);
             AdjustAmount(amount);
             PlaceOrMove(location);
-            AssignType(type);
+            AssignDefinition(definition);
             SetExpirationDate(expirationDate);
         }
 
@@ -31,12 +31,12 @@ namespace Kitchen.Core.Domain.Entities
             Name = new ProductName(name);
         }
 
-        public void AssignType(ProductDefinition? type)
+        public void AssignDefinition(ProductDefinition? definition)
         {
-            if (type != null)
+            if (definition != null)
             {
-                Type = type;
-                TypeName = type.Name;
+                Definition = definition;
+                DefinitionName = definition.Name;
             }
         }
 

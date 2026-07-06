@@ -60,8 +60,8 @@ namespace Kitchen.Tests.Unit.Services
 
             await _service.Add(command);
 
-            Assert.NotNull(unlinkedStockItem.Type);
-            Assert.Equal(stockItemName, unlinkedStockItem.Type!.Name.Value);
+            Assert.NotNull(unlinkedStockItem.Definition);
+            Assert.Equal(stockItemName, unlinkedStockItem.Definition!.Name.Value);
 
             _stockItemRepositoryMock.Verify(repo => repo.Update(unlinkedStockItem), Times.Once);
             _productDefinitionRepositoryMock.Verify(repo => repo.Add(It.IsAny<ProductDefinition>()), Times.Once);
@@ -83,18 +83,18 @@ namespace Kitchen.Tests.Unit.Services
 
             await _service.Add(command);
 
-            Assert.Null(unrelatedStockItem.Type);
+            Assert.Null(unrelatedStockItem.Definition);
             _stockItemRepositoryMock.Verify(repo => repo.Update(It.IsAny<StockItem>()), Times.Never);
         }
 
         [Fact]
-        public async Task Add_ShouldNotOverwriteType_WhenStockItemAlreadyHasType()
+        public async Task Add_ShouldNotOverwriteDefinition_WhenStockItemAlreadyHasDefinition()
         {
             var stockItemName = "Mleko waniliowe";
             var command = new AddProductDefinitionCommand(stockItemName, UnitType.Liters, Category.Dairy);
 
-            var existingType = new ProductDefinition(stockItemName, UnitType.Liters, Category.Dairy);
-            var alreadyLinkedStockItem = new StockItem(stockItemName, 1, StorageLocation.Fridge, existingType);
+            var existingDefinition = new ProductDefinition(stockItemName, UnitType.Liters, Category.Dairy);
+            var alreadyLinkedStockItem = new StockItem(stockItemName, 1, StorageLocation.Fridge, existingDefinition);
 
             _productDefinitionRepositoryMock
                 .Setup(repo => repo.GetByName(stockItemName))
@@ -106,7 +106,7 @@ namespace Kitchen.Tests.Unit.Services
 
             await _service.Add(command);
 
-            Assert.Same(existingType, alreadyLinkedStockItem.Type);
+            Assert.Same(existingDefinition, alreadyLinkedStockItem.Definition);
             _stockItemRepositoryMock.Verify(repo => repo.Update(It.IsAny<StockItem>()), Times.Never);
         }
     }

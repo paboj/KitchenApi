@@ -29,13 +29,13 @@ namespace Kitchen.Infrastructure.DAL.Configurations
                     x => (StorageLocation)x
                 );
 
-            builder.Property<ProductName>("TypeName")
+            builder.Property<ProductName>("DefinitionName")
             .HasConversion(x => x.Value, x => new ProductName(x))
             .IsRequired(false);
 
-            builder.HasOne(x => x.Type)
+            builder.HasOne(x => x.Definition)
                 .WithMany()
-                .HasForeignKey("TypeName")
+                .HasForeignKey("DefinitionName")
                 .IsRequired(false);
         }
     }

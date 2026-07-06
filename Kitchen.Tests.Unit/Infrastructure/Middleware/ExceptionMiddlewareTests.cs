@@ -3,17 +3,21 @@ using FluentAssertions;
 using Kitchen.Core.Domain.Exceptions;
 using Kitchen.Infrastructure.Middleware;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace Kitchen.Tests.Unit.Infrastructure.Middleware;
 
 public class ExceptionMiddlewareTests
 {
+    private readonly Mock<ILogger<ExceptionMiddleware>> _loggerMock;
     private readonly ExceptionMiddleware _middleware;
     private readonly DefaultHttpContext _httpContext;
 
     public ExceptionMiddlewareTests()
     {
-        _middleware = new ExceptionMiddleware();
+        _loggerMock = new Mock<ILogger<ExceptionMiddleware>>();
+        _middleware = new ExceptionMiddleware(_loggerMock.Object);
         _httpContext = new DefaultHttpContext();
         _httpContext.Response.Body = new MemoryStream();
     }

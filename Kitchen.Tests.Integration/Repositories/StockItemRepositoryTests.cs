@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using Kitchen.Application.Commands;
+using Kitchen.Application.Services;
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
 using Kitchen.Infrastructure.DAL;
@@ -81,6 +83,56 @@ namespace Kitchen.Tests.Integration.Repositories
 
             var definitions = await _dbContext.ProductDefinitions.AsNoTracking().ToListAsync();
             definitions.Should().HaveCount(1);
+        }
+
+        // Exercises the actual production path used by InventoryService.Add:
+        // fetch the ProductDefinition by name through the real repository (real
+        // SQL translation of the ProductName comparison, not a hand-built entity),
+        // then add a StockItem referencing it, then re-fetch and check the link
+        // survived the round trip.
+        [Fact]
+        public async Task Add_ShouldLinkStockItem_ToDefinitionFetchedByNameFromRepository()
+        {
+            var definitionRepository = new PostgresProductDefinitionRepository(_dbContext);
+            await definitionRepository.Add(new ProductDefinition("Jajka", UnitType.Pieces, Category.Dairy));
+            _dbContext.ChangeTracker.Clear();
+
+            var fetchedDefinition = await definitionRepository.GetByName("Jajka");
+            fetchedDefinition.Should().NotBeNull("the definition was just added under the exact same name");
+
+            var stockItem = new StockItem("Jajka", amount: 10, StorageLocation.Fridge, definition: fetchedDefinition);
+            await _repository.Add(stockItem);
+            _dbContext.ChangeTracker.Clear();
+
+            var reloaded = await _repository.GetByIdWithDetails(stockItem.Id.Value);
+
+            reloaded!.Definition.Should().NotBeNull();
+            reloaded.Definition!.Name.Value.Should().Be("Jajka");
+        }
+
+        // The test above still hand-rolls the "fetch by name, pass into the
+        // constructor" steps — it tests the repositories, not InventoryService.
+        // This one goes through the actual method the API calls, with a command
+        // shaped exactly like what the form submits: no definition field at all.
+        // Auto-linking by name is InventoryService.Add's job, not the caller's.
+        [Fact]
+        public async Task Add_ShouldAutoLinkStockItem_ToExistingProductDefinition_ViaInventoryService()
+        {
+            var definitionRepository = new PostgresProductDefinitionRepository(_dbContext);
+            await definitionRepository.Add(new ProductDefinition("Jajka", UnitType.Pieces, Category.Dairy));
+            _dbContext.ChangeTracker.Clear();
+
+            var inventoryService = new InventoryService(_repository, definitionRepository);
+
+            var command = new AddStockItemCommand("Jajka", Amount: 10, Location: StorageLocation.Fridge);
+            await inventoryService.Add(command);
+
+            var stockItems = await inventoryService.GetByName("Jajka");
+            var added = stockItems.Should().ContainSingle().Subject;
+
+            added.Definition.Should().NotBeNull(
+                "InventoryService.Add should look up and link the matching ProductDefinition by name");
+            added.Definition!.Name.Value.Should().Be("Jajka");
         }
 
         // Same root cause as above, on the Update path: DbSet.Update marks an

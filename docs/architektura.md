@@ -7,7 +7,7 @@ Projekt oparty jest na wzorcu **Clean Architecture**, który zapewnia separację
 ```
 ┌─────────────────────────────────┐
 │         Kitchen.Api             │  ← Warstwa prezentacji
-│  (kontrolery, middleware, DI)   │
+│  (kontrolery, DI, Program.cs)   │
 └────────────────┬────────────────┘
                  │ zależy od
 ┌────────────────▼────────────────┐
@@ -24,9 +24,12 @@ Projekt oparty jest na wzorcu **Clean Architecture**, który zapewnia separację
          │ implementuje interfejsy z Core
 ┌────────┴────────────────────────┐
 │     Kitchen.Infrastructure      │  ← Infrastruktura
-│  (EF Core, PostgreSQL, repos)   │
+│  (EF Core, PostgreSQL, repos,   │
+│   middleware wyjątków)          │
 └─────────────────────────────────┘
 ```
+
+> **Uwaga:** globalny `ExceptionMiddleware` (mapowanie wyjątków domenowych na kody HTTP) znajduje się w `Kitchen.Infrastructure`, nie w `Kitchen.Api`. To celowa decyzja architektoniczna — obsługa wyjątków jest cross-cutting concern (dotyczy każdego żądania, niezależnie od warstwy), dlatego umieszczono ją razem z pozostałą infrastrukturą przekrojową, a nie w warstwie prezentacji. `Kitchen.Api` rejestruje go przez `app.UseInfrastructure()`.
 
 ---
 
@@ -47,6 +50,7 @@ Centrum całego systemu. **Nie zależy od żadnej innej warstwy projektu.**
 | `Category` | `Category` | Kategoria produktu |
 
 Metody domenowe:
+- `SetName(string)` — ustawia nazwę (deleguje walidację do `ProductName`)
 - `ChangeUnitType(UnitType?)` — zmienia jednostkę; rzuca `UnknownUnitTypeException` przy nieprawidłowej wartości
 - `SetCategory(Category?)` — ustawia kategorię; rzuca `UnknownCategoryException`
 
@@ -57,15 +61,21 @@ Metody domenowe:
 | Właściwość | Typ | Opis |
 |---|---|---|
 | `Id` | `StockItemId` | Klucz główny (GUID) |
-| `Name` | `ProductName` | Nazwa pozycji |
+| `Name` | `ProductName` | Nazwa pozycji — **nieunikalna** (patrz niżej) |
 | `Amount` | `double` | Ilość (musi być ≥ 0) |
 | `Location` | `StorageLocation` | Miejsce przechowywania |
-| `Type` | `ProductDefinition?` | Opcjonalne powiązanie z definicją produktu |
+| `DefinitionName` | `ProductName?` | Nazwa powiązanej definicji (shadow FK w EF) |
+| `Definition` | `ProductDefinition?` | Opcjonalne powiązanie z definicją produktu |
+| `ExpirationDate` | `DateOnly?` | Data ważności — bez walidacji "nie w przeszłości" |
 
 Metody domenowe:
+- `SetName(string?)` — zmienia nazwę
 - `AdjustAmount(double?)` — ustawia ilość; rzuca `IncorrectAmountException` gdy < 0
 - `PlaceOrMove(StorageLocation?)` — ustawia lokalizację; rzuca `UnknownLocationException`
-- `AssignType(ProductDefinition?)` — przypisuje typ produktu
+- `AssignDefinition(ProductDefinition?)` — przypisuje definicję produktu
+- `SetExpirationDate(DateOnly?)` — ustawia datę ważności
+
+`Name` nie ma unikalnego klucza — ta sama nazwa może wystąpić wielokrotnie (np. mleko w lodówce i mleko w spiżarni jako dwie osobne pozycje). Jednoznaczna identyfikacja jest możliwa wyłącznie po `Id`.
 
 #### Value Objects
 
@@ -74,18 +84,19 @@ Metody domenowe:
 - nie może zaczynać się od cyfry
 - automatycznie usuwa białe znaki z początku i końca (`.Trim()`)
 - posiada niejawne konwersje `string ↔ ProductName`
+- **równość po wartości** (`IEquatable<ProductName>`, porównanie `Value` przez `StringComparison.Ordinal`) — istotne dla `CatalogService.LinkToExistingStockItems`, które porównuje `ProductName` po nazwie, nie po referencji
 
-**`StockItemId`** — opakowanie na `Guid`, klucz główny `StockItem`.
+**`StockItemId`** — `record StockItemId(Guid Value)`, klucz główny `StockItem`.
 
 #### Enumy
 
 | Enum | Wartości |
 |---|---|
 | `UnitType` | `Unspecified(0)`, `Pieces(1)`, `Kilograms(2)`, `Liters(3)` |
-| `Category` | `Unspecified` + kategorie produktów |
-| `StorageLocation` | `Unspecified`, `Fridge`, `Freezer`, `Pantry` |
+| `Category` | `Unspecified(0)`, `Meat(1)`, `Vegetables(2)`, `Dairy(3)`, `DryGoods(4)`, `Spices(5)`, `Other(6)` |
+| `StorageLocation` | `Unspecified(0)`, `Fridge(1)`, `Freezer(2)`, `Pantry(3)` |
 
-Każda wartość `UnitType` posiada atrybut `[Description]` (np. `"kg"`, `"szt"`), zwracany przez `EnumExtensions.ToDescription()`.
+Każda wartość posiada atrybut `[Description]` (np. `"kg"`, `"szt"`, `"mięso"`, `"lodówka"`), zwracany przez `EnumExtensions.ToDescription()`. To osobny mechanizm od serializacji JSON — dokładny opis tego, co faktycznie trafia do odpowiedzi JSON, w [docs/api.md](./api.md#dozwolone-wartości-enumeracji).
 
 #### Wyjątki domenowe
 
@@ -94,6 +105,7 @@ Wszystkie dziedziczą po `KitchenApiException : Exception`.
 | Wyjątek | Znaczenie |
 |---|---|
 | `StockItemNotFoundException` | Szukana pozycja nie istnieje |
+| `ProductDefinitionNotFoundException` | Szukana definicja nie istnieje |
 | `ProductDefinitionAlreadyExistsException` | Definicja o tej nazwie już istnieje |
 | `InvalidProductNameException` | Nieprawidłowa nazwa produktu |
 | `IncorrectAmountException` | Ujemna ilość |
@@ -103,7 +115,11 @@ Wszystkie dziedziczą po `KitchenApiException : Exception`.
 
 #### Interfejsy repozytoriów
 
-`IStockItemRepository` i `IProductDefinitionRepository` — zdefiniowane w Core, implementowane w Infrastructure. Dzięki temu domena nie zna szczegółów bazy danych.
+**`IStockItemRepository`:** `GetAll`, `GetById`, `GetByName`, `Add`, `Update`, `Delete` oraz warianty `GetAllWithDetails`/`GetByIdWithDetails`/`GetByNameWithDetails` (dociągają `Definition`).
+
+**`IProductDefinitionRepository`:** `GetAll`, `GetByName`, `Add`, `Update`, `Delete`.
+
+Zdefiniowane w Core, implementowane w Infrastructure. Dzięki temu domena nie zna szczegółów bazy danych.
 
 ---
 
@@ -116,16 +132,16 @@ Orkiestruje przepływ danych między API a domeną. Nie zawiera logiki domenowej
 **`ICatalogService` / `CatalogService`** — zarządzanie katalogiem definicji produktów:
 - `GetAll()` — zwraca wszystkie definicje
 - `GetByName(string)` — szuka definicji po nazwie
-- `Add(AddTypeCatalogCommand)` — tworzy nową definicję; sprawdza unikalność nazwy
-- `Update(ModifyTypeCatalogCommand)` — aktualizuje jednostkę/kategorię
-- `Delete(string)` — usuwa definicję
+- `Add(AddProductDefinitionCommand)` — sprawdza unikalność nazwy (`ProductDefinitionAlreadyExistsException`), tworzy definicję, po zapisie wywołuje `LinkToExistingStockItems`
+- `Update(ModifyProductDefinitionCommand)` — szuka definicji (`ProductDefinitionNotFoundException` jeśli brak), aktualizuje jednostkę/kategorię
+- `Delete(string)` — szuka definicji, usuwa
+- `LinkToExistingStockItems(ProductDefinition)` — przechodzi po wszystkich `StockItem`ach i podpina tę definicję do tych, które mają tę samą nazwę i jeszcze nie mają żadnej definicji.
 
 **`IInventoryService` / `InventoryService`** — zarządzanie zapasami:
-- `GetAll()` — zwraca wszystkie pozycje
-- `GetByName(string)` — szuka pozycji po nazwie
-- `Add(AddToStockCommand)` — tworzy nową pozycję; automatycznie wyszukuje i przypisuje `ProductDefinition` jeśli istnieje
-- `Update(ModifyInStockCommand)` — aktualizuje ilość i/lub lokalizację
-- `Delete(string)` — usuwa pozycję
+- `GetAll()` / `GetById(Guid)` / `GetByName(string)` — korzystają z wariantów `*WithDetails` repozytorium (dociągają `Definition`)
+- `Add(AddStockItemCommand)` — szuka `ProductDefinition` po nazwie i automatycznie przypisuje, jeśli istnieje
+- `Update(ModifyStockItemCommand)` — szuka pozycji po `Id` (`StockItemNotFoundException` jeśli brak), aktualizuje nazwę/ilość/lokalizację/datę ważności
+- `Delete(Guid)` — szuka pozycji, usuwa
 
 #### Komendy (CQRS-like)
 
@@ -133,27 +149,27 @@ Rekordy C# przekazujące dane z kontrolera do serwisu:
 
 | Komenda | Pola |
 |---|---|
-| `AddTypeCatalogCommand` | `Name`, `Unit`, `Category` |
-| `ModifyTypeCatalogCommand` | `Name`, `Unit?`, `Category?` |
-| `AddToStockCommand` | `Name`, `Amount`, `Location` |
-| `ModifyInStockCommand` | `Name`, `Amount?`, `Location?` |
+| `AddProductDefinitionCommand` | `Name`, `Unit`, `Category` |
+| `ModifyProductDefinitionCommand` | `Name`, `Unit?`, `Category?` |
+| `AddStockItemCommand` | `Name`, `Amount`, `Location`, `ExpirationDate = null` |
+| `ModifyStockItemCommand` | `Id`, `Name?`, `Amount?`, `Location?`, `ExpirationDate = null` |
 
 #### Modele żądań (Request Models)
 
-DTO przyjmowane z ciała żądania HTTP:
+DTO przyjmowane z ciała żądania HTTP — `Name`/`Location` tu są zwykłymi typami (`string`, string-enum), w przeciwieństwie do encji zwracanych w odpowiedziach (dokładny opis asymetrii JSON w [docs/api.md](./api.md)):
 
 | Model | Pola |
 |---|---|
 | `CreateProductDefinitionRequest` | `Name`, `Unit`, `Category` |
 | `UpdateProductDefinitionRequest` | `Unit?`, `Category?` |
-| `CreateStockItemRequest` | `Name`, `Amount`, `Location` |
-| `UpdateStockItemRequest` | `Amount?`, `Location?` |
+| `CreateStockItemRequest` | `Name`, `Amount`, `Location`, `ExpirationDate?` |
+| `UpdateStockItemRequest` | `Name?`, `Amount?`, `Location?`, `ExpirationDate?` |
 
 ---
 
 ### Kitchen.Infrastructure — Infrastruktura
 
-Implementuje dostęp do danych. Zależy od `Core` (implementuje jego interfejsy) i **nie jest znana** warstwie `Application` ani `Core`.
+Implementuje dostęp do danych i globalną obsługę wyjątków. Zależy od `Core` (implementuje jego interfejsy).
 
 #### KitchenDbContext
 
@@ -171,9 +187,10 @@ Konfiguracje encji ładowane są automatycznie z assembly (`ApplyConfigurationsF
 
 **`StockItemConfiguration`:**
 - Klucz główny: `Id` (konwersja `StockItemId ↔ Guid`)
-- `Name` z unikalnym indeksem
+- `Name` wymagane, konwersja `ProductName ↔ string` — **bez unikalnego indeksu** (świadomie, `Name` nie jest unikalne)
+- `ExpirationDate` opcjonalne
 - `Location` przechowywana jako `int`
-- Relacja FK: `TypeName → ProductDefinition.Name` (opcjonalna)
+- Shadow property `DefinitionName` (`ProductName ↔ string`, opcjonalna) + relacja FK: `DefinitionName → ProductDefinition.Name` (opcjonalna, `WithMany()` — jedna definicja może mieć wiele powiązanych pozycji)
 
 #### Repozytoria
 
@@ -182,13 +199,33 @@ Konfiguracje encji ładowane są automatycznie z assembly (`ApplyConfigurationsF
 | `PostgresStockItemRepository` | `IStockItemRepository` |
 | `PostgresProductDefinitionRepository` | `IProductDefinitionRepository` |
 
-Oba używają `AsNoTracking()` przy odczycie dla wydajności. `PostgresStockItemRepository` dodatkowo oferuje metody `GetAllWithDetails()` i `GetByNameWithDetails()` z `Include(i => i.Type)`.
+Oba używają `AsNoTracking()` przy odczycie. `PostgresStockItemRepository` dodatkowo oferuje warianty `*WithDetails` z `Include(i => i.Definition)`.
+
+`Add`/`Update` w `PostgresStockItemRepository` sprawdzają, czy `stockItem.Definition` jest w stanie `Detached`, i w takim przypadku wywołują `Attach()` — `Definition` pochodzi zwykle z odczytu `AsNoTracking()`, więc `DbContext` go nie śledzi.
+
+#### KitchenDbContextFactory
+
+`IDesignTimeDbContextFactory<KitchenDbContext>` — pozwala CLI EF Core (`dotnet ef migrations add ...`) tworzyć `DbContext` bez uruchamiania aplikacji. Connection string jest zahardkodowany w tej klasie, niezależnie od `appsettings.json` — używany wyłącznie w design-time, nie w runtime.
 
 #### DatabaseInitBackgroundService
 
 `IHostedService` uruchamiany przy starcie aplikacji:
-1. Stosuje wszystkie oczekujące migracje EF Core (`Database.Migrate()`)
-2. Jeśli tabela `StockItems` jest pusta — dodaje przykładowe dane testowe
+1. Stosuje wszystkie oczekujące migracje EF Core (`Database.MigrateAsync()`)
+2. Jeśli tabela `StockItems` jest pusta — dodaje przykładowe dane testowe (6 `ProductDefinition` + 6 `StockItem`, polskie nazwy: Mleko, Jajka, Kurczak, Marchew, Ryż, Papryka mielona)
+
+#### ExceptionMiddleware
+
+`internal sealed class ExceptionMiddleware : IMiddleware` (namespace `Kitchen.Infrastructure.Middleware`) — globalny handler wyjątków. Loguje każdy przechwycony wyjątek (`ILogger<ExceptionMiddleware>`), mapuje typ wyjątku na kod HTTP i zwraca `{ "code", "message" }` (kod w `snake_case`, przez `Humanizer.Underscore()`). Pełna tabela mapowania: [docs/api.md — Format błędów](./api.md#format-błędów).
+
+Rejestracja: `AddTransient<ExceptionMiddleware>()` w `AddInfrastructure()`, użycie: `app.UseMiddleware<ExceptionMiddleware>()` w `UseInfrastructure()` — obie w `Kitchen.Infrastructure/Extensions.cs`.
+
+#### Migracje
+
+| Migracja | Opis |
+|---|---|
+| `Initial` (2026-07-05) | Punkt startowy po połączeniu wszystkich wcześniejszych migracji w jedną |
+| `AddExpirationDateToStockItem` (2026-07-05) | Kolumna `ExpirationDate` na `StockItems` |
+| `RenameTypeToDefinition` (2026-07-06) | Zmiana kolumny/FK `TypeName` → `DefinitionName` |
 
 ---
 
@@ -201,35 +238,39 @@ Oba używają `AsNoTracking()` przy odczycie dla wydajności. `PostgresStockItem
 | Metoda | Route | Działanie |
 |---|---|---|
 | GET | `/` | `_inventoryService.GetAll()` |
-| GET | `/{name}` | `_inventoryService.GetByName(name)` lub 404 |
-| POST | `/` | Tworzy `AddToStockCommand`, wywołuje `Add()`, zwraca 201 |
-| PUT | `/{name}` | Tworzy `ModifyInStockCommand`, wywołuje `Update()`, zwraca 204 |
-| DELETE | `/{name}` | Wywołuje `Delete()`, zwraca 204 |
+| GET | `/{id:guid}` | `_inventoryService.GetById(id)` lub 404 |
+| GET | `/{name}` | `_inventoryService.GetByName(name)` lub 404 (jeśli pusta kolekcja) |
+| POST | `/` | Tworzy `AddStockItemCommand`, wywołuje `Add()`, zwraca 201 z echem żądania |
+| PUT | `/{id:guid}` | Tworzy `ModifyStockItemCommand`, wywołuje `Update()`, zwraca 204 |
+| DELETE | `/{id:guid}` | Wywołuje `Delete()`, zwraca 204 |
 
 **`ProductDefinitionsController`** (`/api/productdefinitions`):
 
 | Metoda | Route | Działanie |
 |---|---|---|
 | GET | `/` | `_catalogService.GetAll()` |
-| POST | `/` | Tworzy `AddTypeCatalogCommand`, wywołuje `Add()`, zwraca 201 |
-| PUT | `/{name}` | Tworzy `ModifyTypeCatalogCommand`, wywołuje `Update()`, zwraca 204 |
+| GET | `/{name}` | `_catalogService.GetByName(name)` lub 404 |
+| POST | `/` | Tworzy `AddProductDefinitionCommand`, wywołuje `Add()`, zwraca 201 z echem komendy (`Location` header wskazuje na `Get`) |
+| PUT | `/{name}` | Tworzy `ModifyProductDefinitionCommand`, wywołuje `Update()`, zwraca 204 |
 | DELETE | `/{name}` | Wywołuje `Delete()`, zwraca 204 |
 
-#### ExceptionHandlingMiddleware
+#### Serialization/UnitTypeConverter.cs
 
-Globalny handler wyjątków przechwytujący wszystkie nieobsłużone wyjątki i mapujący je na kody HTTP. Szczegóły: [README — Obsługa błędów](../README.md#️-obsługa-błędów).
+Niestandardowy `JsonConverter<UnitType>` z aliasami PL (`szt`, `kg`, `l`, `litry`...), zarejestrowany globalnie w `Program.cs` (aliasy na wejściu, skrót z `[Description]` na wyjściu). Nierozpoznana wartość na wejściu cicho staje się `UnitType.Unspecified`, zamiast zwrócić błąd — opisane szczegółowo w [docs/api.md](./api.md#unittype).
 
-#### UnitTypeConverter
+#### Program.cs — kolejność rejestracji
 
-Niestandardowy `JsonConverter<UnitType>` obsługujący wielojęzyczne aliasy podczas deserializacji:
-
-| Wejście (JSON) | Wynik |
-|---|---|
-| `"szt"`, `"sztuk"`, `"pieces"` | `UnitType.Pieces` |
-| `"kg"`, `"kilograms"` | `UnitType.Kilograms` |
-| `"l"`, `"liters"`, `"litry"` | `UnitType.Liters` |
-
-Podczas serializacji zwraca skrót z atrybutu `[Description]` (np. `"kg"`).
+```
+AddControllers().AddJsonOptions(+ UnitTypeConverter)
+AddCore() / AddApplication() / AddInfrastructure(config)
+AddSwaggerGen()
+AddCors("FrontendCorsPolicy" → http://localhost:5173)
+─────────────
+UseInfrastructure()   // rejestruje ExceptionMiddleware
+Swagger (tylko Development)
+UseCors("FrontendCorsPolicy")
+MapControllers()
+```
 
 ---
 
@@ -241,4 +282,4 @@ Każda warstwa dostarcza metodę rozszerzającą `IServiceCollection`:
 |---|---|---|
 | `AddCore()` | Core | *(brak — zarezerwowane na przyszłość)* |
 | `AddApplication()` | Application | `ICatalogService`, `IInventoryService` (Scoped) |
-| `AddInfrastructure()` | Infrastructure | DbContext, repozytoria (Scoped), `DatabaseInitBackgroundService` |
+| `AddInfrastructure(config)` | Infrastructure | `KitchenDbContext` + repozytoria (Scoped), `DatabaseInitBackgroundService` (Hosted), `ExceptionMiddleware` (Transient) |

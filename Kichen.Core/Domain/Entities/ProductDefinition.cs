@@ -10,7 +10,6 @@ namespace Kitchen.Core.Domain.Entities
         //primary key
         public ProductName Name { get; private set; }
 
-        [JsonConverter(typeof(JsonStringEnumConverter))]
         public UnitType Unit { get; private set; } = UnitType.Unspecified;
 
         [JsonConverter(typeof(JsonStringEnumConverter))]

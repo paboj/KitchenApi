@@ -6,7 +6,6 @@ namespace Kitchen.Application.Models.Requests
     public class CreateProductDefinitionRequest
     {
         public string Name { get; set; }
-        [JsonConverter(typeof(JsonStringEnumConverter))]
         public UnitType Unit { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]

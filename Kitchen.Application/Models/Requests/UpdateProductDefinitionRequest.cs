@@ -5,7 +5,6 @@ namespace Kitchen.Application.Models.Requests
 {
     public class UpdateProductDefinitionRequest
     {
-        [JsonConverter(typeof(JsonStringEnumConverter))]
         public UnitType? Unit { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]

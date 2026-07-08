@@ -51,6 +51,44 @@ namespace Kitchen.Tests.Unit.Api.Controllers
 
         #endregion
 
+        #region Get
+
+        [Fact]
+        public async Task Get_ShouldReturnOk_WhenProductDefinitionExists()
+        {
+            // Arrange
+            var name = "Mleko";
+            var expected = new ProductDefinition(name, UnitType.Liters, Category.Dairy);
+
+            _catalogServiceMock
+                .Setup(s => s.GetByName(name))
+                .ReturnsAsync(expected);
+
+            // Act
+            var response = await _controller.Get(name);
+
+            // Assert
+            var result = response.Should().BeOfType<OkObjectResult>().Subject;
+            result.Value.Should().Be(expected);
+        }
+
+        [Fact]
+        public async Task Get_ShouldReturnNotFound_WhenProductDefinitionDoesNotExist()
+        {
+            // Arrange
+            _catalogServiceMock
+                .Setup(s => s.GetByName(It.IsAny<string>()))
+                .ReturnsAsync((ProductDefinition?)null);
+
+            // Act
+            var response = await _controller.Get("Nieznany");
+
+            // Assert
+            response.Should().BeOfType<NotFoundResult>();
+        }
+
+        #endregion
+
         #region Create
 
         [Fact]
@@ -69,7 +107,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
             // Assert
             var result = response.Should().BeOfType<CreatedAtActionResult>().Subject;
 
-            result.ActionName.Should().Be("GetAll");
+            result.ActionName.Should().Be("Get");
             //result.RouteValues!["name"].Should().Be(request.Name); - also possible
             result.RouteValues.Should()
                     .ContainKey("name")

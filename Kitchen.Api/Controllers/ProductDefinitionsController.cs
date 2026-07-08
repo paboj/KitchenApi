@@ -17,6 +17,15 @@ public class ProductDefinitionsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll() => Ok(await _catalogService.GetAll());
 
+    [HttpGet("{name}")]
+    public async Task<IActionResult> Get(string name)
+    {
+        var productDefinition = await _catalogService.GetByName(name);
+        if (productDefinition == null) return NotFound();
+
+        return Ok(productDefinition);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateProductDefinitionRequest request)
     {
@@ -28,7 +37,7 @@ public class ProductDefinitionsController : ControllerBase
 
         await _catalogService.Add(command);
 
-        return CreatedAtAction(nameof(GetAll), new { name = command.Name }, command);
+        return CreatedAtAction(nameof(Get), new { name = command.Name }, command);
 
     }
 

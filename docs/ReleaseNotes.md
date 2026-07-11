@@ -3,9 +3,11 @@
 [//]: ## '[Version X] - YYYY-MM-DD'
 [//]: ### 'Summary'
 
+> Still `0.y.z` — API not yet stable, so no major bump is needed regardless of
+> what changes. Real `1.0.0` lands once Digital Pantry closes out.
 
 -------------------------
-## [1.8.0] - 2026-07-09
+## [0.7.1] - 2026-07-09
 ### Expose GET by Name for ProductDefinitions
 
 | Layer | Details |
@@ -15,8 +17,10 @@
 | **Test** | • Updated `Create_ShouldReturnCreatedAtAction_WhenRequestIsValid` for the new action name; added `Get_ShouldReturnOk_WhenProductDefinitionExists` / `Get_ShouldReturnNotFound_WhenProductDefinitionDoesNotExist`. |
 
 -------------------------
-## [1.7.0] - 2026-07-08
+## [0.7.0] - 2026-07-08
 ### Fix JSON Enum Serialization
+
+`StockItem.Location` switches wire format in `GET` responses from a raw integer to a string.
 
 | Layer | Details |
 | :--- | :--- |
@@ -25,8 +29,10 @@
 | **Docs** | • `docs/api.md` updated to describe the corrected behavior — including a newly-noticed side effect: `UnitTypeConverter.Read` silently falls back to `Unspecified` for unrecognized input instead of throwing, so a typo in `unit` no longer produces a `400`. |
 
 -------------------------
-## [1.6.0] - 2026-07-06
+## [0.6.0] - 2026-07-06
 ### Expiration Dates & Definition Rename
+
+`StockItem.Type`/`TypeName` renamed to `Definition`/`DefinitionName` — same rename on the wire, not just internally.
 
 | Layer | Details |
 | :--- | :--- |
@@ -37,7 +43,7 @@
 | **DevOps** | • Added `.gitattributes` to normalize line endings. |
 
 -------------------------
-## [1.5.0] - 2026-07-05
+## [0.5.1] - 2026-07-05
 ### Integration Testing & CI
 
 | Layer | Details |
@@ -47,8 +53,10 @@
 | **DevOps** | • Added a GitHub Actions workflow: build + unit tests + integration tests on PRs to `master` and pushes to `dev`.<br>• Removed the gitignored `Private` project from the solution file.<br>• Dev environment fixes and a more realistic seed dataset. |
 
 -------------------------
-## [1.4.0] - 2026-07-04
+## [0.5.0] - 2026-07-04
 ### Exception Middleware Rewrite & CORS
+
+Error response body reshaped from `{error,code,type}` to `{code,message}`.
 
 | Layer | Details |
 | :--- | :--- |
@@ -57,8 +65,10 @@
 | **Api** | • Added a CORS policy (`FrontendCorsPolicy`) allowing `http://localhost:5173` for local frontend development. |
 
 -------------------------
-## [1.3.0] - 2026-06-14
+## [0.4.0] - 2026-06-14
 ### GUID Identity & Async Everywhere
+
+`StockItem` routing switches from name-based to GUID-based — old URLs stop resolving.
 
 | Layer | Details |
 | :--- | :--- |
@@ -67,8 +77,10 @@
 | **Test** | • Updated unit tests for the async refactor. |
 
 -------------------------
-## [1.2.0] - 2026-05-13
+## [0.3.0] - 2026-05-13
 ### Domain Rename: Ingredient → StockItem / ProductDefinition
+
+Routes move from `/api/ingredients` / `/api/ingredienttypes` to `/api/stockitems` / `/api/productdefinitions`.
 
 | Layer | Details |
 | :--- | :--- |
@@ -76,8 +88,10 @@
 | **Application** | • `StockItem`s eagerly load their linked `ProductDefinition` via `*WithDetails` repository methods. |
 
 -------------------------
-## [1.1.0] - 2026-05-07
+## [0.2.0] - 2026-05-07
 ### Categories, Polish Unit Aliases & Stronger Validation
+
+`Category` becomes a required field on `ProductDefinition` — old create requests without it now fail.
 
 | Layer | Details |
 | :--- | :--- |
@@ -85,32 +99,34 @@
 | **Application/Api** | • Fixed a bug in the update flow; added structured domain exception handling. |
 | **Test** | • Expanded validation and service test coverage. |
 
------------------------------------------------------------
-## [1.0.0] - Release 1: "The Digital Pantry" - 2026-05-02
------------------------------------------------------------
+-------------------------
+## [0.1.0] - 2026-05-02
+### Release 1: "The Digital Pantry"
 
-### Purpose & Business Value
-The primary objective of this release is to deliver a reliable tracking system for household food supplies. By maintaining an accurate, real-time record of ingredients across various storage locations, the system eliminates the need for manual tracking and contributes to the reduction of food waste.
+The first genuinely usable version of the system — full CRUD tracking of
+household food stock across storage locations, plus a product catalog.
+Not yet `1.0.0`: as the versions above show, the contract kept moving
+afterward, so it hadn't actually earned a stability promise yet.
 
-### Features & Scope
-The initial release establishes the foundational ecosystem for digital pantry management:
+#### Purpose & Business Value
+Deliver a reliable tracking system for household food supplies. By
+maintaining an accurate, real-time record of ingredients across various
+storage locations, the system eliminates the need for manual tracking and
+contributes to the reduction of food waste.
+
+#### Features & Scope
 * **Inventory Management:** Full CRUD (Create, Read, Update, Delete) capabilities for food items, with support for specific physical assignments: Fridge, Freezer, and Pantry.
 * **Product Catalog:** A standardized dictionary of ingredient types to ensure data consistency and provide metadata for all products.
 
-### Architecture & Technical Design
-The system is implemented following **Clean Architecture** and **Domain-Driven Design (DDD)** principles to ensure long-term maintainability and scalability.
+#### Architecture & Technical Design
+Implemented following **Clean Architecture** and **Domain-Driven Design
+(DDD)** principles:
+* **Kitchen.Core (Domain):** Pure business logic, entities, and value objects; enforces business rules directly within the models.
+* **Kitchen.Application:** Orchestration layer translating user intents into business actions (Commands).
+* **Kitchen.Infrastructure:** PostgreSQL communication via Entity Framework Core.
+* **Kitchen.Api (Presentation):** RESTful endpoints with integrated OpenAPI (Swagger) documentation.
 
-#### 1. Layer Responsibilities
-* **Kitchen.Core (Domain):** The central layer containing pure business logic, entities, and value objects. It ensures data integrity by enforcing essential business rules directly within the models.
-* **Kitchen.Application:** An orchestration layer that translates user intents into business actions (Commands) and coordinates the execution flow.
-* **Kitchen.Infrastructure:** Manages technical implementation details, including PostgreSQL communication via Entity Framework Core.
-* **Kitchen.Api (Presentation):** The system's entry point, exposing RESTful endpoints with integrated OpenAPI (Swagger) documentation.
-
-#### 2. Technical Foundation
-* **Data Persistence:** PostgreSQL database integrated with `docker-compose.yml` for consistent local and production environments.
-* **Automated Lifecycle:** Implementation of automated migrations and data seeding on application startup for seamless deployment.
-* **Security & Config:** Externalized configuration management using `appsettings.json` to secure connection strings and environment settings.
-* **Quality Assurance:** A dedicated suite of unit tests (xUnit & FluentAssertions) verifying both domain rules and application-level orchestration.
+Technical foundation: PostgreSQL via `docker-compose.yml` for local/production parity, automated migrations and data seeding on startup, externalized configuration via `appsettings.json`, and a dedicated xUnit/FluentAssertions test suite covering both domain rules and application orchestration.
 
 -------------------------
 ## [0.0.8] - 2026-04-30

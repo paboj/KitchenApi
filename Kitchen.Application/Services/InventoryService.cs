@@ -6,8 +6,8 @@ using Kitchen.Application.Services;
 
 internal class InventoryService : IInventoryService
 {
-    private readonly IStockItemRepository _repository;
-    private readonly IProductDefinitionRepository _typeRepository;
+    private readonly IStockItemRepository _inventoryRepository;
+    private readonly IProductDefinitionRepository _catalogRepository;
     private async Task<StockItem> FindStockItem(Guid id)
     {
         var stockItem = await GetById(id);
@@ -19,19 +19,19 @@ internal class InventoryService : IInventoryService
 
     public InventoryService(IStockItemRepository repository, IProductDefinitionRepository typeRepository)
     {
-        _repository = repository;
-        _typeRepository = typeRepository;
+        _inventoryRepository = repository;
+        _catalogRepository = typeRepository;
     }
 
-    public async Task<IEnumerable<StockItem>> GetAll() => await _repository.GetAllWithDetails();
+    public async Task<IEnumerable<StockItem>> GetAll() => await _inventoryRepository.GetAllWithDetails();
 
-    public async Task<StockItem?> GetById(Guid id) => await _repository.GetByIdWithDetails(id);
+    public async Task<StockItem?> GetById(Guid id) => await _inventoryRepository.GetByIdWithDetails(id);
 
-    public async Task<IEnumerable<StockItem>> GetByName(string name) => await _repository.GetByNameWithDetails(name);
+    public async Task<IEnumerable<StockItem>> GetByName(string name) => await _inventoryRepository.GetByNameWithDetails(name);
 
     public async Task Add(AddStockItemCommand command)
     {
-        var productDefinition = await _typeRepository.GetByName(command.Name);
+        var productDefinition = await _catalogRepository.GetByName(command.Name);
         var stockItem = new StockItem(
             command.Name,
             command.Amount,
@@ -39,7 +39,7 @@ internal class InventoryService : IInventoryService
             productDefinition,
             command.ExpirationDate
         );
-        await _repository.Add(stockItem);
+        await _inventoryRepository.Add(stockItem);
     }
 
     public async Task Update(ModifyStockItemCommand command)
@@ -51,13 +51,13 @@ internal class InventoryService : IInventoryService
         stockItem.PlaceOrMove(command.Location);
         stockItem.SetExpirationDate(command.ExpirationDate);
 
-        await _repository.Update(stockItem);
+        await _inventoryRepository.Update(stockItem);
     }
 
     public async Task Delete(Guid id)
     {
         var stockItem = await FindStockItem(id);
 
-        await _repository.Delete(id);
+        await _inventoryRepository.Delete(id);
     }
 }

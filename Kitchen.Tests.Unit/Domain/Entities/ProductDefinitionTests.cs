@@ -75,6 +75,72 @@ namespace Kitchen.Tests.Unit.Domain.Entities
             action.Should().Throw<UnknownUnitTypeException>();
         }
 
+        [Fact]
+        public void ChangeUnitType_ShouldLeavePreviousValue_WhenNull()
+        {
+            var startingUnit = _ProductDefinition.Unit;
+
+            _ProductDefinition.ChangeUnitType(null);
+
+            _ProductDefinition.Unit.Should().Be(startingUnit);
+        }
+
+        #endregion
+
+        #region SetName
+
+        [Fact]
+        public void SetName_ShouldUpdateName_WhenValid()
+        {
+            _ProductDefinition.SetName("Kasza");
+
+            _ProductDefinition.Name.Value.Should().Be("Kasza");
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void SetName_ShouldThrowException_WhenInvalid(string invalidName)
+        {
+            Action action = () => _ProductDefinition.SetName(invalidName);
+
+            action.Should().Throw<InvalidProductNameException>();
+        }
+
+        #endregion
+
+        #region SetCategory
+
+        [Fact]
+        public void SetCategory_ShouldUpdateCategory_WhenValid()
+        {
+            var newCategory = Category.Spices;
+
+            _ProductDefinition.SetCategory(newCategory);
+
+            _ProductDefinition.Category.Should().Be(newCategory);
+        }
+
+        [Fact]
+        public void SetCategory_ShouldLeavePreviousValue_WhenNull()
+        {
+            var startingCategory = _ProductDefinition.Category;
+
+            _ProductDefinition.SetCategory(null);
+
+            _ProductDefinition.Category.Should().Be(startingCategory);
+        }
+
+        [Theory]
+        [InlineData((Category)(-1))]
+        [InlineData((Category)999)]
+        public void SetCategory_ShouldThrowException_WhenInvalid(Category invalidCategory)
+        {
+            Action action = () => _ProductDefinition.SetCategory(invalidCategory);
+
+            action.Should().Throw<UnknownCategoryException>();
+        }
+
         #endregion
     }
 }

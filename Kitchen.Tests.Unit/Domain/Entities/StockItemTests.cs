@@ -138,5 +138,93 @@ namespace Kitchen.Tests.Unit.Domain.Entities
 
         #endregion
 
+        #region SetName
+
+        [Fact]
+        public void GivenValidName_SetName_ShouldUpdateName()
+        {
+            _StockItem.SetName("Ogórek");
+
+            _StockItem.Name.Value.Should().Be("Ogórek");
+        }
+
+        [Fact]
+        public void GivenNullName_SetName_ShouldLeavePreviousValue()
+        {
+            _StockItem.SetName(null);
+
+            _StockItem.Name.Value.Should().Be(_startName);
+        }
+
+        [Fact]
+        public void GivenEmptyName_SetName_ShouldFail()
+        {
+            Action action = () => _StockItem.SetName("");
+
+            action.Should().Throw<InvalidProductNameException>();
+        }
+
+        #endregion
+
+        #region AssignDefinition
+
+        [Fact]
+        public void GivenDefinition_AssignDefinition_ShouldSetDefinitionAndDefinitionName()
+        {
+            var definition = new ProductDefinition(_startName, UnitType.Kilograms, Category.Vegetables);
+
+            _StockItem.AssignDefinition(definition);
+
+            _StockItem.Definition.Should().Be(definition);
+            _StockItem.DefinitionName.Should().Be(definition.Name);
+        }
+
+        [Fact]
+        public void GivenNullDefinition_AssignDefinition_ShouldLeaveDefinitionUnset()
+        {
+            _StockItem.AssignDefinition(null);
+
+            _StockItem.Definition.Should().BeNull();
+            _StockItem.DefinitionName.Should().BeNull();
+        }
+
+        #endregion
+
+        #region SetExpirationDate
+
+        [Fact]
+        public void GivenDate_SetExpirationDate_ShouldUpdateValue()
+        {
+            var date = new DateOnly(2026, 12, 31);
+
+            _StockItem.SetExpirationDate(date);
+
+            _StockItem.ExpirationDate.Should().Be(date);
+        }
+
+        [Fact]
+        public void GivenNullDate_SetExpirationDate_ShouldLeavePreviousValue()
+        {
+            var date = new DateOnly(2026, 12, 31);
+            _StockItem.SetExpirationDate(date);
+
+            _StockItem.SetExpirationDate(null);
+
+            _StockItem.ExpirationDate.Should().Be(date);
+        }
+
+        [Fact]
+        public void GivenPastDate_SetExpirationDate_ShouldStillSetValue()
+        {
+            // Intentionally allowed: an expired item is still a real item in the fridge.
+            var pastDate = new DateOnly(2020, 1, 1);
+
+            _StockItem.SetExpirationDate(pastDate);
+
+            _StockItem.ExpirationDate.Should().Be(pastDate);
+        }
+
+        #endregion
+
     }
 }

@@ -84,6 +84,34 @@ namespace Kitchen.Tests.Unit.Services
         }
 
         [Fact]
+        public async Task GetById_ShouldReturnStockItem_WhenItExists()
+        {
+            var stockItem = new StockItem("Onion", 10, StorageLocation.Fridge, null);
+
+            _stockItemRepositoryMock
+                .Setup(repo => repo.GetByIdWithDetails(stockItem.Id.Value))
+                .ReturnsAsync(stockItem);
+
+            var result = await _service.GetById(stockItem.Id.Value);
+
+            Assert.Equal(stockItem, result);
+        }
+
+        [Fact]
+        public async Task GetById_ShouldReturnNull_WhenItDoesNotExist()
+        {
+            var id = Guid.NewGuid();
+
+            _stockItemRepositoryMock
+                .Setup(repo => repo.GetByIdWithDetails(id))
+                .ReturnsAsync((StockItem?)null);
+
+            var result = await _service.GetById(id);
+
+            Assert.Null(result);
+        }
+
+        [Fact]
         public async Task Add_ShouldSucceed_WhenValidStockItem()
         {
             var command = new AddStockItemCommand("Onion", 10, StorageLocation.Fridge);
@@ -94,6 +122,24 @@ namespace Kitchen.Tests.Unit.Services
                 i.Name == command.Name &&
                 i.Amount == command.Amount &&
                 i.Location == command.Location)),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task Add_ShouldLinkExistingProductDefinition_WhenOneMatchesByName()
+        {
+            var name = "Onion";
+            var command = new AddStockItemCommand(name, 10, StorageLocation.Fridge);
+            var existingDefinition = new ProductDefinition(name, UnitType.Kilograms, Category.Vegetables);
+
+            _productDefinitionRepositoryMock
+                .Setup(repo => repo.GetByName(name))
+                .ReturnsAsync(existingDefinition);
+
+            await _service.Add(command);
+
+            _stockItemRepositoryMock.Verify(repo => repo.Add(It.Is<StockItem>(i =>
+                i.Definition == existingDefinition)),
                 Times.Once);
         }
 
@@ -123,6 +169,23 @@ namespace Kitchen.Tests.Unit.Services
 
             _stockItemRepositoryMock.Verify(repo => repo.Update(existingStockItem), Times.Once);
 
+        }
+
+        [Fact]
+        public async Task Update_ShouldThrowException_WhenStockItemDoesNotExist()
+        {
+            var id = Guid.NewGuid();
+
+            _stockItemRepositoryMock
+                .Setup(repo => repo.GetByIdWithDetails(id))
+                .ReturnsAsync((StockItem?)null);
+
+            var command = new ModifyStockItemCommand(id, "Onion", 5, StorageLocation.Pantry);
+
+            var action = async () => await _service.Update(command);
+
+            await Assert.ThrowsAsync<StockItemNotFoundException>(action);
+            _stockItemRepositoryMock.Verify(repo => repo.Update(It.IsAny<StockItem>()), Times.Never);
         }
 
         [Fact]

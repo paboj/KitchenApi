@@ -13,6 +13,11 @@ namespace Kitchen.Tests.Unit.Api.Controllers
     {
         #region Arrange
 
+        private const string FirstValidName = "Mleko";
+        private const string SecondValidName = "Masło";
+        private const UnitType ValidUnitType = UnitType.Liters;
+        private const Category ValidCategory = Category.Dairy;
+
         private readonly Mock<ICatalogService> _catalogServiceMock;
         private readonly ProductDefinitionsController _controller;
 
@@ -30,22 +35,22 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         public async Task GetAll_ShouldReturnOk_WithIngredientTypes()
         {
             // Arrange
-            var expectedTypes = new List<ProductDefinition>
+            var expectedDefinitions = new List<ProductDefinition>
             {
-                new("Mąka", UnitType.Kilograms, Category.DryGoods),
-                new("Mleko", UnitType.Liters, Category.Dairy)
+                new(FirstValidName, ValidUnitType, ValidCategory),
+                new(SecondValidName, ValidUnitType, ValidCategory)
             };
 
             _catalogServiceMock
                 .Setup(s => s.GetAll())
-                .ReturnsAsync(expectedTypes);
+                .ReturnsAsync(expectedDefinitions);
 
             // Act
             var response = await _controller.GetAll();
 
             // Assert
             var result = response.Should().BeOfType<OkObjectResult>().Subject;
-            result.Value.Should().BeEquivalentTo(expectedTypes);
+            result.Value.Should().BeEquivalentTo(expectedDefinitions);
             _catalogServiceMock.Verify(s => s.GetAll(), Times.Once);
         }
 
@@ -57,8 +62,8 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         public async Task Get_ShouldReturnOk_WhenProductDefinitionExists()
         {
             // Arrange
-            var name = "Mleko";
-            var expected = new ProductDefinition(name, UnitType.Liters, Category.Dairy);
+            var name = FirstValidName;
+            var expected = new ProductDefinition(name, ValidUnitType, ValidCategory);
 
             _catalogServiceMock
                 .Setup(s => s.GetByName(name))
@@ -97,8 +102,8 @@ namespace Kitchen.Tests.Unit.Api.Controllers
             // Arrange
             var request = new CreateProductDefinitionRequest
             {
-                Name = "Cukier",
-                Unit = UnitType.Kilograms
+                Name = FirstValidName,
+                Unit = ValidUnitType
             };
 
             // Act
@@ -130,20 +135,19 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         public async Task Update_ShouldReturnNoContent_WhenValid()
         {
             // Arrange
-            var typeName = "Mleko";
             var request = new UpdateProductDefinitionRequest
             {
-                Unit = UnitType.Liters
+                Unit = ValidUnitType
             };
 
             // Act
-            var response = await _controller.Update(typeName, request);
+            var response = await _controller.Update(FirstValidName, request);
 
             // Assert
             response.Should().BeOfType<NoContentResult>();
 
             _catalogServiceMock.Verify(s => s.Update(It.Is<ModifyProductDefinitionCommand>(c =>
-                c.Name == typeName &&
+                c.Name == FirstValidName &&
                 c.Unit == request.Unit)), Times.Once);
         }
 
@@ -154,15 +158,12 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         [Fact]
         public async Task Delete_ShouldReturnNoContent_WhenSuccessful()
         {
-            // Arrange
-            var typeName = "Mąka";
-
             // Act
-            var response = await _controller.Delete(typeName);
+            var response = await _controller.Delete(FirstValidName);
 
             // Assert
             response.Should().BeOfType<NoContentResult>();
-            _catalogServiceMock.Verify(s => s.Delete(typeName), Times.Once);
+            _catalogServiceMock.Verify(s => s.Delete(FirstValidName), Times.Once);
         }
 
         #endregion

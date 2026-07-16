@@ -109,5 +109,96 @@ namespace Kitchen.Tests.Unit.Services
             Assert.Same(existingDefinition, alreadyLinkedStockItem.Definition);
             _stockItemRepositoryMock.Verify(repo => repo.Update(It.IsAny<StockItem>()), Times.Never);
         }
+
+        [Fact]
+        public async Task GetAll_ShouldReturnAllProductDefinitions()
+        {
+            var expected = new List<ProductDefinition>
+            {
+                new("Mąka", UnitType.Kilograms, Category.DryGoods),
+                new("Mleko", UnitType.Liters, Category.Dairy)
+            };
+
+            _productDefinitionRepositoryMock
+                .Setup(repo => repo.GetAll())
+                .ReturnsAsync(expected);
+
+            var result = await _service.GetAll();
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public async Task GetByName_ShouldReturnNull_WhenProductDefinitionDoesNotExist()
+        {
+            _productDefinitionRepositoryMock
+                .Setup(repo => repo.GetByName(It.IsAny<string>()))
+                .ReturnsAsync((ProductDefinition?)null);
+
+            var result = await _service.GetByName("Nieznany");
+
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task Update_ShouldApplyChanges_WhenProductDefinitionExists()
+        {
+            var name = "Mleko waniliowe";
+            var existingDefinition = new ProductDefinition(name, UnitType.Liters, Category.Dairy);
+
+            _productDefinitionRepositoryMock
+                .Setup(repo => repo.GetByName(name))
+                .ReturnsAsync(existingDefinition);
+
+            var command = new ModifyProductDefinitionCommand(name, UnitType.Kilograms, Category.DryGoods);
+
+            await _service.Update(command);
+
+            Assert.Equal(UnitType.Kilograms, existingDefinition.Unit);
+            Assert.Equal(Category.DryGoods, existingDefinition.Category);
+            _productDefinitionRepositoryMock.Verify(repo => repo.Update(existingDefinition), Times.Once);
+        }
+
+        [Fact]
+        public async Task Update_ShouldThrow_WhenProductDefinitionDoesNotExist()
+        {
+            _productDefinitionRepositoryMock
+                .Setup(repo => repo.GetByName(It.IsAny<string>()))
+                .ReturnsAsync((ProductDefinition?)null);
+
+            var command = new ModifyProductDefinitionCommand("Nieznany", UnitType.Kilograms, Category.DryGoods);
+
+            var action = async () => await _service.Update(command);
+
+            await Assert.ThrowsAsync<ProductDefinitionNotFoundException>(action);
+            _productDefinitionRepositoryMock.Verify(repo => repo.Update(It.IsAny<ProductDefinition>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Delete_ShouldCallRepository_WhenProductDefinitionExists()
+        {
+            var name = "Mleko waniliowe";
+
+            _productDefinitionRepositoryMock
+                .Setup(repo => repo.GetByName(name))
+                .ReturnsAsync(new ProductDefinition(name, UnitType.Liters, Category.Dairy));
+
+            await _service.Delete(name);
+
+            _productDefinitionRepositoryMock.Verify(repo => repo.Delete(name), Times.Once);
+        }
+
+        [Fact]
+        public async Task Delete_ShouldThrow_WhenProductDefinitionDoesNotExist()
+        {
+            _productDefinitionRepositoryMock
+                .Setup(repo => repo.GetByName(It.IsAny<string>()))
+                .ReturnsAsync((ProductDefinition?)null);
+
+            var action = async () => await _service.Delete("Nieznany");
+
+            await Assert.ThrowsAsync<ProductDefinitionNotFoundException>(action);
+            _productDefinitionRepositoryMock.Verify(repo => repo.Delete(It.IsAny<string>()), Times.Never);
+        }
     }
 }

@@ -10,11 +10,15 @@ namespace Kitchen.Tests.Unit.Domain.Entities
 
         #region Arrange
 
-        private readonly ProductDefinition _ProductDefinition;
+        private const string ValidName = "Mąka";
+        private const UnitType ValidUnitType = UnitType.Kilograms;
+        private const Category ValidCategory = Category.Dairy;
+
+        private readonly ProductDefinition _productDefinition;
 
         public ProductDefinitionTests()
         {
-            _ProductDefinition = new ProductDefinition("Mąka", UnitType.Kilograms, Category.DryGoods);
+            _productDefinition = new ProductDefinition(ValidName, ValidUnitType, ValidCategory);
         }
 
         #endregion
@@ -25,11 +29,12 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         public void GivenValidParameters_Constructor_ShouldCreateCorrectEntity()
         {
             // Act
-            var type = new ProductDefinition("Mleko", UnitType.Liters, Category.Dairy);
+            var definition = new ProductDefinition(ValidName, ValidUnitType, ValidCategory);
 
             // Assert
-            type.Name.Value.Should().Be("Mleko");
-            type.Unit.Should().Be(UnitType.Liters);
+            definition.Name.Value.Should().Be(ValidName);
+            definition.Unit.Should().Be(ValidUnitType);
+            definition.Category.Should().Be(ValidCategory);
         }
 
         [Theory]
@@ -37,7 +42,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData(null)]
         public void GivenEmptyName_Constructor_ShouldFail(string invalidName)
         {
-            Action action = () => new ProductDefinition(invalidName, UnitType.Kilograms, Category.DryGoods);
+            Action action = () => new ProductDefinition(invalidName, ValidUnitType, ValidCategory);
 
             action.Should().Throw<InvalidProductNameException>();
         }
@@ -47,7 +52,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData((UnitType)999)]
         public void GivenInvalidUnit_Constructor_ShouldFail(UnitType invalidUnit)
         {
-            Action action = () => new ProductDefinition("Mąka", invalidUnit, Category.DryGoods);
+            Action action = () => new ProductDefinition(ValidName, invalidUnit, ValidCategory);
 
             action.Should().Throw<UnknownUnitTypeException>();
         }
@@ -61,16 +66,18 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         {
             var newUnit = UnitType.Liters;
 
-            _ProductDefinition.ChangeUnitType(newUnit);
+            _productDefinition.Unit.Should().NotBe(newUnit);
 
-            _ProductDefinition.Unit.Should().Be(newUnit);
+            _productDefinition.ChangeUnitType(newUnit);
+
+            _productDefinition.Unit.Should().Be(newUnit);
         }
 
         [Theory]
         [InlineData((UnitType)66)]
         public void ChangeUnitType_ShouldThrowException_WhenInvalid(UnitType invalidUnit)
         {
-            Action action = () => _ProductDefinition.ChangeUnitType(invalidUnit);
+            Action action = () => _productDefinition.ChangeUnitType(invalidUnit);
 
             action.Should().Throw<UnknownUnitTypeException>();
         }
@@ -78,11 +85,11 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Fact]
         public void ChangeUnitType_ShouldLeavePreviousValue_WhenNull()
         {
-            var startingUnit = _ProductDefinition.Unit;
+            var startingUnit = _productDefinition.Unit;
 
-            _ProductDefinition.ChangeUnitType(null);
+            _productDefinition.ChangeUnitType(null);
 
-            _ProductDefinition.Unit.Should().Be(startingUnit);
+            _productDefinition.Unit.Should().Be(startingUnit);
         }
 
         #endregion
@@ -92,9 +99,10 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Fact]
         public void SetName_ShouldUpdateName_WhenValid()
         {
-            _ProductDefinition.SetName("Kasza");
+            string newName = "Kasza";
+            _productDefinition.SetName(newName);
 
-            _ProductDefinition.Name.Value.Should().Be("Kasza");
+            _productDefinition.Name.Value.Should().Be(newName);
         }
 
         [Theory]
@@ -102,7 +110,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData(null)]
         public void SetName_ShouldThrowException_WhenInvalid(string invalidName)
         {
-            Action action = () => _ProductDefinition.SetName(invalidName);
+            Action action = () => _productDefinition.SetName(invalidName);
 
             action.Should().Throw<InvalidProductNameException>();
         }
@@ -116,19 +124,19 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         {
             var newCategory = Category.Spices;
 
-            _ProductDefinition.SetCategory(newCategory);
+            _productDefinition.SetCategory(newCategory);
 
-            _ProductDefinition.Category.Should().Be(newCategory);
+            _productDefinition.Category.Should().Be(newCategory);
         }
 
         [Fact]
         public void SetCategory_ShouldLeavePreviousValue_WhenNull()
         {
-            var startingCategory = _ProductDefinition.Category;
+            var startingCategory = _productDefinition.Category;
 
-            _ProductDefinition.SetCategory(null);
+            _productDefinition.SetCategory(null);
 
-            _ProductDefinition.Category.Should().Be(startingCategory);
+            _productDefinition.Category.Should().Be(startingCategory);
         }
 
         [Theory]
@@ -136,7 +144,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData((Category)999)]
         public void SetCategory_ShouldThrowException_WhenInvalid(Category invalidCategory)
         {
-            Action action = () => _ProductDefinition.SetCategory(invalidCategory);
+            Action action = () => _productDefinition.SetCategory(invalidCategory);
 
             action.Should().Throw<UnknownCategoryException>();
         }

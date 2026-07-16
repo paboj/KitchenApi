@@ -10,15 +10,20 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         #region Arrange
 
         
-        private readonly string _startName = "Pomidor";
-        private readonly double _startAmount = 2;
-        private readonly StorageLocation _startLocation = StorageLocation.Fridge;
+        private const string ValidName = "Pomidor";
+        private const double ValidAmount = 2;
+        private const StorageLocation ValidLocation = StorageLocation.Fridge;
 
-        private readonly StockItem _StockItem;
+        private const UnitType ValidUnitType = UnitType.Pieces;
+        private const Category ValidCategory = Category.Vegetables;
+
+        private readonly ProductDefinition _productDefinition;
+        private readonly StockItem _stockItem;
 
         public StockItemTests()
         {
-            _StockItem = new StockItem(_startName, _startAmount, _startLocation, null);
+            _productDefinition = new ProductDefinition(ValidName, ValidUnitType, ValidCategory);
+            _stockItem = new StockItem(ValidName, ValidAmount, ValidLocation, _productDefinition);
         }
 
         #endregion
@@ -30,7 +35,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData(null)]
         public void GivenEmptyName_Constructor_ShouldFail(string name)
         {
-            Action action = () => new StockItem(name, 2, StorageLocation.Fridge, null);
+            Action action = () => new StockItem(name, ValidAmount, ValidLocation, null);
 
             action.Should().Throw<InvalidProductNameException>();
         }
@@ -40,7 +45,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData(-0.01)]
         public void GivenNegativeAmount_Constructor_ShouldFail(double invalidAmount)
         {
-            Action action = () => new StockItem("Pomidor", invalidAmount, StorageLocation.Fridge, null);
+            Action action = () => new StockItem(ValidName, invalidAmount, ValidLocation, null);
 
             action.Should().Throw<IncorrectAmountException>();
         }
@@ -50,7 +55,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData(999)]
         public void GivenInvalidLocation_Constructor_ShouldFail(int invalidLocation)
         {
-            Action action = () => new StockItem("Pomidor", 2, (StorageLocation)invalidLocation, null);
+            Action action = () => new StockItem(ValidName, ValidAmount, (StorageLocation)invalidLocation, null);
 
             action.Should().Throw<UnknownLocationException>();
         }
@@ -59,13 +64,15 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         public void GivenValidParameters_Constructor_ShouldCreateCorrectEntity()
         {
             // Act
-            var StockItem = new StockItem("Czosnek", 10, StorageLocation.Pantry, null);
+            var StockItem = new StockItem(ValidName, ValidAmount, ValidLocation, _productDefinition);
 
             // Assert
-            StockItem.Name.Value.Should().Be("Czosnek");
-            StockItem.Amount.Should().Be(10);
-            StockItem.Location.Should().Be(StorageLocation.Pantry);
             StockItem.Id.Should().NotBe(Guid.Empty);
+            StockItem.Name.Value.Should().Be(ValidName);
+            StockItem.Amount.Should().Be(ValidAmount);
+            StockItem.Location.Should().Be(ValidLocation);
+            StockItem.Definition.Should().Be(_productDefinition);
+            
         }
 
         #endregion
@@ -76,11 +83,12 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         public void GivenCorrectAmount_Adjustment_ShouldSetNewValue()
         {
             var newValue = 5;
+            var startLocation = _stockItem.Location;
 
-            _StockItem.AdjustAmount(newValue);
+            _stockItem.AdjustAmount(newValue);
 
-            _StockItem.Amount.Should().Be(newValue);
-            _StockItem.Location.Should().Be(_startLocation);
+            _stockItem.Amount.Should().Be(newValue);
+            _stockItem.Location.Should().Be(startLocation);
         }
 
         [Theory]
@@ -88,7 +96,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData(-0.1)]
         public void GivenInvalidAmount_Adjustment_ShouldFail(double invalidAmount)
         {   
-            Action action = () => _StockItem.AdjustAmount(invalidAmount);
+            Action action = () => _stockItem.AdjustAmount(invalidAmount);
 
             action.Should().Throw<IncorrectAmountException>();
         }
@@ -96,10 +104,13 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Fact]
         public void GivenNullAmount_Adjustment_ShouldLeavePreviousValue()
         {
-            _StockItem.AdjustAmount(null);
+            var startAmount = _stockItem.Amount;
+            var startLocation = _stockItem.Location;
 
-            _StockItem.Amount.Should().Be(_startAmount);
-            _StockItem.Location.Should().Be(_startLocation);
+            _stockItem.AdjustAmount(null);
+
+            _stockItem.Amount.Should().Be(startAmount);
+            _stockItem.Location.Should().Be(startLocation);
         }
 
         #endregion
@@ -110,11 +121,12 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         public void GivenValidLocation_PlaceOrMove_ShouldUpdateLocation()
         {
             var newLocation = StorageLocation.Pantry;
+            var startAmount = _stockItem.Amount;
 
-            _StockItem.PlaceOrMove(newLocation);
+            _stockItem.PlaceOrMove(newLocation);
 
-            _StockItem.Location.Should().Be(newLocation);
-            _StockItem.Amount.Should().Be(_startAmount);
+            _stockItem.Location.Should().Be(newLocation);
+            _stockItem.Amount.Should().Be(startAmount);
         }
 
         [Theory]
@@ -122,7 +134,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [InlineData(666)]
         public void GivenInvalidLocation_PlaceOrMove_ShouldFail(int invalidLocation)
         {
-            Action action = () => _StockItem.PlaceOrMove((StorageLocation)invalidLocation);
+            Action action = () => _stockItem.PlaceOrMove((StorageLocation)invalidLocation);
 
             action.Should().Throw<UnknownLocationException>();
         }
@@ -130,10 +142,13 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Fact]
         public void GivenNullLocation_PlaceOrMove_ShouldLeavePreviousValue()
         {
-            _StockItem.PlaceOrMove(null);
+            var startAmount = _stockItem.Amount;
+            var startLocation = _stockItem.Location;
 
-            _StockItem.Amount.Should().Be(_startAmount);
-            _StockItem.Location.Should().Be(_startLocation);
+            _stockItem.PlaceOrMove(null);
+
+            _stockItem.Amount.Should().Be(startAmount);
+            _stockItem.Location.Should().Be(startLocation);
         }
 
         #endregion
@@ -143,23 +158,25 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Fact]
         public void GivenValidName_SetName_ShouldUpdateName()
         {
-            _StockItem.SetName("Ogórek");
+            _stockItem.SetName("Ogórek");
 
-            _StockItem.Name.Value.Should().Be("Ogórek");
+            _stockItem.Name.Value.Should().Be("Ogórek");
         }
 
         [Fact]
         public void GivenNullName_SetName_ShouldLeavePreviousValue()
         {
-            _StockItem.SetName(null);
+            var startName = _stockItem.Name;
 
-            _StockItem.Name.Value.Should().Be(_startName);
+            _stockItem.SetName(null);
+
+            _stockItem.Name.Value.Should().Be(startName);
         }
 
         [Fact]
         public void GivenEmptyName_SetName_ShouldFail()
         {
-            Action action = () => _StockItem.SetName("");
+            Action action = () => _stockItem.SetName("");
 
             action.Should().Throw<InvalidProductNameException>();
         }
@@ -171,21 +188,21 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         [Fact]
         public void GivenDefinition_AssignDefinition_ShouldSetDefinitionAndDefinitionName()
         {
-            var definition = new ProductDefinition(_startName, UnitType.Kilograms, Category.Vegetables);
+            var definition = new ProductDefinition(ValidName, ValidUnitType, ValidCategory);
 
-            _StockItem.AssignDefinition(definition);
+            _stockItem.AssignDefinition(definition);
 
-            _StockItem.Definition.Should().Be(definition);
-            _StockItem.DefinitionName.Should().Be(definition.Name);
+            _stockItem.Definition.Should().Be(definition);
+            _stockItem.DefinitionName.Should().Be(definition.Name);
         }
 
         [Fact]
         public void GivenNullDefinition_AssignDefinition_ShouldLeaveDefinitionUnset()
         {
-            _StockItem.AssignDefinition(null);
+            _stockItem.AssignDefinition(null);
 
-            _StockItem.Definition.Should().BeNull();
-            _StockItem.DefinitionName.Should().BeNull();
+            _stockItem.Definition.Should().BeNull();
+            _stockItem.DefinitionName.Should().BeNull();
         }
 
         #endregion
@@ -197,20 +214,20 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         {
             var date = new DateOnly(2026, 12, 31);
 
-            _StockItem.SetExpirationDate(date);
+            _stockItem.SetExpirationDate(date);
 
-            _StockItem.ExpirationDate.Should().Be(date);
+            _stockItem.ExpirationDate.Should().Be(date);
         }
 
         [Fact]
         public void GivenNullDate_SetExpirationDate_ShouldLeavePreviousValue()
         {
             var date = new DateOnly(2026, 12, 31);
-            _StockItem.SetExpirationDate(date);
+            _stockItem.SetExpirationDate(date);
 
-            _StockItem.SetExpirationDate(null);
+            _stockItem.SetExpirationDate(null);
 
-            _StockItem.ExpirationDate.Should().Be(date);
+            _stockItem.ExpirationDate.Should().Be(date);
         }
 
         [Fact]
@@ -219,9 +236,9 @@ namespace Kitchen.Tests.Unit.Domain.Entities
             // Intentionally allowed: an expired item is still a real item in the fridge.
             var pastDate = new DateOnly(2020, 1, 1);
 
-            _StockItem.SetExpirationDate(pastDate);
+            _stockItem.SetExpirationDate(pastDate);
 
-            _StockItem.ExpirationDate.Should().Be(pastDate);
+            _stockItem.ExpirationDate.Should().Be(pastDate);
         }
 
         #endregion

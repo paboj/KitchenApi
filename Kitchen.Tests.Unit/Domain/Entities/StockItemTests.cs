@@ -23,7 +23,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         public StockItemTests()
         {
             _productDefinition = new ProductDefinition(ValidName, ValidUnitType, ValidCategory);
-            _stockItem = new StockItem(ValidName, ValidAmount, ValidLocation, _productDefinition);
+            _stockItem = new StockItem(ValidName, ValidAmount, ValidLocation, null);
         }
 
         #endregion

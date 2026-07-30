@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Kitchen.Application.Commands;
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
@@ -31,7 +32,7 @@ namespace Kitchen.Tests.Unit.Services
 
             var action = async () => await _service.Add(command);
 
-            await Assert.ThrowsAsync<ProductDefinitionAlreadyExistsException>(action);
+            await action.Should().ThrowAsync<ProductDefinitionAlreadyExistsException>();
 
             _stockItemRepositoryMock.Verify(repo => repo.Update(It.IsAny<StockItem>()), Times.Never);
         }
@@ -60,8 +61,8 @@ namespace Kitchen.Tests.Unit.Services
 
             await _service.Add(command);
 
-            Assert.NotNull(unlinkedStockItem.Definition);
-            Assert.Equal(stockItemName, unlinkedStockItem.Definition!.Name.Value);
+            unlinkedStockItem.Definition.Should().NotBeNull();
+            unlinkedStockItem.Definition!.Name.Value.Should().Be(stockItemName);
 
             _stockItemRepositoryMock.Verify(repo => repo.Update(unlinkedStockItem), Times.Once);
             _productDefinitionRepositoryMock.Verify(repo => repo.Add(It.IsAny<ProductDefinition>()), Times.Once);
@@ -83,7 +84,7 @@ namespace Kitchen.Tests.Unit.Services
 
             await _service.Add(command);
 
-            Assert.Null(unrelatedStockItem.Definition);
+            unrelatedStockItem.Definition.Should().BeNull();
             _stockItemRepositoryMock.Verify(repo => repo.Update(It.IsAny<StockItem>()), Times.Never);
         }
 
@@ -106,7 +107,7 @@ namespace Kitchen.Tests.Unit.Services
 
             await _service.Add(command);
 
-            Assert.Same(existingDefinition, alreadyLinkedStockItem.Definition);
+            alreadyLinkedStockItem.Definition.Should().BeSameAs(existingDefinition);
             _stockItemRepositoryMock.Verify(repo => repo.Update(It.IsAny<StockItem>()), Times.Never);
         }
 
@@ -125,7 +126,7 @@ namespace Kitchen.Tests.Unit.Services
 
             var result = await _service.GetAll();
 
-            Assert.Equal(expected, result);
+            result.Should().Equal(expected);
         }
 
         [Fact]
@@ -137,7 +138,7 @@ namespace Kitchen.Tests.Unit.Services
 
             var result = await _service.GetByName("Nieznany");
 
-            Assert.Null(result);
+            result.Should().BeNull();
         }
 
         [Fact]
@@ -154,8 +155,8 @@ namespace Kitchen.Tests.Unit.Services
 
             await _service.Update(command);
 
-            Assert.Equal(UnitType.Kilograms, existingDefinition.Unit);
-            Assert.Equal(Category.DryGoods, existingDefinition.Category);
+            existingDefinition.Unit.Should().Be(UnitType.Kilograms);
+            existingDefinition.Category.Should().Be(Category.DryGoods);
             _productDefinitionRepositoryMock.Verify(repo => repo.Update(existingDefinition), Times.Once);
         }
 
@@ -170,7 +171,7 @@ namespace Kitchen.Tests.Unit.Services
 
             var action = async () => await _service.Update(command);
 
-            await Assert.ThrowsAsync<ProductDefinitionNotFoundException>(action);
+            await action.Should().ThrowAsync<ProductDefinitionNotFoundException>();
             _productDefinitionRepositoryMock.Verify(repo => repo.Update(It.IsAny<ProductDefinition>()), Times.Never);
         }
 
@@ -197,7 +198,7 @@ namespace Kitchen.Tests.Unit.Services
 
             var action = async () => await _service.Delete("Nieznany");
 
-            await Assert.ThrowsAsync<ProductDefinitionNotFoundException>(action);
+            await action.Should().ThrowAsync<ProductDefinitionNotFoundException>();
             _productDefinitionRepositoryMock.Verify(repo => repo.Delete(It.IsAny<string>()), Times.Never);
         }
     }

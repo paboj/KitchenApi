@@ -1,7 +1,7 @@
 ﻿using Kitchen.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-public static class Extensions
+public static class ApplicationExtensions
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {

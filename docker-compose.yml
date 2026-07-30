@@ -1,6 +1,14 @@
-version: '3.8'
-
 services:
+  kitchen-api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - database__ConnectionString=Host=kitchen-db;Database=KitchenDb;Username=postgres;Password=postgres
+    depends_on:
+      - kitchen-db
+
   kitchen-db:
     image: postgres:16
     container_name: kitchen-api-db

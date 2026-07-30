@@ -8,6 +8,7 @@ Private/
 coveragereport/
 Kitchen.Tests.Unit/TestResults/
 backups/
+*.dump
 docs/decisions/0000-template.md
 
 # dotenv files

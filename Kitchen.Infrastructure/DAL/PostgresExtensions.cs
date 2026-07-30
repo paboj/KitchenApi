@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kitchen.Infrastructure.DAL
 {
-    internal static class Extensions
+    internal static class PostgresExtensions
     {
         public static IServiceCollection AddPostgres(this IServiceCollection services, IConfiguration configuration)
         {

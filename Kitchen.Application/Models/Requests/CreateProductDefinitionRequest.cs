@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Kitchen.Core.Domain.Enums;
+﻿using Kitchen.Core.Domain.Enums;
 
 namespace Kitchen.Application.Models.Requests
 {
@@ -7,8 +6,6 @@ namespace Kitchen.Application.Models.Requests
     {
         public string Name { get; set; }
         public UnitType Unit { get; set; }
-
-        [JsonConverter(typeof(JsonStringEnumConverter))]
         public Category Category { get; set; }
     }
 }

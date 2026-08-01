@@ -37,6 +37,12 @@ namespace Kitchen.Tests.Unit.Api.Controllers
                 Location = ValidLocation
             };
 
+            var createdStockItem = new StockItem(request.Name, request.Amount, request.Location, null);
+
+            _inventoryServiceMock
+                .Setup(s => s.Add(It.IsAny<AddStockItemCommand>()))
+                .ReturnsAsync(createdStockItem);
+
             // Act
             var response = await _controller.Create(request);
 
@@ -44,8 +50,8 @@ namespace Kitchen.Tests.Unit.Api.Controllers
             var result = response.Should().BeOfType<CreatedAtActionResult>().Subject;
 
             result.ActionName.Should().Be("Get");
-            result.RouteValues!["name"].Should().Be(request.Name);
-            result.Value.Should().Be(request);
+            result.RouteValues!["id"].Should().Be(createdStockItem.Id.Value);
+            result.Value.Should().Be(createdStockItem);
 
             _inventoryServiceMock.Verify(s => s.Add(It.Is<AddStockItemCommand>(c =>
                 c.Name == request.Name &&

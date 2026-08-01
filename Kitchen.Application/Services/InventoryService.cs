@@ -29,7 +29,7 @@ internal class InventoryService : IInventoryService
 
     public async Task<IEnumerable<StockItem>> GetByName(string name) => await _inventoryRepository.GetByNameWithDetails(name);
 
-    public async Task Add(AddStockItemCommand command)
+    public async Task<StockItem> Add(AddStockItemCommand command)
     {
         var productDefinition = await _catalogRepository.GetByName(command.Name);
         var stockItem = new StockItem(
@@ -40,6 +40,8 @@ internal class InventoryService : IInventoryService
             command.ExpirationDate
         );
         await _inventoryRepository.Add(stockItem);
+
+        return stockItem;
     }
 
     public async Task Update(ModifyStockItemCommand command)

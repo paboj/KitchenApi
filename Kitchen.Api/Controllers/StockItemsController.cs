@@ -45,11 +45,10 @@ public class StockItemsController : ControllerBase
             request.ExpirationDate
         );
 
-        await _inventoryService.Add(command);
+        var stockItem = await _inventoryService.Add(command);
 
-        return CreatedAtAction(nameof(Get), new { name = request.Name }, request);
-    
-}
+        return CreatedAtAction(nameof(Get), new { id = stockItem.Id.Value }, stockItem);
+    }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateStockItemRequest request)

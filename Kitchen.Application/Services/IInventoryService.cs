@@ -8,7 +8,7 @@ namespace Kitchen.Application.Services
         Task<IEnumerable<StockItem>> GetAll();
         Task<StockItem?> GetById(Guid id);
         Task<IEnumerable<StockItem>> GetByName(string name);
-        Task Add(AddStockItemCommand command);
+        Task<StockItem> Add(AddStockItemCommand command);
         Task Update(ModifyStockItemCommand command);
         Task Delete(Guid id);
     }

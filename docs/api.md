@@ -1,82 +1,80 @@
-# 📡 Dokumentacja API
+# 📡 API Documentation
 
-Bazowy URL: `http://localhost:5099/api`
+Base URL: `http://localhost:5099/api`
 
-Swagger UI dostępny pod: `http://localhost:5099/swagger` (tylko w trybie `Development`)
+Swagger UI available at: `http://localhost:5099/swagger` (`Development` environment only)
 
-Wszystkie żądania i odpowiedzi używają formatu **JSON** (`Content-Type: application/json`).
-
-> ⚠️ **Uwaga o kształcie JSON-a:** `StockItem.Name`, `ProductDefinition.Name` i `StockItem.DefinitionName` są typu `ProductName` (value object bez własnego `JsonConverter`), więc w odpowiedziach serializują się jako obiekt `{ "value": "..." }`, nie jako zwykły string. To samo dotyczy `StockItem.Id` (`StockItemId` → `{ "value": "<guid>" }`). W żądaniach `POST`/`PUT` pole `name` to zwykły `string` — asymetria między tym, co się wysyła, a tym, co się dostaje z powrotem. Przykłady poniżej odzwierciedlają rzeczywisty kształt odpowiedzi API.
+All requests and responses use **JSON** (`Content-Type: application/json`).
 
 ---
 
-## StockItems — Zapasy
+## StockItems — Inventory
 
 ### GET `/api/stockitems`
 
-Pobiera listę wszystkich pozycji z zapasów (z powiązaną `ProductDefinition`, jeśli istnieje).
+Retrieves the list of all stock items (with the linked `ProductDefinition`, if one exists).
 
-**Odpowiedź `200 OK`:**
+**Response `200 OK`:**
 
 ```json
 [
   {
-    "id": { "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6" },
-    "name": { "value": "Mleko" },
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "name": "Mleko",
     "amount": 2.5,
-    "location": "Fridge",
-    "definitionName": { "value": "Mleko" },
+    "location": "lodówka",
+    "definitionName": "Mleko",
     "definition": {
-      "name": { "value": "Mleko" },
+      "name": "Mleko",
       "unit": "l",
-      "category": "Dairy"
+      "category": "nabiał"
     },
     "expirationDate": "2026-07-15"
   }
 ]
 ```
 
-> **Uwaga:** `definition.unit` w zagnieżdżonej `ProductDefinition` wraca jako skrót (`"l"`, `"kg"`, `"szt"`, `"-"`) — przyczyna opisana w sekcji [UnitType](#unittype). Jeśli pozycja nie ma powiązanej definicji: `"definitionName": null, "definition": null`. Jeśli nie ma ustawionej daty ważności: `"expirationDate": null`.
+> **Note:** `unit`, `category`, and `location` come back as their Polish short form (`"l"`, `"nabiał"`, `"lodówka"`), not the C# enum name — see [Allowed enum values](#allowed-enum-values). If the item has no linked definition: `"definitionName": null, "definition": null`. If no expiration date is set: `"expirationDate": null`.
 
 ---
 
 ### GET `/api/stockitems/{id:guid}`
 
-Pobiera pojedynczą pozycję po `Id`.
+Retrieves a single item by `Id`.
 
-**Odpowiedzi:**
+**Responses:**
 
-| Kod | Opis |
+| Code | Description |
 |---|---|
-| `200 OK` | Znaleziono — zwraca obiekt `StockItem` (kształt jak wyżej) |
-| `404 Not Found` | Brak pozycji o podanym `Id` |
+| `200 OK` | Found — returns a `StockItem` object (shape as above) |
+| `404 Not Found` | No item with the given `Id` |
 
 ---
 
 ### GET `/api/stockitems/{name}`
 
-Pobiera **wszystkie** pozycje o podanej nazwie — `StockItem.Name` nie jest unikalny (to samo mleko może leżeć w lodówce i w spiżarni jako dwie osobne pozycje).
+Retrieves **all** items with the given name — `StockItem.Name` isn't unique (the same milk can sit in the fridge and in the pantry as two separate items).
 
-**Parametry ścieżki:**
+**Path parameters:**
 
-| Parametr | Typ | Opis |
+| Parameter | Type | Description |
 |---|---|---|
-| `name` | `string` | Nazwa pozycji |
+| `name` | `string` | Item name |
 
-**Odpowiedzi:**
+**Responses:**
 
-| Kod | Opis |
+| Code | Description |
 |---|---|
-| `200 OK` | Zwraca tablicę pasujących `StockItem` |
-| `404 Not Found` | Brak pozycji o podanej nazwie |
+| `200 OK` | Returns an array of matching `StockItem`s |
+| `404 Not Found` | No items with the given name |
 
 ---
 
 ### POST `/api/stockitems`
 
-Dodaje nową pozycję do zapasów.
+Adds a new item to inventory.
 
-**Ciało żądania:**
+**Request body:**
 
 ```json
 {
@@ -87,31 +85,33 @@ Dodaje nową pozycję do zapasów.
 }
 ```
 
-| Pole | Typ | Wymagane | Opis |
+`location` accepts either the English name (`"Fridge"`) or the Polish short form (`"lodówka"`), case-insensitively — see [Allowed enum values](#allowed-enum-values).
+
+| Field | Type | Required | Description |
 |---|---|---|---|
-| `name` | `string` | ✅ | Nazwa pozycji (nie może być pusta ani zaczynać się od cyfry) |
-| `amount` | `double` | ✅ | Ilość (≥ 0) |
-| `location` | `StorageLocation` | ❌ | Miejsce przechowywania (domyślnie: `Unspecified`) |
-| `expirationDate` | `date` (`yyyy-MM-dd`) | ❌ | Data ważności; brak walidacji "nie w przeszłości" — przeterminowana pozycja to nadal realna pozycja |
+| `name` | `string` | ✅ | Item name (can't be blank or start with a digit) |
+| `amount` | `double` | ✅ | Quantity (≥ 0) |
+| `location` | `StorageLocation` | ❌ | Storage location (defaults to `Unspecified`) |
+| `expirationDate` | `date` (`yyyy-MM-dd`) | ❌ | Expiration date; no "not in the past" validation — an expired item is still a real item |
 
-**Odpowiedzi:**
+**Responses:**
 
-| Kod | Opis |
+| Code | Description |
 |---|---|
-| `201 Created` | Pozycja została dodana |
-| `400 Bad Request` | Nieprawidłowe dane wejściowe |
+| `201 Created` | Item was added |
+| `400 Bad Request` | Invalid input — including an unrecognized `location` value |
 
-> **Uwaga:** Ciało odpowiedzi `201` to **echo wysłanego żądania** (`CreateStockItemRequest`), nie zapisana encja — więc wygenerowane `Id` nie wraca w odpowiedzi. Aby je poznać, należy pobrać pozycję przez `GET /api/stockitems/{name}`.
+> **Note:** the `201` response body is the **created item itself**, including its generated `Id`, with a `Location` header pointing at `GET /api/stockitems/{id:guid}`.
 >
-> Jeśli istnieje `ProductDefinition` o tej samej nazwie, zostanie automatycznie powiązana (`InventoryService.Add`).
+> If a `ProductDefinition` with the same name exists, it's linked automatically (`InventoryService.Add`).
 
 ---
 
 ### PUT `/api/stockitems/{id:guid}`
 
-Aktualizuje istniejącą pozycję po `Id`. Wszystkie pola są opcjonalne — podaj tylko te, które chcesz zmienić.
+Updates an existing item by `Id`. All fields are optional — send only what you want to change.
 
-**Ciało żądania:**
+**Request body:**
 
 ```json
 {
@@ -122,82 +122,82 @@ Aktualizuje istniejącą pozycję po `Id`. Wszystkie pola są opcjonalne — pod
 }
 ```
 
-| Pole | Typ | Wymagane | Opis |
+| Field | Type | Required | Description |
 |---|---|---|---|
-| `name` | `string?` | ❌ | Nowa nazwa |
-| `amount` | `double?` | ❌ | Nowa ilość (≥ 0) |
-| `location` | `StorageLocation?` | ❌ | Nowe miejsce przechowywania |
-| `expirationDate` | `date?` | ❌ | Nowa data ważności |
+| `name` | `string?` | ❌ | New name |
+| `amount` | `double?` | ❌ | New quantity (≥ 0) |
+| `location` | `StorageLocation?` | ❌ | New storage location |
+| `expirationDate` | `date?` | ❌ | New expiration date |
 
-**Odpowiedzi:**
+**Responses:**
 
-| Kod | Opis |
+| Code | Description |
 |---|---|
-| `204 No Content` | Zaktualizowano pomyślnie |
-| `400 Bad Request` | Nieprawidłowe dane |
-| `404 Not Found` | Brak pozycji o podanym `Id` |
+| `204 No Content` | Updated successfully |
+| `400 Bad Request` | Invalid input |
+| `404 Not Found` | No item with the given `Id` |
 
 ---
 
 ### DELETE `/api/stockitems/{id:guid}`
 
-Usuwa pozycję z zapasów.
+Removes an item from inventory.
 
-**Odpowiedzi:**
+**Responses:**
 
-| Kod | Opis |
+| Code | Description |
 |---|---|
-| `204 No Content` | Usunięto pomyślnie |
-| `404 Not Found` | Brak pozycji o podanym `Id` |
+| `204 No Content` | Deleted successfully |
+| `404 Not Found` | No item with the given `Id` |
 
 ---
 
-## ProductDefinitions — Katalog typów produktów
+## ProductDefinitions — Product catalog
 
 ### GET `/api/productdefinitions`
 
-Pobiera listę wszystkich definicji produktów.
+Retrieves the list of all product definitions.
 
-**Odpowiedź `200 OK`:**
+**Response `200 OK`:**
 
 ```json
 [
   {
-    "name": { "value": "Mleko" },
+    "name": "Mleko",
     "unit": "l",
-    "category": "Dairy"
+    "category": "nabiał"
   }
 ]
 ```
 
-> `unit` wraca jako skrót (`"l"`), nie pełna nazwa — patrz [UnitType](#unittype). `category` nadal jako pełna nazwa (`"Dairy"`), bo `Category` nie ma własnego konwertera z aliasami.
+> `unit` and `category` come back as their Polish short form, same as in `StockItem` responses — see [Allowed enum values](#allowed-enum-values).
 
 ---
 
 ### GET `/api/productdefinitions/{name}`
 
-Pobiera pojedynczą definicję po nazwie.
+Retrieves a single definition by name.
 
-**Parametry ścieżki:**
+**Path parameters:**
 
-| Parametr | Typ | Opis |
+| Parameter | Type | Description |
 |---|---|---|
-| `name` | `string` | Nazwa definicji |
+| `name` | `string` | Definition name |
 
-**Odpowiedzi:**
+**Responses:**
 
-| Kod | Opis |
+| Code | Description |
 |---|---|
-| `200 OK` | Znaleziono — zwraca obiekt `ProductDefinition` (kształt jak wyżej) |
-| `404 Not Found` | Brak definicji o podanej nazwie |
+| `200 OK` | Found — returns a `ProductDefinition` object (shape as above) |
+| `404 Not Found` | No definition with the given name |
 
 ---
 
 ### POST `/api/productdefinitions`
 
-Tworzy nową definicję produktu.
+Creates a new product definition.
 
-**Ciało żądania:**
+**Request body:**
 
 ```json
 {
@@ -207,29 +207,31 @@ Tworzy nową definicję produktu.
 }
 ```
 
-| Pole | Typ | Wymagane | Opis |
+`unit` and `category` each accept either the English name or the Polish short form, case-insensitively — see [Allowed enum values](#allowed-enum-values).
+
+| Field | Type | Required | Description |
 |---|---|---|---|
-| `name` | `string` | ✅ | Unikalna nazwa produktu (klucz główny) |
-| `unit` | `UnitType` | ✅ | Jednostka miary |
-| `category` | `Category` | ✅ | Kategoria produktu |
+| `name` | `string` | ✅ | Unique product name (primary key) |
+| `unit` | `UnitType` | ✅ | Unit of measure |
+| `category` | `Category` | ✅ | Product category |
 
-**Odpowiedzi:**
+**Responses:**
 
-| Kod | Opis |
+| Code | Description |
 |---|---|
-| `201 Created` | Definicja została dodana; ciało to echo komendy (`name` jako zwykły string, nie `{ "value" }`) |
-| `400 Bad Request` | Nieprawidłowe dane |
-| `409 Conflict` | Definicja o tej nazwie już istnieje |
+| `201 Created` | Definition was added; body is the created definition itself |
+| `400 Bad Request` | Invalid input — including an unrecognized `unit`/`category` value |
+| `409 Conflict` | A definition with this name already exists |
 
-> **Uwaga:** jeśli w bazie są już pozycje `StockItem` o tej samej nazwie bez przypisanej definicji, `CatalogService.Add` automatycznie je z nią połączy (`LinkToExistingStockItems`).
+> **Note:** if `StockItem`s with the same name already exist without a linked definition, `CatalogService.Add` links them automatically (`LinkToExistingStockItems`).
 
 ---
 
 ### PUT `/api/productdefinitions/{name}`
 
-Aktualizuje istniejącą definicję produktu.
+Updates an existing product definition.
 
-**Ciało żądania:**
+**Request body:**
 
 ```json
 {
@@ -238,94 +240,94 @@ Aktualizuje istniejącą definicję produktu.
 }
 ```
 
-| Pole | Typ | Wymagane | Opis |
+| Field | Type | Required | Description |
 |---|---|---|---|
-| `unit` | `UnitType?` | ❌ | Nowa jednostka miary |
-| `category` | `Category?` | ❌ | Nowa kategoria |
+| `unit` | `UnitType?` | ❌ | New unit of measure |
+| `category` | `Category?` | ❌ | New category |
 
-**Odpowiedzi:**
+**Responses:**
 
-| Kod | Opis |
+| Code | Description |
 |---|---|
-| `204 No Content` | Zaktualizowano pomyślnie |
-| `400 Bad Request` | Nieprawidłowe dane |
-| `404 Not Found` | Brak definicji o podanej nazwie |
+| `204 No Content` | Updated successfully |
+| `400 Bad Request` | Invalid input |
+| `404 Not Found` | No definition with the given name |
 
 ---
 
 ### DELETE `/api/productdefinitions/{name}`
 
-Usuwa definicję produktu.
+Removes a product definition.
 
-**Odpowiedzi:**
+**Responses:**
 
-| Kod | Opis |
+| Code | Description |
 |---|---|
-| `204 No Content` | Usunięto pomyślnie |
-| `404 Not Found` | Brak definicji o podanej nazwie |
+| `204 No Content` | Deleted successfully |
+| `404 Not Found` | No definition with the given name |
 
 ---
 
-## Dozwolone wartości enumeracji
+## Allowed enum values
+
+`UnitType`, `Category`, and `StorageLocation` each have a dedicated `JsonConverter` (`Kitchen.Api/Serialization/`), registered globally in `Program.cs`. Each one accepts, case-insensitively: its English C# name, its Polish short form (the `[Description]` attribute on the enum member), or `"-"` / `"unspecified"` for the default value. Anything else is rejected with a `400 Bad Request` — see [Error format](#error-format).
+
+On the way out, all three are written as their Polish short form, not the English enum name.
 
 ### UnitType
 
-Wszystkie miejsca, gdzie `UnitType` pojawia się w JSON-ie (`ProductDefinition.Unit`, `Create-`/`UpdateProductDefinitionRequest.Unit`), używają globalnie zarejestrowanego `UnitTypeConverter` (`Kitchen.Api/Serialization/UnitTypeConverter.cs`, dodany w `Program.cs`). Żadna z tych właściwości nie ma własnego, nadpisującego atrybutu `[JsonConverter(typeof(JsonStringEnumConverter))]`.
-
-**Odczyt (co wolno wysłać, bez rozróżniania wielkości liter):**
-
-| Wartość JSON | Enum |
+| JSON value (input) | Enum |
 |---|---|
-| `"-"` | `Unspecified` |
+| `"-"`, `"unspecified"` | `Unspecified` |
 | `"szt"`, `"sztuk"`, `"pieces"` | `Pieces` |
 | `"kg"`, `"kilograms"` | `Kilograms` |
 | `"l"`, `"liters"`, `"litry"` | `Liters` |
 
-**Zapis (co wraca w odpowiedzi):** skrót z atrybutu `[Description]` — `"-"`, `"szt"`, `"kg"`, `"l"`, nie pełna nazwa enuma.
-
-> ⚠️ **Uwaga:** `UnitTypeConverter.Read` nie rzuca wyjątku dla nierozpoznanej wartości — cicho zwraca `UnitType.Unspecified`. Wysłanie literówki (np. `"kilo"` zamiast `"kilograms"`) nie skończy się błędem `400`, tylko zapisze produkt z jednostką `Unspecified`.
+Output: `"-"`, `"szt"`, `"kg"`, `"l"`.
 
 ### Category
 
-| Wartość JSON | Enum |
+| JSON value (input) | Enum |
 |---|---|
-| `"Unspecified"` | `Unspecified` |
-| `"Meat"` | `Meat` |
-| `"Vegetables"` | `Vegetables` |
-| `"Dairy"` | `Dairy` |
-| `"DryGoods"` | `DryGoods` |
-| `"Spices"` | `Spices` |
-| `"Other"` | `Other` |
+| `"-"`, `"unspecified"` | `Unspecified` |
+| `"meat"`, `"mięso"` | `Meat` |
+| `"vegetables"`, `"warzywa"` | `Vegetables` |
+| `"dairy"`, `"nabiał"` | `Dairy` |
+| `"drygoods"`, `"sypkie"` | `DryGoods` |
+| `"spices"`, `"przyprawy"` | `Spices` |
+| `"other"`, `"inne"` | `Other` |
 
-Tak samo jak `UnitType`: standardowy `JsonStringEnumConverter`, bez aliasów.
+Output: `"-"`, `"mięso"`, `"warzywa"`, `"nabiał"`, `"sypkie"`, `"przyprawy"`, `"inne"`.
 
 ### StorageLocation
 
-| Wartość JSON | Enum |
+| JSON value (input) | Enum |
 |---|---|
-| `"Unspecified"` | `Unspecified` (0) |
-| `"Fridge"` | `Fridge` (1) |
-| `"Freezer"` | `Freezer` (2) |
-| `"Pantry"` | `Pantry` (3) |
+| `"-"`, `"unspecified"` | `Unspecified` (0) |
+| `"fridge"`, `"lodówka"` | `Fridge` (1) |
+| `"freezer"`, `"zamrażarka"` | `Freezer` (2) |
+| `"pantry"`, `"szafki"` | `Pantry` (3) |
 
-Zawsze string (standardowy `JsonStringEnumConverter`), zarówno w żądaniach, jak i w odpowiedziach `GET /api/stockitems*` — `StockItem.Location` ma własny `[JsonConverter(typeof(JsonStringEnumConverter))]`, więc kształt jest spójny w obie strony.
+Output: `"-"`, `"lodówka"`, `"zamrażarka"`, `"szafki"`.
+
+> ⚠️ **Note:** this replaced an earlier version of `UnitTypeConverter` that silently fell back to `Unspecified` for any unrecognized value instead of rejecting it — a typo like `"kilo"` used to save silently as `Unspecified` instead of failing with a `400`. Fixed 2026-08-01.
 
 ---
 
-## Format błędów
+## Error format
 
-Wszystkie błędy zwracają JSON w jednolitej strukturze (`Kitchen.Infrastructure.Middleware.ExceptionMiddleware`):
+All errors return JSON in a uniform shape (`Kitchen.Infrastructure.Middleware.ExceptionMiddleware`):
 
 ```json
 {
   "code": "product_definition_not_found",
-  "message": "Czytelny komunikat błędu"
+  "message": "Human-readable error message"
 }
 ```
 
-`code` to nazwa klasy wyjątku bez przyrostka `Exception`, w `snake_case` (`Humanizer.Underscore()`).
+`code` is the exception class name minus the `Exception` suffix, in `snake_case` (`Humanizer.Underscore()`).
 
-| Wyjątek | `code` | HTTP |
+| Exception | `code` | HTTP |
 |---|---|---|
 | `StockItemNotFoundException` | `stock_item_not_found` | `404 Not Found` |
 | `ProductDefinitionNotFoundException` | `product_definition_not_found` | `404 Not Found` |
@@ -335,5 +337,5 @@ Wszystkie błędy zwracają JSON w jednolitej strukturze (`Kitchen.Infrastructur
 | `UnknownLocationException` | `unknown_location` | `400 Bad Request` |
 | `UnknownCategoryException` | `unknown_category` | `400 Bad Request` |
 | `UnknownUnitTypeException` | `unknown_unit_type` | `400 Bad Request` |
-| Pozostałe `KitchenApiException` | *(nazwa wyjątku)* | `400 Bad Request` |
-| Nieoczekiwane błędy | *(nazwa wyjątku lub `exception`)* | `500 Internal Server Error` — logowane przez `ILogger<ExceptionMiddleware>` |
+| Other `KitchenApiException` | *(exception name)* | `400 Bad Request` |
+| Unexpected errors | *(exception name or `exception`)* | `500 Internal Server Error` — logged via `ILogger<ExceptionMiddleware>` |

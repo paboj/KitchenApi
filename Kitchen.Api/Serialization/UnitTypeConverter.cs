@@ -26,9 +26,6 @@ public class UnitTypeConverter : JsonConverter<UnitType>
 
     private string GetDescription(UnitType value)
     {
-        return value.GetType()
-            .GetField(value.ToString())
-            ?.GetCustomAttribute<DescriptionAttribute>()
-            ?.Description ?? value.ToString().ToLower();
+        return value.ToDescription();
     }
 }

@@ -3,19 +3,22 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Kitchen.Core.Domain.Enums;
+using Kitchen.Core.Domain.Exceptions;
 
 public class UnitTypeConverter : JsonConverter<UnitType>
 {
     public override UnitType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var value = reader.GetString()?.ToLower();
+        var raw = reader.GetString();
+        var value = raw?.ToLower();
 
         return value switch
         {
+            "" or "-" or "unspecified" => UnitType.Unspecified,
             "szt" or "sztuk" or "pieces" => UnitType.Pieces,
             "kg" or "kilograms" => UnitType.Kilograms,
             "l" or "liters" or "litry" => UnitType.Liters,
-            _ => UnitType.Unspecified
+            _ => throw new UnknownUnitTypeException(raw)
         };
     }
 

@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Kitchen.Core.Domain.Enums;
+﻿using Kitchen.Core.Domain.Enums;
 using Kitchen.Core.Domain.Exceptions;
 using Kitchen.Core.ValueObjects;
 
@@ -11,7 +10,6 @@ namespace Kitchen.Core.Domain.Entities
         public ProductName Name { get; private set; }
         public double Amount { get; private set; } = 0;
 
-        [JsonConverter(typeof(JsonStringEnumConverter))]
         public StorageLocation Location { get; private set; } = StorageLocation.Unspecified;
         public ProductName? DefinitionName { get; private set; }
         public ProductDefinition? Definition { get; private set; }

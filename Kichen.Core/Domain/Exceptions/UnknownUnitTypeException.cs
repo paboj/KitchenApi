@@ -2,7 +2,7 @@
 {
     public sealed class UnknownUnitTypeException : KitchenApiException
     {
-        //TODO: remove hardcode
-        public UnknownUnitTypeException() : base("Uknown unit type. Available: pieces, grams, mililiters.") { }
+        public UnknownUnitTypeException(string? value = null)
+            : base(value is null ? "Unknown unit type." : $"Unknown unit type: '{value}'.") { }
     }
 }

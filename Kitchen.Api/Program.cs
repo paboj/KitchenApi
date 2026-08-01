@@ -14,6 +14,11 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new UnitTypeConverter());
+        options.JsonSerializerOptions.Converters.Add(new ProductNameConverter());
+        options.JsonSerializerOptions.Converters.Add(new StockItemIdConverter());
+        options.JsonSerializerOptions.Converters.Add(new CategoryConverter());
+        options.JsonSerializerOptions.Converters.Add(new StorageLocationConverter());
+        options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
     });
 builder.Services.AddCore();
 builder.Services.AddApplication();

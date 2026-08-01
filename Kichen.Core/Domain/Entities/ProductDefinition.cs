@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Kitchen.Core.Domain.Enums;
+﻿using Kitchen.Core.Domain.Enums;
 using Kitchen.Core.Domain.Exceptions;
 using Kitchen.Core.ValueObjects;
 
@@ -12,7 +11,6 @@ namespace Kitchen.Core.Domain.Entities
 
         public UnitType Unit { get; private set; } = UnitType.Unspecified;
 
-        [JsonConverter(typeof(JsonStringEnumConverter))]
         public Category Category { get; private set; } = Category.Unspecified;
 
 

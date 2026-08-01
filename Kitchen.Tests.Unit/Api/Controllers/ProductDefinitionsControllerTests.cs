@@ -106,6 +106,12 @@ namespace Kitchen.Tests.Unit.Api.Controllers
                 Unit = ValidUnitType
             };
 
+            var createdDefinition = new ProductDefinition(request.Name, request.Unit, request.Category);
+
+            _catalogServiceMock
+                .Setup(s => s.Add(It.IsAny<AddProductDefinitionCommand>()))
+                .ReturnsAsync(createdDefinition);
+
             // Act
             var response = await _controller.Create(request);
 
@@ -113,14 +119,11 @@ namespace Kitchen.Tests.Unit.Api.Controllers
             var result = response.Should().BeOfType<CreatedAtActionResult>().Subject;
 
             result.ActionName.Should().Be("Get");
-            //result.RouteValues!["name"].Should().Be(request.Name); - also possible
             result.RouteValues.Should()
                     .ContainKey("name")
-                    .WhoseValue.Should().Be(request.Name);
+                    .WhoseValue.Should().Be(createdDefinition.Name.Value);
 
-            var command = result.Value.Should().BeOfType<AddProductDefinitionCommand>().Subject;
-            command.Name.Should().Be(request.Name);
-            command.Unit.Should().Be(request.Unit);
+            result.Value.Should().Be(createdDefinition);
 
             _catalogServiceMock.Verify(s => s.Add(It.Is<AddProductDefinitionCommand>(c =>
                 c.Name == request.Name &&

@@ -27,7 +27,7 @@ internal class CatalogService : ICatalogService
 
     public async Task<ProductDefinition?> GetByName(string name) => await _catalogRepository.GetByName(name);
 
-    public async Task Add(AddProductDefinitionCommand command)
+    public async Task<ProductDefinition> Add(AddProductDefinitionCommand command)
     {
         var existing = await _catalogRepository.GetByName(command.Name);
         if (existing != null) throw new ProductDefinitionAlreadyExistsException();
@@ -40,6 +40,8 @@ internal class CatalogService : ICatalogService
         await _catalogRepository.Add(definition);
 
         await LinkToExistingStockItems(definition);
+
+        return definition;
     }
 
     public async Task Update(ModifyProductDefinitionCommand command)

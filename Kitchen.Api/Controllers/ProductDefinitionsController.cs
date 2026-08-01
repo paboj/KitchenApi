@@ -35,10 +35,9 @@ public class ProductDefinitionsController : ControllerBase
                 request.Category
             );
 
-        await _catalogService.Add(command);
+        var definition = await _catalogService.Add(command);
 
-        return CreatedAtAction(nameof(Get), new { name = command.Name }, command);
-
+        return CreatedAtAction(nameof(Get), new { name = definition.Name.Value }, definition);
     }
 
     [HttpPut("{name}")]

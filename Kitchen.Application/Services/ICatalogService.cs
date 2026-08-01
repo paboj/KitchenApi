@@ -7,7 +7,7 @@ namespace Kitchen.Application.Services
     {
         Task<IEnumerable<ProductDefinition>> GetAll();
         Task<ProductDefinition?> GetByName(string name);
-        Task Add(AddProductDefinitionCommand command);
+        Task<ProductDefinition> Add(AddProductDefinitionCommand command);
         Task Update(ModifyProductDefinitionCommand command);
         Task Delete(string name);
     }

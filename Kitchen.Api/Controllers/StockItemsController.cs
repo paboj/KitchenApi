@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Kitchen.Application.Services;
-using Kitchen.Api.Models.Requests;
+using Kitchen.Api.Requests;
 using Kitchen.Application.Commands;
 
 [ApiController]

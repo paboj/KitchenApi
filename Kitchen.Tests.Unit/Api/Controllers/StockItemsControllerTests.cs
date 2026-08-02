@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Kitchen.Application.Commands;
-using Kitchen.Api.Models.Requests;
+using Kitchen.Api.Requests;
 using Kitchen.Application.Services;
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
@@ -30,12 +30,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         public async Task Create_ShouldReturnCreatedAtAction_WhenRequestIsValid()
         {
             // Arrange
-            var request = new CreateStockItemRequest
-            {
-                Name = ValidName,
-                Amount = ValidAmount,
-                Location = ValidLocation
-            };
+            var request = new CreateStockItemRequest(ValidName, ValidAmount, ValidLocation);
 
             var createdStockItem = new StockItem(request.Name, request.Amount, request.Location, null);
 
@@ -152,11 +147,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         public async Task Update_ShouldReturnNoContent_WhenValid()
         {
             var id = Guid.NewGuid();
-            var request = new UpdateStockItemRequest
-            {
-                Amount = ValidAmount,
-                Location = ValidLocation
-            };
+            var request = new UpdateStockItemRequest(Amount: ValidAmount, Location: ValidLocation);
 
             var response = await _controller.Update(id, request);
 

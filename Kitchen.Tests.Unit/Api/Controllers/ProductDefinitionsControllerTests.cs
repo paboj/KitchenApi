@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Kitchen.Application.Commands;
-using Kitchen.Api.Models.Requests;
+using Kitchen.Api.Requests;
 using Kitchen.Application.Services;
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
@@ -100,11 +100,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         public async Task Create_ShouldReturnCreatedAtAction_WhenRequestIsValid()
         {
             // Arrange
-            var request = new CreateProductDefinitionRequest
-            {
-                Name = FirstValidName,
-                Unit = ValidUnitType
-            };
+            var request = new CreateProductDefinitionRequest(FirstValidName, ValidUnitType, ValidCategory);
 
             var createdDefinition = new ProductDefinition(request.Name, request.Unit, request.Category);
 
@@ -138,10 +134,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         public async Task Update_ShouldReturnNoContent_WhenValid()
         {
             // Arrange
-            var request = new UpdateProductDefinitionRequest
-            {
-                Unit = ValidUnitType
-            };
+            var request = new UpdateProductDefinitionRequest(Unit: ValidUnitType);
 
             // Act
             var response = await _controller.Update(FirstValidName, request);

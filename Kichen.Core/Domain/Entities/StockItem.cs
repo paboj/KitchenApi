@@ -6,8 +6,8 @@ namespace Kitchen.Core.Domain.Entities
 {
     public class StockItem
     {
-        public StockItemId Id { get; private set; }
-        public ProductName Name { get; private set; }
+        public StockItemId Id { get; private set; } = null!;
+        public ProductName Name { get; private set; } = null!;
         public double Amount { get; private set; } = 0;
 
         public StorageLocation Location { get; private set; } = StorageLocation.Unspecified;

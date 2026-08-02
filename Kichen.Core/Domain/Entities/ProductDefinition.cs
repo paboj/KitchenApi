@@ -7,7 +7,7 @@ namespace Kitchen.Core.Domain.Entities
     public class ProductDefinition
     {
         //primary key
-        public ProductName Name { get; private set; }
+        public ProductName Name { get; private set; } = null!;
 
         public UnitType Unit { get; private set; } = UnitType.Unspecified;
 

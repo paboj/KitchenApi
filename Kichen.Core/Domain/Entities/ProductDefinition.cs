@@ -21,7 +21,7 @@ namespace Kitchen.Core.Domain.Entities
             SetCategory(category);
         }
 
-        public void SetName(string name)
+        private void SetName(string name)
         {
             Name = new ProductName(name);
         }

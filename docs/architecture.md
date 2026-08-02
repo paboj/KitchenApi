@@ -295,6 +295,5 @@ Each layer provides an `IServiceCollection` extension method:
 
 | Method | Layer | Registers |
 |---|---|---|
-| `AddCore()` | Core | *(none yet — reserved for future use)* |
 | `AddApplication()` | Application | `ICatalogService`, `IInventoryService` (Scoped) |
 | `AddInfrastructure(config)` | Infrastructure | `KitchenDbContext` + repositories (Scoped), `DatabaseInitBackgroundService` (Hosted), `ExceptionMiddleware` (Transient) |

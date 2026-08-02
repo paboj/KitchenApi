@@ -9,7 +9,7 @@ coveragereport/
 Kitchen.Tests.Unit/TestResults/
 backups/
 *.dump
-docs/decisions/0000-template.md
+docs/decisions/
 
 # dotenv files
 .env

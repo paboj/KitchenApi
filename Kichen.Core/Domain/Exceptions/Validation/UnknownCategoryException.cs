@@ -1,4 +1,4 @@
-﻿namespace Kitchen.Core.Domain.Exceptions
+namespace Kitchen.Core.Domain.Exceptions
 {
     public sealed class UnknownCategoryException : KitchenApiException
     {

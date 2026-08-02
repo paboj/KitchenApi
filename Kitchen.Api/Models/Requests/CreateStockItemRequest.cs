@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Kitchen.Core.Domain.Enums;
 
-namespace Kitchen.Application.Models.Requests
+namespace Kitchen.Api.Models.Requests
 {
     public class CreateStockItemRequest
     {

@@ -1,81 +1,81 @@
 # 🍽️ Kitchen.Api
 
-REST API do zarządzania spiżarnią kuchenną — pozwala śledzić stan zapasów (`StockItems`) oraz katalog definicji produktów (`ProductDefinitions`).
+A REST API for managing a kitchen pantry — tracks inventory (`StockItems`) and a catalog of product definitions (`ProductDefinitions`).
 
-Zbudowane w **.NET 8** z wykorzystaniem architektury **Clean Architecture**, bazy danych **PostgreSQL** (Npgsql.EntityFrameworkCore.PostgreSQL) i **Entity Framework Core**.
-
----
-
-## 📋 Spis treści
-
-- [Funkcjonalności](#-funkcjonalności)
-- [Architektura](#-architektura)
-- [Wymagania](#-wymagania)
-- [Uruchomienie](#-uruchomienie)
-- [Konfiguracja](#-konfiguracja)
-- [Endpointy API](#-endpointy-api)
-- [Model danych](#-model-danych)
-- [Obsługa błędów](#-obsługa-błędów)
-- [Struktura projektu](#-struktura-projektu)
-- [Testy](#-testy)
+Built with **.NET 8** using **Clean Architecture**, a **PostgreSQL** database (Npgsql.EntityFrameworkCore.PostgreSQL), and **Entity Framework Core**.
 
 ---
 
-## ✅ Funkcjonalności
+## 📋 Table of Contents
 
-- Zarządzanie **zapasami** (`StockItems`): dodawanie, edycja i usuwanie po `Id` (GUID), przeglądanie wszystkich pozycji oraz wyszukiwanie po nazwie
-- Zarządzanie **katalogiem definicji produktów** (`ProductDefinitions`): typy składników z jednostką miary i kategorią
-- Automatyczne powiązanie `StockItem ↔ ProductDefinition` po nazwie — w obie strony (przy dodaniu zapasu, jeśli istnieje pasująca definicja, oraz przy dodaniu definicji, jeśli istnieją niepowiązane zapasy o tej samej nazwie)
-- Automatyczna inicjalizacja bazy danych (migracje + dane testowe) przy starcie aplikacji
-- Globalna obsługa błędów z czytelnymi komunikatami JSON
-- CORS skonfigurowany dla lokalnego frontendu deweloperskiego (`http://localhost:5173`)
-- Dokumentacja Swagger dostępna w trybie developerskim
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [Requirements](#-requirements)
+- [Getting Started](#-getting-started)
+- [Configuration](#-configuration)
+- [API Endpoints](#-api-endpoints)
+- [Data Model](#-data-model)
+- [Error Handling](#-error-handling)
+- [Project Structure](#-project-structure)
+- [Testing](#-testing)
 
 ---
 
-## 🏗️ Architektura
+## ✅ Features
 
-Projekt stosuje **Clean Architecture** z podziałem na cztery warstwy:
+- **Inventory** management (`StockItems`): add, edit, and delete by `Id` (GUID), browse all items, and search by name
+- **Product definition catalog** management (`ProductDefinitions`): ingredient types with a unit of measure and a category
+- Automatic `StockItem ↔ ProductDefinition` linking by name — in both directions (when a stock item is added, if a matching definition exists; and when a definition is added, if unlinked stock items with the same name exist)
+- Automatic database initialization (migrations + seed data) on application startup
+- Global error handling with readable JSON error messages
+- CORS configured for a local development frontend (`http://localhost:5173`)
+- Swagger documentation available in development mode
+
+---
+
+## 🏗️ Architecture
+
+The project follows **Clean Architecture**, split into four layers:
 
 ```
-Kitchen.Api              ← Warstwa prezentacji (kontrolery, DI)
-Kitchen.Application      ← Logika aplikacji (serwisy, komendy, modele żądań)
-Kitchen.Core             ← Domena (encje, value objects, wyjątki, interfejsy repozytoriów)
-Kitchen.Infrastructure   ← Infrastruktura (EF Core, PostgreSQL, repozytoria, migracje, middleware wyjątków)
+Kitchen.Api              ← Presentation layer (controllers, DI)
+Kitchen.Application      ← Application logic (services, commands, request models)
+Kitchen.Core             ← Domain (entities, value objects, exceptions, repository interfaces)
+Kitchen.Infrastructure   ← Infrastructure (EF Core, PostgreSQL, repositories, migrations, exception middleware)
 ```
 
-Zależności płyną tylko do wewnątrz — `Infrastructure` i `Application` zależą od `Core`, `Api` zależy od `Application`.
+Dependencies only flow inward — `Infrastructure` and `Application` depend on `Core`, `Api` depends on `Application`.
 
-Pogłębiony opis warstw znajduje się w [docs/architektura.md](docs/architektura.md), natomiast pełny opis endpointów (razem z dokładnym kształtem JSON-a) w [docs/api.md](docs/api.md).
+A deeper walkthrough of each layer lives in [docs/architecture.md](docs/architecture.md), and the full endpoint reference (including the exact JSON shape) is in [docs/api.md](docs/api.md).
 
 ---
 
-## 📦 Wymagania
+## 📦 Requirements
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [PostgreSQL](https://www.postgresql.org/) (wersja 13+)
-- (opcjonalnie) [Docker](https://www.docker.com/) do uruchomienia bazy danych
+- [PostgreSQL](https://www.postgresql.org/) (version 13+)
+- (optional) [Docker](https://www.docker.com/) to run the database
 
 ---
 
-## 🚀 Uruchomienie
+## 🚀 Getting Started
 
-### 1. Sklonuj repozytorium
+### 1. Clone the repository
 
 ```bash
-git clone <adres-repozytorium>
+git clone <repository-url>
 cd Kitchen.Api
 ```
 
-### 2. Uruchom bazę danych PostgreSQL
+### 2. Start the PostgreSQL database
 
-W repozytorium znajduje się gotowy `docker-compose.yml`:
+A ready-made `docker-compose.yml` is included:
 
 ```bash
 docker compose up -d
 ```
 
-Alternatywnie, ręcznie:
+Or manually:
 
 ```bash
 docker run --name kitchen-api-db \
@@ -86,9 +86,9 @@ docker run --name kitchen-api-db \
   -d postgres
 ```
 
-### 3. Skonfiguruj connection string
+### 3. Configure the connection string
 
-W pliku `appsettings.json` (lub przez zmienne środowiskowe):
+In `appsettings.json` (or via environment variables):
 
 ```json
 {
@@ -98,103 +98,103 @@ W pliku `appsettings.json` (lub przez zmienne środowiskowe):
 }
 ```
 
-### 4. Uruchom aplikację
+### 4. Run the application
 
 ```bash
 dotnet run --project Kitchen.Api
 ```
 
-Migracje bazy danych są **automatycznie stosowane** przy starcie aplikacji (`DatabaseInitBackgroundService`), a jeśli tabela `StockItems` jest pusta — dodawane są przykładowe dane testowe.
+Database migrations are **applied automatically** on application startup (`DatabaseInitBackgroundService`), and if the `StockItems` table is empty, sample seed data is added.
 
-### 5. Otwórz Swagger UI
+### 5. Open Swagger UI
 
 ```
 http://localhost:5099/swagger
 ```
 
-### Praca z migracjami EF Core
+### Working with EF Core migrations
 
-Design-time tworzenie `DbContext` obsługuje `KitchenDbContextFactory` (`IDesignTimeDbContextFactory<KitchenDbContext>`), dzięki czemu CLI EF Core działa bez uruchamiania aplikacji:
+Design-time `DbContext` creation is handled by `KitchenDbContextFactory` (`IDesignTimeDbContextFactory<KitchenDbContext>`), so the EF Core CLI works without running the application:
 
 ```bash
-dotnet ef migrations add <NazwaMigracji> --project Kitchen.Infrastructure --startup-project Kitchen.Api
+dotnet ef migrations add <MigrationName> --project Kitchen.Infrastructure --startup-project Kitchen.Api
 ```
 
 ---
 
-## ⚙️ Konfiguracja
+## ⚙️ Configuration
 
-| Klucz | Opis | Domyślna wartość |
+| Key | Description | Default value |
 |---|---|---|
-| `database:ConnectionString` | Connection string do PostgreSQL | `Host=localhost;Database=KitchenDb;Username=postgres;Password=postgres` |
-| `Logging:LogLevel:Default` | Poziom logowania | `Information` |
+| `database:ConnectionString` | PostgreSQL connection string | `Host=localhost;Database=KitchenDb;Username=postgres;Password=postgres` |
+| `Logging:LogLevel:Default` | Logging level | `Information` |
 
-W środowisku `Development` włączone są szczegółowe błędy (`DetailedErrors: true`).
+Detailed errors (`DetailedErrors: true`) are enabled in the `Development` environment.
 
 ---
 
-## 📡 Endpointy API
+## 📡 API Endpoints
 
-Bazowy URL: `http://localhost:5099/api`
+Base URL: `http://localhost:5099/api`
 
-### StockItems — zapasy
+### StockItems — inventory
 
-| Metoda | Endpoint | Opis |
+| Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/stockitems` | Pobierz wszystkie pozycje z zapasów (z powiązaną `ProductDefinition`, jeśli istnieje) |
-| `GET` | `/api/stockitems/{id:guid}` | Pobierz pozycję po `Id` — `404`, jeśli nie istnieje |
-| `GET` | `/api/stockitems/{name}` | Pobierz **wszystkie** pozycje o danej nazwie — `404`, jeśli brak wyników |
-| `POST` | `/api/stockitems` | Dodaj nową pozycję do zapasów — `201 Created` |
-| `PUT` | `/api/stockitems/{id:guid}` | Zaktualizuj pozycję po `Id` — `204 No Content` |
-| `DELETE` | `/api/stockitems/{id:guid}` | Usuń pozycję po `Id` — `204 No Content` |
+| `GET` | `/api/stockitems` | Get all inventory items (with the linked `ProductDefinition`, if one exists) |
+| `GET` | `/api/stockitems/{id:guid}` | Get an item by `Id` — `404` if it doesn't exist |
+| `GET` | `/api/stockitems/{name}` | Get **all** items with the given name — `404` if there are no results |
+| `POST` | `/api/stockitems` | Add a new item to inventory — `201 Created` |
+| `PUT` | `/api/stockitems/{id:guid}` | Update an item by `Id` — `204 No Content` |
+| `DELETE` | `/api/stockitems/{id:guid}` | Delete an item by `Id` — `204 No Content` |
 
-> **Uwaga:** `StockItem` nie ma unikalnego klucza na nazwie — ta sama nazwa może występować wielokrotnie (np. mleko w lodówce i mleko w spiżarni jako dwie osobne pozycje), dlatego identyfikacja po `Id` jest jedynym sposobem jednoznacznej aktualizacji/usunięcia pozycji.
+> **Note:** `StockItem` has no unique key on name — the same name can occur multiple times (e.g. milk in the fridge and milk in the pantry as two separate items), so identifying by `Id` is the only way to unambiguously update/delete an item.
 
-### ProductDefinitions — katalog typów produktów
+### ProductDefinitions — product catalog
 
-| Metoda | Endpoint | Opis |
+| Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/productdefinitions` | Pobierz wszystkie definicje produktów |
-| `GET` | `/api/productdefinitions/{name}` | Pobierz definicję po nazwie — `404`, jeśli nie istnieje |
-| `POST` | `/api/productdefinitions` | Dodaj nową definicję produktu — `201 Created` |
-| `PUT` | `/api/productdefinitions/{name}` | Zaktualizuj definicję produktu (klucz: nazwa) — `204 No Content` |
-| `DELETE` | `/api/productdefinitions/{name}` | Usuń definicję produktu — `204 No Content` |
+| `GET` | `/api/productdefinitions` | Get all product definitions |
+| `GET` | `/api/productdefinitions/{name}` | Get a definition by name — `404` if it doesn't exist |
+| `POST` | `/api/productdefinitions` | Add a new product definition — `201 Created` |
+| `PUT` | `/api/productdefinitions/{name}` | Update a product definition (key: name) — `204 No Content` |
+| `DELETE` | `/api/productdefinitions/{name}` | Delete a product definition — `204 No Content` |
 
 ---
 
-## 🗂️ Model danych
+## 🗂️ Data Model
 
-### Enumy
+### Enums
 
-| Enum | Wartości |
+| Enum | Values |
 |---|---|
 | `UnitType` | `Unspecified`, `Pieces` (szt), `Kilograms` (kg), `Liters` (l) |
 | `Category` | `Unspecified`, `Meat` (mięso), `Vegetables` (warzywa), `Dairy` (nabiał), `DryGoods` (sypkie), `Spices` (przyprawy), `Other` (inne) |
 | `StorageLocation` | `Unspecified`, `Fridge` (lodówka), `Freezer` (zamrażarka), `Pantry` (szafki) |
 
-`Category` jest obecnie zwykłym enumem.
+All three have a dedicated `JsonConverter` — each accepts its English name or Polish short form on input, and writes the Polish short form on output. See [docs/api.md](docs/api.md#allowed-enum-values) for the exact alias tables.
 
 ### Value Objects
 
-- **`ProductName`** — nazwa produktu; nie może być pusta ani zaczynać się od cyfry
-- **`StockItemId`** — GUID identyfikujący pozycję zapasów
+- **`ProductName`** — product name; can't be empty or start with a digit; has its own `JsonConverter`, so it serializes as a plain string
+- **`StockItemId`** — a GUID identifying an inventory item; also has its own `JsonConverter`, serializing as a plain GUID string
 
 ---
 
-## ⚠️ Obsługa błędów
+## ⚠️ Error Handling
 
-Globalny `ExceptionMiddleware` (`Kitchen.Infrastructure/Middleware`, `IMiddleware`) łapie wszystkie wyjątki, loguje je i zwraca spójną strukturę JSON:
+A global `ExceptionMiddleware` (`Kitchen.Infrastructure/Middleware`, `IMiddleware`) catches every exception, logs it, and returns a consistent JSON shape:
 
 ```json
 {
   "code": "product_definition_not_found",
-  "message": "Treść komunikatu błędu"
+  "message": "Error message text"
 }
 ```
 
-`code` to nazwa klasy wyjątku bez przyrostka `Exception`, w `snake_case`.
+`code` is the exception class name minus the `Exception` suffix, in `snake_case`.
 
-| Wyjątek | Kod HTTP |
+| Exception | HTTP code |
 |---|---|
 | `StockItemNotFoundException` | `404 Not Found` |
 | `ProductDefinitionNotFoundException` | `404 Not Found` |
@@ -204,36 +204,40 @@ Globalny `ExceptionMiddleware` (`Kitchen.Infrastructure/Middleware`, `IMiddlewar
 | `UnknownLocationException` | `400 Bad Request` |
 | `UnknownCategoryException` | `400 Bad Request` |
 | `UnknownUnitTypeException` | `400 Bad Request` |
-| Pozostałe `KitchenApiException` | `400 Bad Request` |
-| Nieoczekiwane błędy | `500 Internal Server Error` (logowane) |
+| Other `KitchenApiException` | `400 Bad Request` |
+| Unexpected errors | `500 Internal Server Error` (logged) |
 
-Pełna specyfikacja, w tym dokładny kształt JSON-a dla każdego endpointu: [docs/api.md](docs/api.md#format-błędów).
+Full specification, including the exact JSON shape for every endpoint: [docs/api.md](docs/api.md#error-format).
 
 ---
 
-## 📁 Struktura projektu
+## 📁 Project Structure
 
 ```
 Kitchen.Api/
 ├── Controllers/
-│   ├── StockItemsController.cs         # Endpointy StockItems (GET/POST/PUT/DELETE po Id, GET po name)
-│   └── ProductDefinitionsController.cs # Endpointy ProductDefinitions
+│   ├── StockItemsController.cs         # StockItems endpoints (GET/POST/PUT/DELETE by Id, GET by name)
+│   └── ProductDefinitionsController.cs # ProductDefinitions endpoints
+├── Models/Requests/
+│   ├── CreateProductDefinitionRequest.cs
+│   ├── CreateStockItemRequest.cs
+│   ├── UpdateProductDefinitionRequest.cs
+│   └── UpdateStockItemRequest.cs
 ├── Serialization/
-│   └── UnitTypeConverter.cs            # JsonConverter<UnitType> z aliasami PL, zarejestrowany globalnie
+│   ├── UnitTypeConverter.cs            # JsonConverter<UnitType>, PL aliases, registered globally
+│   ├── CategoryConverter.cs            # JsonConverter<Category>, PL aliases
+│   ├── StorageLocationConverter.cs     # JsonConverter<StorageLocation>, PL aliases
+│   ├── ProductNameConverter.cs         # JsonConverter<ProductName> — plain string in/out
+│   └── StockItemIdConverter.cs         # JsonConverter<StockItemId> — plain GUID string in/out
 └── Program.cs
 
 Kitchen.Application/
 ├── Commands/
 │   ├── CatalogCommands.cs      # AddProductDefinitionCommand, ModifyProductDefinitionCommand
 │   └── InventoryCommands.cs    # AddStockItemCommand, ModifyStockItemCommand
-├── Models/Requests/
-│   ├── CreateProductDefinitionRequest.cs
-│   ├── CreateStockItemRequest.cs
-│   ├── UpdateProductDefinitionRequest.cs
-│   └── UpdateStockItemRequest.cs
 └── Services/
-    ├── CatalogService.cs    # + LinkToExistingStockItems(), łączy nowe definicje z istniejącymi zapasami
-    └── InventoryService.cs  # korzysta z wariantów *WithDetails repozytorium
+    ├── CatalogService.cs    # + LinkToExistingStockItems(), links new definitions to existing stock items
+    └── InventoryService.cs  # uses the repository's *WithDetails variants
 
 Kitchen.Core/
 ├── Domain/
@@ -245,10 +249,10 @@ Kitchen.Core/
 │   │   ├── StorageLocation.cs
 │   │   └── UnitType.cs
 │   └── Exceptions/
-│       ├── KitchenApiException.cs   # bazowy wyjątek domenowy
-│       └── (pochodne wyjątki, w tym ProductDefinitionNotFoundException, UnknownCategoryException)
+│       ├── KitchenApiException.cs   # base domain exception
+│       └── (derived exceptions, incl. ProductDefinitionNotFoundException, UnknownCategoryException)
 ├── Repositories/
-│   ├── IStockItemRepository.cs         # GetAll/GetById/GetByName + warianty WithDetails
+│   ├── IStockItemRepository.cs         # GetAll/GetById/GetByName + WithDetails variants
 │   └── IProductDefinitionRepository.cs
 └── ValueObjects/
     ├── ProductName.cs
@@ -256,9 +260,9 @@ Kitchen.Core/
 
 Kitchen.Infrastructure/
 ├── BackgroundServices/
-│   └── DatabaseInitBackgroundService.cs  # migracje + seed danych testowych przy starcie
+│   └── DatabaseInitBackgroundService.cs  # migrations + seed data on startup
 ├── Middleware/
-│   └── ExceptionMiddleware.cs   # IMiddleware, globalna obsługa błędów (patrz wyżej)
+│   └── ExceptionMiddleware.cs   # IMiddleware, global error handling (see above)
 └── DAL/
     ├── Configurations/
     │   ├── ProductDefinitionConfiguration.cs
@@ -268,36 +272,38 @@ Kitchen.Infrastructure/
     │   ├── PostgresStockItemRepository.cs
     │   └── PostgresProductDefinitionRepository.cs
     ├── KitchenDbContext.cs
-    ├── KitchenDbContextFactory.cs   # IDesignTimeDbContextFactory — wsparcie dla `dotnet ef`, zahardkodowany connection string
-    ├── ConfigurationExtensions.cs   # GetOptions<T>() — generyczny binder appsettings
+    ├── KitchenDbContextFactory.cs   # IDesignTimeDbContextFactory — supports `dotnet ef`, hardcoded connection string
+    ├── ConfigurationExtensions.cs   # GetOptions<T>() — generic appsettings binder
     └── PostgresOptions.cs
 ```
 
 ---
 
-## 🧪 Testy
+## 🧪 Testing
 
-Projekt ma dwie warstwy testów: `Kitchen.Tests.Unit` (xUnit, FluentAssertions, Moq) oraz `Kitchen.Tests.Integration` (xUnit, FluentAssertions, **Testcontainers.PostgreSql** — odpala prawdziwego Postgresa w kontenerze i realne migracje).
+The project has two test layers: `Kitchen.Tests.Unit` (xUnit, FluentAssertions, Moq) and `Kitchen.Tests.Integration` (xUnit, FluentAssertions, **Testcontainers.PostgreSql** — spins up a real Postgres container and runs real migrations).
 
 ```bash
 dotnet test Kitchen.Tests.Unit
-dotnet test Kitchen.Tests.Integration   # wymaga Dockera
+dotnet test Kitchen.Tests.Integration   # requires Docker
 ```
 
-CI (`.github/workflows/ci.yml`) odpala obie warstwy na PR-ach do `master` i push'ach do `dev`.
+CI (`.github/workflows/ci.yml`) runs both layers on PRs to `master` and pushes to `dev`.
 
-Aktualne pokrycie testów jednostkowych:
+Current unit test coverage:
 
-| Warstwa / obszar | Klasa testowa | Zakres |
+| Layer / area | Test class | Scope |
 |---|---|---|
-| Domena | `StockItemTests` | konstruktor, `AdjustAmount`, `PlaceOrMove` |
-| Domena | `ProductDefinitionTests` | konstruktor, `ChangeUnitType` |
-| Aplikacja | `InventoryServiceTests` | `GetAll`, `GetByName`, `Add`, `Update`, `Delete` |
-| Aplikacja | `CatalogServiceTests` | `Add` (w tym `LinkToExistingStockItems` i regresja na równość `ProductName`) |
-| Infrastruktura | `ExceptionMiddlewareTests` | mapowanie wyjątków na kody HTTP i treść JSON |
-| API | `StockItemsControllerTests` | `Create` |
-| API | `ProductDefinitionsControllerTests` | `GetAll`, `Create`, `Update`, `Delete` |
+| Domain | `StockItemTests` | constructor, `AdjustAmount`, `PlaceOrMove` |
+| Domain | `ProductDefinitionTests` | constructor, `ChangeUnitType` |
+| Application | `InventoryServiceTests` | `GetAll`, `GetByName`, `Add`, `Update`, `Delete` |
+| Application | `CatalogServiceTests` | `Add` (including `LinkToExistingStockItems` and a regression test for `ProductName` equality) |
+| Infrastructure | `ExceptionMiddlewareTests` | mapping exceptions to HTTP codes and JSON body |
+| Api | `StockItemsControllerTests` | `GetAll`, `Get` (by id, by name), `Create`, `Update`, `Delete` |
+| Api | `ProductDefinitionsControllerTests` | `GetAll`, `Get`, `Create`, `Update`, `Delete` |
+| Api | `UnitTypeConverterTests`, `CategoryConverterTests`, `StorageLocationConverterTests` | alias mapping, unspecified handling, rejection of unrecognized input, description output |
+| Api | `ProductNameConverterTests`, `StockItemIdConverterTests` | round-trip (de)serialization, invalid-input handling |
 
-Testy integracyjne (`Kitchen.Tests.Integration/Repositories/StockItemRepositoryTests`): auto-linking `StockItem` ↔ `ProductDefinition` na realnej bazie, regresja na ponowne wstawianie już istniejącej `ProductDefinition`.
+Integration tests (`Kitchen.Tests.Integration/Repositories/StockItemRepositoryTests`): auto-linking `StockItem` ↔ `ProductDefinition` against a real database, regression test for re-inserting an already-existing `ProductDefinition`.
 
-Braki w pokryciu: brak testów kontrolera dla `Update`/`Delete`/`Get` w `StockItemsController`, brak testów jednostkowych na `SetName`/`AssignDefinition`/`SetExpirationDate` w `StockItemTests`.
+Known coverage gaps: no unit tests yet for `SetName`/`AssignDefinition`/`SetExpirationDate` on `StockItem`.

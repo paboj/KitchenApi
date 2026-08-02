@@ -2,6 +2,7 @@
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
 using Kitchen.Core.Domain.Exceptions;
+using Kitchen.Core.ValueObjects;
 
 namespace Kitchen.Tests.Unit.Domain.Entities
 {
@@ -32,7 +33,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
             var definition = new ProductDefinition(ValidName, ValidUnitType, ValidCategory);
 
             // Assert
-            definition.Name.Value.Should().Be(ValidName);
+            definition.Name.Value.Should().Be(new ProductName(ValidName));
             definition.Unit.Should().Be(ValidUnitType);
             definition.Category.Should().Be(ValidCategory);
         }
@@ -102,7 +103,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
             string newName = "Kasza";
             _productDefinition.SetName(newName);
 
-            _productDefinition.Name.Value.Should().Be(newName);
+            _productDefinition.Name.Value.Should().Be(new ProductName(newName));
         }
 
         [Theory]

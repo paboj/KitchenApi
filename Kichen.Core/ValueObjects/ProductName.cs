@@ -14,7 +14,7 @@ namespace Kitchen.Core.ValueObjects
             if (char.IsDigit(value[0]))
                 throw new InvalidProductNameException();
 
-            Value = value;
+            Value = value.ToLowerInvariant();
         }
 
         public static implicit operator ProductName(string value) => new(value);

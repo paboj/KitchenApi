@@ -8,6 +8,16 @@ docker-compose up -d
 
 Starts `kitchen-api` (port 8080) and `kitchen-db` — PostgreSQL 16, container `kitchen-api-db`, database `KitchenDb`.
 
+## Setting the connection string secret
+
+The real `database:ConnectionString` value doesn't live in `appsettings.json` — it's set locally via user-secrets instead (`Kitchen.Api.csproj` already has a `<UserSecretsId>`, so no `dotnet user-secrets init` needed):
+
+```
+dotnet user-secrets set "database:ConnectionString" "Host=localhost;Database=<database_name>;Username=<username>;Password=<password>" --project Kitchen.Api
+```
+
+One-time setup per machine — picked up automatically in `Development`, no code changes needed. Swap the value if your local Postgres uses different credentials.
+
 ## Database backup
 
 Dump in custom format (`pg_dump -Fc`) — compressed, allows selective restore, not human-readable.

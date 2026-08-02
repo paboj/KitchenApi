@@ -2,6 +2,7 @@
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
 using Kitchen.Core.Domain.Exceptions;
+using Kitchen.Core.ValueObjects;
 
 namespace Kitchen.Tests.Unit.Domain.Entities
 {
@@ -68,7 +69,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
 
             // Assert
             StockItem.Id.Should().NotBe(Guid.Empty);
-            StockItem.Name.Value.Should().Be(ValidName);
+            StockItem.Name.Value.Should().Be(new ProductName(ValidName));
             StockItem.Amount.Should().Be(ValidAmount);
             StockItem.Location.Should().Be(ValidLocation);
             StockItem.Definition.Should().Be(_productDefinition);
@@ -160,7 +161,7 @@ namespace Kitchen.Tests.Unit.Domain.Entities
         {
             _stockItem.SetName("Ogórek");
 
-            _stockItem.Name.Value.Should().Be("Ogórek");
+            _stockItem.Name.Value.Should().Be(new ProductName("Ogórek"));
         }
 
         [Fact]

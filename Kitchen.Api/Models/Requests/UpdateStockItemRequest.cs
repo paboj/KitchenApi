@@ -1,6 +1,6 @@
-﻿using Kitchen.Core.Domain.Enums;
+using Kitchen.Core.Domain.Enums;
 
-namespace Kitchen.Application.Models.Requests
+namespace Kitchen.Api.Models.Requests
 {
     public class UpdateStockItemRequest
     {

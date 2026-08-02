@@ -30,3 +30,15 @@ jobs:
 
       - name: Integration tests
         run: dotnet test Kitchen.Tests.Integration --no-build --configuration Release
+
+      - name: Install dotnet-ef
+        run: |
+          dotnet tool install --global dotnet-ef --version 8.0.13
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Check for pending model changes
+        env:
+          # Placeholder only — this command never opens a real connection, it just
+          # compares the current model against the last migration's snapshot file.
+          database__ConnectionString: "Host=localhost;Database=KitchenDb;Username=postgres;Password=postgres"
+        run: dotnet ef migrations has-pending-model-changes --project Kitchen.Infrastructure --startup-project Kitchen.Api

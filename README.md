@@ -218,6 +218,11 @@ Kitchen.Api/
 ├── Controllers/
 │   ├── StockItemsController.cs         # StockItems endpoints (GET/POST/PUT/DELETE by Id, GET by name)
 │   └── ProductDefinitionsController.cs # ProductDefinitions endpoints
+├── Models/Requests/
+│   ├── CreateProductDefinitionRequest.cs
+│   ├── CreateStockItemRequest.cs
+│   ├── UpdateProductDefinitionRequest.cs
+│   └── UpdateStockItemRequest.cs
 ├── Serialization/
 │   ├── UnitTypeConverter.cs            # JsonConverter<UnitType>, PL aliases, registered globally
 │   ├── CategoryConverter.cs            # JsonConverter<Category>, PL aliases
@@ -230,11 +235,6 @@ Kitchen.Application/
 ├── Commands/
 │   ├── CatalogCommands.cs      # AddProductDefinitionCommand, ModifyProductDefinitionCommand
 │   └── InventoryCommands.cs    # AddStockItemCommand, ModifyStockItemCommand
-├── Models/Requests/
-│   ├── CreateProductDefinitionRequest.cs
-│   ├── CreateStockItemRequest.cs
-│   ├── UpdateProductDefinitionRequest.cs
-│   └── UpdateStockItemRequest.cs
 └── Services/
     ├── CatalogService.cs    # + LinkToExistingStockItems(), links new definitions to existing stock items
     └── InventoryService.cs  # uses the repository's *WithDetails variants

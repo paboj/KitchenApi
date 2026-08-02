@@ -7,12 +7,13 @@ The project is built on the **Clean Architecture** pattern, which separates resp
 ```
 ┌─────────────────────────────────┐
 │         Kitchen.Api             │  ← Presentation layer
-│  (controllers, DI, Program.cs)  │
+│ (controllers, request models,   │
+│  DI, Program.cs)                │
 └────────────────┬────────────────┘
                  │ depends on
 ┌────────────────▼────────────────┐
 │      Kitchen.Application        │  ← Application logic
-│   (services, commands, models)  │
+│      (services, commands)       │
 └────────────────┬────────────────┘
                  │ depends on
 ┌────────────────▼────────────────┐
@@ -156,17 +157,6 @@ C# records carrying data from the controller to the service:
 | `AddStockItemCommand` | `Name`, `Amount`, `Location`, `ExpirationDate = null` |
 | `ModifyStockItemCommand` | `Id`, `Name?`, `Amount?`, `Location?`, `ExpirationDate = null` |
 
-#### Request Models
-
-DTOs accepted from the HTTP request body — `Name` here is a plain `string`, same as it now serializes in responses too, since `ProductName` has its own converter:
-
-| Model | Fields |
-|---|---|
-| `CreateProductDefinitionRequest` | `Name`, `Unit`, `Category` |
-| `UpdateProductDefinitionRequest` | `Unit?`, `Category?` |
-| `CreateStockItemRequest` | `Name`, `Amount`, `Location`, `ExpirationDate?` |
-| `UpdateStockItemRequest` | `Name?`, `Amount?`, `Location?`, `ExpirationDate?` |
-
 ---
 
 ### Kitchen.Infrastructure — Infrastructure
@@ -232,6 +222,17 @@ Registration: `AddTransient<ExceptionMiddleware>()` in `AddInfrastructure()`, us
 ---
 
 ### Kitchen.Api — Presentation layer
+
+#### Request Models
+
+DTOs accepted from the HTTP request body. Controllers map each one directly into the matching `Command` before calling a service. `Name` here is a plain `string`, same as it now serializes in responses too, since `ProductName` has its own converter:
+
+| Model | Fields |
+|---|---|
+| `CreateProductDefinitionRequest` | `Name`, `Unit`, `Category` |
+| `UpdateProductDefinitionRequest` | `Unit?`, `Category?` |
+| `CreateStockItemRequest` | `Name`, `Amount`, `Location`, `ExpirationDate?` |
+| `UpdateStockItemRequest` | `Name?`, `Amount?`, `Location?`, `ExpirationDate?` |
 
 #### Controllers
 

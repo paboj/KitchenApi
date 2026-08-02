@@ -1,5 +1,5 @@
 ﻿using Kitchen.Application.Commands;
-using Kitchen.Application.Models.Requests;
+using Kitchen.Api.Models.Requests;
 using Kitchen.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 

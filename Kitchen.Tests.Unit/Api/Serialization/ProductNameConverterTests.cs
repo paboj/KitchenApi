@@ -24,7 +24,7 @@ namespace Kitchen.Tests.Unit.Api.Serialization
             var result = JsonSerializer.Deserialize<ProductName>("\"Mleko\"", _options);
 
             result.Should().NotBeNull();
-            result!.Value.Should().Be("Mleko");
+            result!.Value.Should().Be("mleko");
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace Kitchen.Tests.Unit.Api.Serialization
 
             var json = JsonSerializer.Serialize(productName, _options);
 
-            json.Should().Be("\"Mleko\"");
+            json.Should().Be("\"mleko\"");
         }
     }
 }

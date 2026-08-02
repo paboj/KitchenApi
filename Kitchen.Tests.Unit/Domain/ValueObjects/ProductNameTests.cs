@@ -29,7 +29,15 @@ namespace Kitchen.Tests.Unit.Domain.ValueObjects
         {
             var name = new ProductName("  Mleko  ");
 
-            name.Value.Should().Be("Mleko");
+            name.Value.Should().Be("mleko");
+        }
+
+        [Fact]
+        public void Constructor_ShouldLowercaseValue()
+        {
+            var name = new ProductName("MLEKO");
+
+            name.Value.Should().Be("mleko");
         }
 
         [Fact]
@@ -37,7 +45,7 @@ namespace Kitchen.Tests.Unit.Domain.ValueObjects
         {
             ProductName name = "Mleko";
 
-            name.Value.Should().Be("Mleko");
+            name.Value.Should().Be("mleko");
         }
 
         [Fact]
@@ -47,7 +55,7 @@ namespace Kitchen.Tests.Unit.Domain.ValueObjects
 
             string value = name;
 
-            value.Should().Be("Mleko");
+            value.Should().Be("mleko");
         }
 
         [Fact]
@@ -55,7 +63,7 @@ namespace Kitchen.Tests.Unit.Domain.ValueObjects
         {
             var name = new ProductName("Mleko");
 
-            name.ToString().Should().Be("Mleko");
+            name.ToString().Should().Be("mleko");
         }
 
         [Fact]
@@ -87,6 +95,17 @@ namespace Kitchen.Tests.Unit.Domain.ValueObjects
             first.Equals(second).Should().BeFalse();
             (first == second).Should().BeFalse();
             (first != second).Should().BeTrue();
+        }
+
+        [Fact]
+        public void Equals_ShouldReturnTrue_WhenValuesDifferOnlyByCasing()
+        {
+            var first = new ProductName("Mleko");
+            var second = new ProductName("MLEKO");
+
+            first.Equals(second).Should().BeTrue();
+            (first == second).Should().BeTrue();
+            first.GetHashCode().Should().Be(second.GetHashCode());
         }
 
         [Fact]

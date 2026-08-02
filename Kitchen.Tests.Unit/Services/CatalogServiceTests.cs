@@ -4,6 +4,7 @@ using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
 using Kitchen.Core.Domain.Exceptions;
 using Kitchen.Core.Repositories;
+using Kitchen.Core.ValueObjects;
 using Moq;
 
 namespace Kitchen.Tests.Unit.Services
@@ -62,7 +63,7 @@ namespace Kitchen.Tests.Unit.Services
             await _service.Add(command);
 
             unlinkedStockItem.Definition.Should().NotBeNull();
-            unlinkedStockItem.Definition!.Name.Value.Should().Be(stockItemName);
+            unlinkedStockItem.Definition!.Name.Value.Should().Be(new ProductName(stockItemName));
 
             _stockItemRepositoryMock.Verify(repo => repo.Update(unlinkedStockItem), Times.Once);
             _productDefinitionRepositoryMock.Verify(repo => repo.Add(It.IsAny<ProductDefinition>()), Times.Once);

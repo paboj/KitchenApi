@@ -5,6 +5,7 @@ using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
 using Kitchen.Infrastructure.DAL;
 using Kitchen.Infrastructure.DAL.Repositories;
+using Kitchen.Core.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 
@@ -107,7 +108,7 @@ namespace Kitchen.Tests.Integration.Repositories
             var reloaded = await _repository.GetByIdWithDetails(stockItem.Id.Value);
 
             reloaded!.Definition.Should().NotBeNull();
-            reloaded.Definition!.Name.Value.Should().Be("Jajka");
+            reloaded.Definition!.Name.Value.Should().Be(new ProductName("Jajka"));
         }
 
         // The test above still hand-rolls the "fetch by name, pass into the
@@ -132,7 +133,7 @@ namespace Kitchen.Tests.Integration.Repositories
 
             added.Definition.Should().NotBeNull(
                 "InventoryService.Add should look up and link the matching ProductDefinition by name");
-            added.Definition!.Name.Value.Should().Be("Jajka");
+            added.Definition!.Name.Value.Should().Be(new ProductName("Jajka"));
         }
 
         // Same root cause as above, on the Update path: DbSet.Update marks an

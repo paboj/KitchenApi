@@ -4,6 +4,7 @@ using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
 using Kitchen.Core.Domain.Exceptions;
 using Kitchen.Core.Repositories;
+using Kitchen.Core.ValueObjects;
 using Moq;
 
 namespace Kitchen.Tests.Unit.Services
@@ -39,7 +40,7 @@ namespace Kitchen.Tests.Unit.Services
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().OnlyContain(item => item.Name.Value == stockItemName);
+            result.Should().OnlyContain(item => item.Name.Value == new ProductName(stockItemName));
 
             // Optional
             _stockItemRepositoryMock.Verify(repo => repo.GetByNameWithDetails(stockItemName), Times.Once);

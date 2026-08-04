@@ -20,7 +20,6 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new StorageLocationConverter());
         options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
     });
-builder.Services.AddCore();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 

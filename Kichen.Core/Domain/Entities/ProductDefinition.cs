@@ -7,7 +7,7 @@ namespace Kitchen.Core.Domain.Entities
     public class ProductDefinition
     {
         //primary key
-        public ProductName Name { get; private set; }
+        public ProductName Name { get; private set; } = null!;
 
         public UnitType Unit { get; private set; } = UnitType.Unspecified;
 
@@ -21,7 +21,7 @@ namespace Kitchen.Core.Domain.Entities
             SetCategory(category);
         }
 
-        public void SetName(string name)
+        private void SetName(string name)
         {
             Name = new ProductName(name);
         }

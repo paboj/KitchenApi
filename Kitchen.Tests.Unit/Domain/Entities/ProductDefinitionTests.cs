@@ -95,29 +95,6 @@ namespace Kitchen.Tests.Unit.Domain.Entities
 
         #endregion
 
-        #region SetName
-
-        [Fact]
-        public void SetName_ShouldUpdateName_WhenValid()
-        {
-            string newName = "Kasza";
-            _productDefinition.SetName(newName);
-
-            _productDefinition.Name.Value.Should().Be(new ProductName(newName));
-        }
-
-        [Theory]
-        [InlineData("")]
-        [InlineData(null)]
-        public void SetName_ShouldThrowException_WhenInvalid(string invalidName)
-        {
-            Action action = () => _productDefinition.SetName(invalidName);
-
-            action.Should().Throw<InvalidProductNameException>();
-        }
-
-        #endregion
-
         #region SetCategory
 
         [Fact]

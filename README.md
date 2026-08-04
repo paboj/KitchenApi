@@ -218,7 +218,7 @@ Kitchen.Api/
 ├── Controllers/
 │   ├── StockItemsController.cs         # StockItems endpoints (GET/POST/PUT/DELETE by Id, GET by name)
 │   └── ProductDefinitionsController.cs # ProductDefinitions endpoints
-├── Models/Requests/
+├── Requests/
 │   ├── CreateProductDefinitionRequest.cs
 │   ├── CreateStockItemRequest.cs
 │   ├── UpdateProductDefinitionRequest.cs

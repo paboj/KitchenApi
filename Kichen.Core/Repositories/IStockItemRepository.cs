@@ -8,6 +8,7 @@ namespace Kitchen.Core.Repositories
         Task<IEnumerable<StockItem>> GetAll();
         Task<StockItem?> GetById(Guid id);
         Task<IEnumerable<StockItem>> GetByName(string name);
+        Task<IEnumerable<StockItem>> GetExpiring(DateOnly threshold);
         Task Add(StockItem stockItem);
         Task Update(StockItem stockItem);
         Task Delete(Guid id);

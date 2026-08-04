@@ -13,6 +13,8 @@ namespace Kitchen.Tests.Integration.Repositories
 {
     public class StockItemRepositoryTests : IAsyncLifetime
     {
+        private static readonly DateOnly ValidExpiringDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(4));
+
         private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:16-alpine")
             .Build();
 
@@ -163,6 +165,27 @@ namespace Kitchen.Tests.Integration.Repositories
 
             var definitions = await _dbContext.ProductDefinitions.AsNoTracking().ToListAsync();
             definitions.Should().HaveCount(1);
+        }
+
+        [Fact]
+        public async Task GetExpiring_ShouldReturnItems_WithExpirationDateOnOrBeforeThreshold()
+        {
+            var expiringOnThreshold = new StockItem("Mleko", amount: 1, StorageLocation.Fridge, definition: null, expirationDate: ValidExpiringDate);
+            var expiringBeforeThreshold = new StockItem("Jajka", amount: 1, StorageLocation.Fridge, definition: null, expirationDate: ValidExpiringDate.AddDays(-2));
+            var expiringAfterThreshold = new StockItem("Maslo", amount: 1, StorageLocation.Fridge, definition: null, expirationDate: ValidExpiringDate.AddDays(5));
+            var withoutExpirationDate = new StockItem("Sol", amount: 1, StorageLocation.Pantry, definition: null, expirationDate: null);
+
+            await _repository.Add(expiringOnThreshold);
+            await _repository.Add(expiringBeforeThreshold);
+            await _repository.Add(expiringAfterThreshold);
+            await _repository.Add(withoutExpirationDate);
+
+            var result = await _repository.GetExpiring(ValidExpiringDate);
+
+            result.Should().Contain(x => x.Id == expiringOnThreshold.Id);
+            result.Should().Contain(x => x.Id == expiringBeforeThreshold.Id);
+            result.Should().NotContain(x => x.Id == expiringAfterThreshold.Id);
+            result.Should().NotContain(x => x.Id == withoutExpirationDate.Id);
         }
     }
 }

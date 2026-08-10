@@ -6,6 +6,8 @@ Swagger UI available at: `http://localhost:5099/swagger` (`Development` environm
 
 All requests and responses use **JSON** (`Content-Type: application/json`).
 
+> **Note:** `name` fields (`StockItem.Name`, `ProductDefinition.Name`) are backed by the `ProductName` value object, which normalizes on construction — trims whitespace and **lowercases** the value. Send `"Mleko"` or `"MLEKO"`, get `"mleko"` back either way; this applies on every read and write.
+
 ---
 
 ## StockItems — Inventory
@@ -20,12 +22,12 @@ Retrieves the list of all stock items (with the linked `ProductDefinition`, if o
 [
   {
     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    "name": "Mleko",
+    "name": "mleko",
     "amount": 2.5,
     "location": "lodówka",
-    "definitionName": "Mleko",
+    "definitionName": "mleko",
     "definition": {
-      "name": "Mleko",
+      "name": "mleko",
       "unit": "l",
       "category": "nabiał"
     },
@@ -67,6 +69,24 @@ Retrieves **all** items with the given name — `StockItem.Name` isn't unique (t
 |---|---|
 | `200 OK` | Returns an array of matching `StockItem`s |
 | `404 Not Found` | No items with the given name |
+
+---
+
+### GET `/api/stockitems/expiring`
+
+Retrieves all items whose `ExpirationDate` falls within the next `days` days (i.e. `ExpirationDate <= today + days`, including already-expired items).
+
+**Query parameters:**
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `days` | `int` | ❌ | Look-ahead window in days (default `7`) |
+
+**Responses:**
+
+| Code | Description |
+|---|---|
+| `200 OK` | Returns an array of matching `StockItem`s (empty array if none match) |
 
 ---
 
@@ -163,7 +183,7 @@ Retrieves the list of all product definitions.
 ```json
 [
   {
-    "name": "Mleko",
+    "name": "mleko",
     "unit": "l",
     "category": "nabiał"
   }

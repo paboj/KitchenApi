@@ -52,7 +52,7 @@ The center of the whole system. **Depends on no other layer in the project.**
 | `Category` | `Category` | Product category |
 
 Domain methods:
-- `SetName(string)` — sets the name (delegates validation to `ProductName`)
+- `SetName(string)` — **private**, called only from the constructor (delegates validation to `ProductName`); there's no public way to rename a definition after creation
 - `ChangeUnitType(UnitType?)` — changes the unit; throws `UnknownUnitTypeException` for an invalid value
 - `SetCategory(Category?)` — sets the category; throws `UnknownCategoryException`
 
@@ -84,7 +84,7 @@ Domain methods:
 **`ProductName`** — wraps a string with validation:
 - can't be empty or made up of only whitespace
 - can't start with a digit
-- automatically trims leading/trailing whitespace (`.Trim()`)
+- automatically trims leading/trailing whitespace (`.Trim()`) and **normalizes to lowercase** (`.ToLowerInvariant()`) — `"Mleko"` and `"MLEKO"` are the same name, both stored/returned as `"mleko"`
 - has implicit `string ↔ ProductName` conversions
 - **value equality** (`IEquatable<ProductName>`, compares `Value` via `StringComparison.Ordinal`) — matters for `CatalogService.LinkToExistingStockItems`, which compares `ProductName` by name, not by reference
 - has its own `JsonConverter` (`Kitchen.Api/Serialization/ProductNameConverter.cs`), so it serializes as a plain string, not `{ "value": "..." }`
@@ -116,9 +116,11 @@ All inherit from `KitchenApiException : Exception`.
 | `UnknownUnitTypeException` | Unrecognized unit of measure |
 | `UnknownCategoryException` | Unrecognized category |
 
+Grouped into subfolders by concern: `Catalog/` (`ProductDefinitionNotFoundException`, `ProductDefinitionAlreadyExistsException`), `Inventory/` (`StockItemNotFoundException`), `Validation/` (the rest), plus the base `KitchenApiException` directly under `Exceptions/`.
+
 #### Repository Interfaces
 
-**`IStockItemRepository`:** `GetAll`, `GetById`, `GetByName`, `Add`, `Update`, `Delete`, plus `GetAllWithDetails`/`GetByIdWithDetails`/`GetByNameWithDetails` variants (eager-load `Definition`).
+**`IStockItemRepository`:** `GetAll`, `GetById`, `GetByName`, `GetExpiring(DateOnly threshold)`, `Add`, `Update`, `Delete`, plus `GetAllWithDetails`/`GetByIdWithDetails`/`GetByNameWithDetails` variants (eager-load `Definition`).
 
 **`IProductDefinitionRepository`:** `GetAll`, `GetByName`, `Add`, `Update`, `Delete`.
 
@@ -142,6 +144,7 @@ Orchestrates the flow of data between the API and the domain. Contains no domain
 
 **`IInventoryService` / `InventoryService`** — manages inventory:
 - `GetAll()` / `GetById(Guid)` / `GetByName(string)` — use the repository's `*WithDetails` variants (eager-load `Definition`)
+- `GetExpiring(int days)` — converts `days` into a `DateOnly` threshold (`UtcNow.AddDays(days)`) and delegates to `IStockItemRepository.GetExpiring`
 - `Add(AddStockItemCommand)` — looks up a `ProductDefinition` by name and links it automatically if one exists; returns the created `StockItem`
 - `Update(ModifyStockItemCommand)` — looks up the item by `Id` (`StockItemNotFoundException` if missing), updates name/amount/location/expiration date
 - `Delete(Guid)` — looks up the item, deletes it
@@ -197,7 +200,7 @@ Both use `AsNoTracking()` on reads. `PostgresStockItemRepository` additionally o
 
 #### KitchenDbContextFactory
 
-`IDesignTimeDbContextFactory<KitchenDbContext>` — lets the EF Core CLI (`dotnet ef migrations add ...`) create a `DbContext` without running the app. The connection string is hardcoded in this class, independent of `appsettings.json` — used only at design time, never at runtime.
+`IDesignTimeDbContextFactory<KitchenDbContext>` — lets the EF Core CLI (`dotnet ef migrations add ...`) create a `DbContext` without running the app. Since there's no DI container at design time, it reads `database:ConnectionString` itself via a standalone `ConfigurationBuilder` (`AddUserSecrets` with the same `UserSecretsId` as `Kitchen.Api.csproj`, plus environment variables), throwing a clear `InvalidOperationException` if the secret isn't set. No connection string is hardcoded anymore.
 
 #### DatabaseInitBackgroundService
 
@@ -243,6 +246,7 @@ DTOs accepted from the HTTP request body. Controllers map each one directly into
 | GET | `/` | `_inventoryService.GetAll()` |
 | GET | `/{id:guid}` | `_inventoryService.GetById(id)` or 404 |
 | GET | `/{name}` | `_inventoryService.GetByName(name)` or 404 (if the collection is empty) |
+| GET | `/expiring?days={n}` | `_inventoryService.GetExpiring(days)`, default `days = 7`; always `200` (empty array if none match) |
 | POST | `/` | Builds an `AddStockItemCommand`, calls `Add()`, returns 201 with the created item and a `Location` header pointing at `GET /{id:guid}` |
 | PUT | `/{id:guid}` | Builds a `ModifyStockItemCommand`, calls `Update()`, returns 204 |
 | DELETE | `/{id:guid}` | Calls `Delete()`, returns 204 |

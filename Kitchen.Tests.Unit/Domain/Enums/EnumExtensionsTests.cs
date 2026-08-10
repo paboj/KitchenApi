@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using FluentAssertions;
+using AwesomeAssertions;
 using Kitchen.Core.Domain.Enums;
 
 namespace Kitchen.Tests.Unit.Domain.Enums

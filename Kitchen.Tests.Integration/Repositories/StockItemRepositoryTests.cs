@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Kitchen.Application.Commands;
 using Kitchen.Application.Services;
 using Kitchen.Core.Domain.Entities;

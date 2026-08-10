@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Kitchen.Core.Domain.Exceptions;
 using Kitchen.Core.ValueObjects;
 

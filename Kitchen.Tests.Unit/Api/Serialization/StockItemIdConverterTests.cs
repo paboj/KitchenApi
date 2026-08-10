@@ -1,5 +1,5 @@
 using System.Text.Json;
-using FluentAssertions;
+using AwesomeAssertions;
 using Kitchen.Core.ValueObjects;
 using Xunit;
 

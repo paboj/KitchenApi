@@ -1,5 +1,5 @@
 using System.Text.Json;
-using FluentAssertions;
+using AwesomeAssertions;
 using Kitchen.Core.Domain.Enums;
 using Kitchen.Core.Domain.Exceptions;
 using Xunit;

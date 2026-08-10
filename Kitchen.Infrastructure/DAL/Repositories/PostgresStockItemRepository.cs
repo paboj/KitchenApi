@@ -31,6 +31,12 @@ namespace Kitchen.Infrastructure.DAL.Repositories
            .Where(x => x.Name == new ProductName(name))
            .ToListAsync();
 
+        public async Task<IEnumerable<StockItem>> GetExpiring(DateOnly threshold)
+           => await _dbContext.StockItems
+           .AsNoTracking()
+           .Where(x => x.ExpirationDate <= threshold)
+           .ToListAsync();
+
         public async Task Add(StockItem stockItem)
         {
             // stockItem.Definition (if any) was loaded with AsNoTracking, so the

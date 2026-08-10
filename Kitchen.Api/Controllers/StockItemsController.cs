@@ -35,6 +35,14 @@ public class StockItemsController : ControllerBase
         return Ok(stockitems);
     }
 
+    [HttpGet("expiring")]
+    public async Task<IActionResult> GetExpiring([FromQuery]int days = 7)
+    {
+        var stockitems = await _inventoryService.GetExpiring(days);
+
+        return Ok(stockitems);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateStockItemRequest request)
     {

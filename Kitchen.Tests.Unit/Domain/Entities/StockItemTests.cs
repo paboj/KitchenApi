@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
 using Kitchen.Core.Domain.Exceptions;

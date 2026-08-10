@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Kitchen.Application.Commands;
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Enums;
@@ -11,6 +11,9 @@ namespace Kitchen.Tests.Unit.Services
 {
     public class InventoryServiceTests
     {
+        private const int ValidExpiringDays = 4;
+        private static readonly DateOnly ValidExpiringDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(ValidExpiringDays));
+
         private readonly Mock<IStockItemRepository> _stockItemRepositoryMock;
         private readonly Mock<IProductDefinitionRepository> _productDefinitionRepositoryMock;
         private readonly InventoryService _service;
@@ -56,6 +59,42 @@ namespace Kitchen.Tests.Unit.Services
 
             // Act
             var result = await _service.GetByName("NonExistent");
+
+            // Assert
+            result.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task GetExpiring_ShouldConvertDaysToUtcThreshold_AndReturnMatchingStockItems()
+        {
+            // Arrange
+            IEnumerable<StockItem> expectedStockItems = new List<StockItem>
+            {
+                new StockItem("Milk", 1, StorageLocation.Fridge, null, ValidExpiringDate)
+            };
+
+            _stockItemRepositoryMock
+                .Setup(repo => repo.GetExpiring(ValidExpiringDate))
+                .ReturnsAsync(expectedStockItems);
+
+            // Act
+            var result = await _service.GetExpiring(ValidExpiringDays);
+
+            // Assert
+            result.Should().Equal(expectedStockItems);
+            _stockItemRepositoryMock.Verify(repo => repo.GetExpiring(ValidExpiringDate), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetExpiring_ShouldReturnEmpty_WhenNothingIsExpiring()
+        {
+            // Arrange
+            _stockItemRepositoryMock
+                .Setup(repo => repo.GetExpiring(It.IsAny<DateOnly>()))
+                .ReturnsAsync(Enumerable.Empty<StockItem>());
+
+            // Act
+            var result = await _service.GetExpiring(ValidExpiringDays);
 
             // Assert
             result.Should().BeEmpty();

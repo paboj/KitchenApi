@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Kitchen.Application.Commands;
 using Kitchen.Api.Requests;
 using Kitchen.Application.Services;
@@ -16,6 +16,7 @@ namespace Kitchen.Tests.Unit.Api.Controllers
         private const string ValidName2 = "Cebula";
         private const int ValidAmount = 5;
         private const StorageLocation ValidLocation = StorageLocation.Fridge;
+        private const int ValidExpiringDays = 7;
 
         private readonly Mock<IInventoryService> _inventoryServiceMock;
         private readonly StockItemsController _controller;
@@ -137,6 +138,51 @@ namespace Kitchen.Tests.Unit.Api.Controllers
             var response = await _controller.Get("Nieznany");
 
             response.Should().BeOfType<NotFoundResult>();
+        }
+
+        #endregion
+
+        #region GetExpiring
+
+        [Fact]
+        public async Task GetExpiring_ShouldReturnOk_WithStockItems()
+        {
+            var expected = new List<StockItem> { new(ValidName, ValidAmount, ValidLocation, null) };
+
+            _inventoryServiceMock
+                .Setup(s => s.GetExpiring(ValidExpiringDays))
+                .ReturnsAsync(expected);
+
+            var response = await _controller.GetExpiring(ValidExpiringDays);
+
+            var result = response.Should().BeOfType<OkObjectResult>().Subject;
+            result.Value.Should().BeEquivalentTo(expected);
+            _inventoryServiceMock.Verify(s => s.GetExpiring(ValidExpiringDays), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetExpiring_ShouldDefaultToSevenDays_WhenDaysNotProvided()
+        {
+            _inventoryServiceMock
+                .Setup(s => s.GetExpiring(It.IsAny<int>()))
+                .ReturnsAsync(Enumerable.Empty<StockItem>());
+
+            await _controller.GetExpiring();
+
+            _inventoryServiceMock.Verify(s => s.GetExpiring(ValidExpiringDays), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetExpiring_ShouldReturnOk_WithEmptyList_WhenNoneAreExpiring()
+        {
+            _inventoryServiceMock
+                .Setup(s => s.GetExpiring(It.IsAny<int>()))
+                .ReturnsAsync(Enumerable.Empty<StockItem>());
+
+            var response = await _controller.GetExpiring(ValidExpiringDays);
+
+            var result = response.Should().BeOfType<OkObjectResult>().Subject;
+            result.Value.Should().BeEquivalentTo(Enumerable.Empty<StockItem>());
         }
 
         #endregion

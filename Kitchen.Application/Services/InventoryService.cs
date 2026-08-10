@@ -1,8 +1,8 @@
 ﻿using Kitchen.Application.Commands;
+using Kitchen.Application.Services;
 using Kitchen.Core.Domain.Entities;
 using Kitchen.Core.Domain.Exceptions;
 using Kitchen.Core.Repositories;
-using Kitchen.Application.Services;
 
 internal class InventoryService : IInventoryService
 {
@@ -28,6 +28,14 @@ internal class InventoryService : IInventoryService
     public async Task<StockItem?> GetById(Guid id) => await _inventoryRepository.GetByIdWithDetails(id);
 
     public async Task<IEnumerable<StockItem>> GetByName(string name) => await _inventoryRepository.GetByNameWithDetails(name);
+
+    public async Task<IEnumerable<StockItem>> GetExpiring(int days)
+    {
+        DateOnly threshold = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(days));
+        var expiringStockItems = await _inventoryRepository.GetExpiring(threshold);
+
+        return expiringStockItems;
+    }
 
     public async Task<StockItem> Add(AddStockItemCommand command)
     {

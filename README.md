@@ -88,15 +88,13 @@ docker run --name kitchen-api-db \
 
 ### 3. Configure the connection string
 
-In `appsettings.json` (or via environment variables):
+`appsettings.json` ships with an empty `database:ConnectionString` on purpose — the real value lives in local user-secrets, not in a tracked file (avoids committing even a local-only credential):
 
-```json
-{
-  "database": {
-    "ConnectionString": "Host=localhost;Database=KitchenDb;Username=postgres;Password=postgres"
-  }
-}
+```bash
+dotnet user-secrets set "database:ConnectionString" "Host=localhost;Database=KitchenDb;Username=postgres;Password=postgres" --project Kitchen.Api
 ```
+
+One-time setup per machine — picked up automatically in `Development`. `KitchenDbContextFactory` (used by the EF Core CLI) reads the same secret directly and throws a clear error if it isn't set. More commands: [docs/runbook.md](docs/runbook.md).
 
 ### 4. Run the application
 
@@ -126,7 +124,7 @@ dotnet ef migrations add <MigrationName> --project Kitchen.Infrastructure --star
 
 | Key | Description | Default value |
 |---|---|---|
-| `database:ConnectionString` | PostgreSQL connection string | `Host=localhost;Database=KitchenDb;Username=postgres;Password=postgres` |
+| `database:ConnectionString` | PostgreSQL connection string | *(empty in `appsettings.json` — set via `dotnet user-secrets`, see above)* |
 | `Logging:LogLevel:Default` | Logging level | `Information` |
 
 Detailed errors (`DetailedErrors: true`) are enabled in the `Development` environment.
@@ -144,6 +142,7 @@ Base URL: `http://localhost:5099/api`
 | `GET` | `/api/stockitems` | Get all inventory items (with the linked `ProductDefinition`, if one exists) |
 | `GET` | `/api/stockitems/{id:guid}` | Get an item by `Id` — `404` if it doesn't exist |
 | `GET` | `/api/stockitems/{name}` | Get **all** items with the given name — `404` if there are no results |
+| `GET` | `/api/stockitems/expiring?days={n}` | Get items expiring within `n` days (default `7`) |
 | `POST` | `/api/stockitems` | Add a new item to inventory — `201 Created` |
 | `PUT` | `/api/stockitems/{id:guid}` | Update an item by `Id` — `204 No Content` |
 | `DELETE` | `/api/stockitems/{id:guid}` | Delete an item by `Id` — `204 No Content` |
@@ -176,7 +175,7 @@ All three have a dedicated `JsonConverter` — each accepts its English name or 
 
 ### Value Objects
 
-- **`ProductName`** — product name; can't be empty or start with a digit; has its own `JsonConverter`, so it serializes as a plain string
+- **`ProductName`** — product name; can't be empty or start with a digit; **normalized to lowercase** on construction (`ToLowerInvariant()`) — `"Mleko"` and `"MLEKO"` are the same name and both come back as `"mleko"`; has its own `JsonConverter`, so it serializes as a plain string
 - **`StockItemId`** — a GUID identifying an inventory item; also has its own `JsonConverter`, serializing as a plain GUID string
 
 ---
@@ -250,9 +249,11 @@ Kitchen.Core/
 │   │   └── UnitType.cs
 │   └── Exceptions/
 │       ├── KitchenApiException.cs   # base domain exception
-│       └── (derived exceptions, incl. ProductDefinitionNotFoundException, UnknownCategoryException)
+│       ├── Catalog/    # ProductDefinitionNotFoundException, ProductDefinitionAlreadyExistsException
+│       ├── Inventory/  # StockItemNotFoundException
+│       └── Validation/ # InvalidProductNameException, IncorrectAmountException, UnknownLocationException, UnknownCategoryException, UnknownUnitTypeException
 ├── Repositories/
-│   ├── IStockItemRepository.cs         # GetAll/GetById/GetByName + WithDetails variants
+│   ├── IStockItemRepository.cs         # GetAll/GetById/GetByName/GetExpiring + WithDetails variants
 │   └── IProductDefinitionRepository.cs
 └── ValueObjects/
     ├── ProductName.cs
